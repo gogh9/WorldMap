@@ -21,15 +21,16 @@ export default function CountryPanel({ countryId, onClose, user }) {
       const { data, error } = await supabase
         .from('countries_data')
         .select('*')
-        .eq('link', countryId) // link 열을 고유 ID 저장소로 사용
+        .eq('link', countryId)
         .order('created_at', { ascending: false })
       
       if (error) {
         if (error.code !== '42P01') console.error("Error fetching data:", error)
       } else {
         setSavedData(data || [])
-        if (data && data.length > 0) {
-          setInputCountryName(data[0].country_name)
+        const validNameRecord = data?.find(r => r.country_name && r.country_name.trim() !== '')
+        if (validNameRecord) {
+          setInputCountryName(validNameRecord.country_name)
         } else {
           setInputCountryName('')
         }
@@ -65,7 +66,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
             { 
               country_name: inputCountryName, 
               content: info, 
-              link: countryId, // 고유 ID를 link에 몰래 저장
+              link: countryId,
               author_name: user?.user_metadata?.full_name || '익명 학생',
               author_avatar: user?.user_metadata?.avatar_url || ''
             }
@@ -81,7 +82,6 @@ export default function CountryPanel({ countryId, onClose, user }) {
       }
 
       setInfo('')
-      // setInputCountryName('') -> 삭제 (이름은 그대로 유지)
       setEditingId(null)
       fetchData() // 목록 새로고침
     } catch (err) {
@@ -110,7 +110,6 @@ export default function CountryPanel({ countryId, onClose, user }) {
 
   const cancelEdit = () => {
     setInfo('')
-    // setInputCountryName('') -> 취소해도 이름은 유지
     setEditingId(null)
   }
 
@@ -121,7 +120,6 @@ export default function CountryPanel({ countryId, onClose, user }) {
     }
     try {
       if (savedData.length === 0) {
-        // 아무 기록이 없을 때 '입력'을 누르면 최초 발견자 기록 생성
         const { error } = await supabase.from('countries_data').insert([{
           country_name: inputCountryName,
           content: `${user?.user_metadata?.full_name}님이 이 나라의 이름을 최초로 등록했습니다! 🎉`,
@@ -131,7 +129,6 @@ export default function CountryPanel({ countryId, onClose, user }) {
         }]);
         if (error && error.code !== '42P01') throw error;
       } else {
-        // 이미 기록이 있으면 이름만 일괄 업데이트
         const { error } = await supabase
           .from('countries_data')
           .update({ country_name: inputCountryName })
@@ -146,10 +143,15 @@ export default function CountryPanel({ countryId, onClose, user }) {
     }
   }
 
+  // 시스템이 자동 생성한 '최초 등록' 메시지는 목록에서 숨김
+  const displayRecords = savedData.filter(item => !item.content.includes('이 나라의 이름을 최초로 등록했습니다! 🎉'))
+
   return (
     <aside className="country-panel">
       <div className="panel-header">
-        <div className="header-top-row">
+        {savedData.length > 0 ? (
+          <h2 className="country-title-display">{inputCountryName || '이름 없는 나라'}</h2>
+        ) : (
           <div className="header-input-group">
             <input 
               type="text" 
@@ -159,12 +161,9 @@ export default function CountryPanel({ countryId, onClose, user }) {
               onChange={(e) => setInputCountryName(e.target.value)}
               required
             />
-            <button className="name-apply-btn" onClick={handleNameUpdate}>
-              {savedData.length > 0 ? '수정' : '입력'}
-            </button>
+            <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
           </div>
-          <button onClick={onClose} className="close-btn">닫기</button>
-        </div>
+        )}
         {savedData.length > 0 && (
           <div className="discoverer-info">
             🏅 {savedData[savedData.length - 1].author_name}님이 등록한 나라입니다
@@ -175,9 +174,9 @@ export default function CountryPanel({ countryId, onClose, user }) {
       <div className="panel-content">
         <div className="records-section">
           <h3>우리 반 친구들의 기록</h3>
-          {savedData.length > 0 && (
+          {displayRecords.length > 0 && (
             <div className="records-list">
-              {savedData.map((item) => (
+              {displayRecords.map((item) => (
                 <div key={item.id} className="record-card">
                   <div className="record-header">
                     <div className="record-author">
@@ -191,7 +190,6 @@ export default function CountryPanel({ countryId, onClose, user }) {
                       </div>
                     )}
                   </div>
-                  <h4 className="record-country-title">{item.country_name}</h4>
                   <p className="record-text">{item.content}</p>
                 </div>
               ))}
@@ -217,6 +215,9 @@ export default function CountryPanel({ countryId, onClose, user }) {
                   취소
                 </button>
               )}
+              <button type="button" className="cancel-btn" onClick={onClose}>
+                닫기
+              </button>
             </div>
           </form>
         </div>
