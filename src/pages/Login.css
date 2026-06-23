@@ -14,7 +14,7 @@
   text-align: center;
   animation: slideUp 0.6s ease-out;
   width: 100%;
-  max-width: 450px;
+  max-width: 600px; /* 너비 증가 */
 }
 
 .login-box h1 {
@@ -24,12 +24,14 @@
   font-weight: 800;
   margin-bottom: 10px;
   letter-spacing: -1px;
+  white-space: nowrap; /* 한 줄로 표시 */
 }
 
 .login-box p {
   color: var(--text-secondary);
   margin-bottom: 40px;
   font-size: 1rem;
+  white-space: nowrap; /* 한 줄로 표시 */
 }
 
 .google-login-btn {
