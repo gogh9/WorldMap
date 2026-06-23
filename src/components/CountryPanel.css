@@ -12,12 +12,32 @@
   padding: 20px 25px;
   background-color: white;
   border-bottom: 1px solid #eee;
+  gap: 15px;
 }
 
-.panel-header h2 {
-  margin: 0;
-  color: #00838f;
-  font-size: 1.5rem;
+.header-input-group {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.name-apply-btn {
+  padding: 8px 16px;
+  background-color: #00838f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.name-apply-btn:hover {
+  background-color: #006064;
 }
 
 .close-btn {
@@ -27,6 +47,8 @@
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .close-btn:hover {
@@ -79,7 +101,6 @@
   color: #00838f;
   background: transparent;
   transition: all 0.2s;
-  margin-right: 15px;
 }
 
 .country-name-input-header:focus,

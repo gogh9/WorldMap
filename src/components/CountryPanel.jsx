@@ -109,17 +109,40 @@ export default function CountryPanel({ countryId, onClose, user }) {
     setEditingId(null)
   }
 
+  const handleNameUpdate = async () => {
+    if (!inputCountryName.trim()) {
+      alert("나라 이름을 먼저 입력해주세요!");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('countries_data')
+        .update({ country_name: inputCountryName })
+        .eq('link', countryId);
+        
+      if (error && error.code !== '42P01') throw error;
+      
+      alert("나라 이름이 적용되었습니다! (아래에 기록도 남겨주세요)");
+      fetchData();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   return (
     <aside className="country-panel">
       <div className="panel-header">
-        <input 
-          type="text" 
-          className="country-name-input-header"
-          placeholder="나라 이름을 적어주세요!"
-          value={inputCountryName}
-          onChange={(e) => setInputCountryName(e.target.value)}
-          required
-        />
+        <div className="header-input-group">
+          <input 
+            type="text" 
+            className="country-name-input-header"
+            placeholder="나라 이름을 적어주세요!"
+            value={inputCountryName}
+            onChange={(e) => setInputCountryName(e.target.value)}
+            required
+          />
+          <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
+        </div>
         <button onClick={onClose} className="close-btn">닫기</button>
       </div>
 
