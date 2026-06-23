@@ -73,11 +73,20 @@
   font-family: inherit;
 }
 
-.input-section input[type="url"] {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.file-input-wrapper label {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.file-input-wrapper input[type="file"] {
+  font-size: 0.9rem;
 }
 
 .submit-btn {
@@ -153,16 +162,12 @@
   white-space: pre-wrap;
 }
 
-.record-link {
-  display: inline-block;
-  color: #00838f;
-  text-decoration: none;
-  font-size: 0.9rem;
-  background: #e0f7fa;
-  padding: 4px 8px;
-  border-radius: 4px;
+.record-image {
+  margin-top: 10px;
 }
 
-.record-link:hover {
-  text-decoration: underline;
+.record-image img {
+  max-width: 100%;
+  border-radius: 8px;
+  border: 1px solid #eee;
 }

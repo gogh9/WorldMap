@@ -57,7 +57,7 @@ export default function Home() {
 
   const handleCountryClick = (properties) => {
     console.log("Clicked:", properties)
-    setSelectedCountry(properties.ADMIN || properties.name)
+    setSelectedCountry(properties.koreanName || properties.ADMIN || properties.name)
   }
 
   if (!user) return <div className="loading">로딩 중...</div>
