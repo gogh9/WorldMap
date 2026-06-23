@@ -169,8 +169,8 @@ export default function CountryPanel({ countryId, onClose, user }) {
         {savedData.length > 0 ? (
           <div className="header-title-row">
             <h2 className="country-title-display">{inputCountryName || '이름 없는 나라'}</h2>
-            <div className="discoverer-info">
-              🏅 {savedData[savedData.length - 1].author_name}님이 등록한 나라입니다
+            <div className="discoverer-info" title={`${savedData[savedData.length - 1].author_name}님이 최초로 등록한 나라입니다`}>
+              🏅 {savedData[savedData.length - 1].author_name}
             </div>
             {isAdmin && (
               <button className="admin-name-edit-btn" onClick={handleAdminEditName}>
