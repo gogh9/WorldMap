@@ -2,27 +2,29 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import './CountryPanel.css'
 
-export default function CountryPanel({ countryName, onClose, user }) {
+export default function CountryPanel({ countryId, onClose, user }) {
   const [info, setInfo] = useState('')
-  const [imageFile, setImageFile] = useState(null)
+  const [inputCountryName, setInputCountryName] = useState('')
   const [loading, setLoading] = useState(false)
   const [savedData, setSavedData] = useState([])
+  const [editingId, setEditingId] = useState(null)
+
+  const isAdmin = user?.email === 'gogh999@gmail.com'
 
   // 저장된 데이터 불러오기
   useEffect(() => {
     fetchData()
-  }, [countryName])
+  }, [countryId])
 
   const fetchData = async () => {
     try {
       const { data, error } = await supabase
         .from('countries_data')
         .select('*')
-        .eq('country_name', countryName)
+        .eq('link', countryId) // link 열을 고유 ID 저장소로 사용
         .order('created_at', { ascending: false })
       
       if (error) {
-        // 테이블이 아직 없으면 무시
         if (error.code !== '42P01') console.error("Error fetching data:", error)
       } else {
         setSavedData(data || [])
@@ -34,67 +36,83 @@ export default function CountryPanel({ countryName, onClose, user }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!info.trim()) return
+    if (!info.trim() || !inputCountryName.trim()) return
 
     setLoading(true)
-    let imageUrl = null
 
     try {
-      // 1. 이미지 파일이 있으면 Storage에 먼저 업로드
-      if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop()
-        const fileName = `${Math.random()}.${fileExt}`
-        const filePath = `${countryName}/${fileName}`
-
-        const { error: uploadError } = await supabase.storage
-          .from('country-images')
-          .upload(filePath, imageFile)
-
-        if (uploadError) throw uploadError
-
-        const { data: publicUrlData } = supabase.storage
-          .from('country-images')
-          .getPublicUrl(filePath)
-        
-        imageUrl = publicUrlData.publicUrl
-      }
-
-      // 2. 데이터베이스에 기록 저장
-      const { error } = await supabase
-        .from('countries_data')
-        .insert([
-          { 
-            country_name: countryName, 
-            content: info, 
-            image_url: imageUrl,
-            author_name: user?.user_metadata?.full_name || '익명 학생',
-            author_avatar: user?.user_metadata?.avatar_url || ''
-          }
-        ])
-
-      if (error) {
-        if (error.code === '42P01') {
-          alert('Supabase에 countries_data 테이블이 아직 생성되지 않았습니다!')
-        } else {
-          throw error
-        }
+      if (editingId) {
+        // 수정 모드
+        const { error } = await supabase
+          .from('countries_data')
+          .update({
+            country_name: inputCountryName,
+            content: info
+          })
+          .eq('id', editingId)
+          
+        if (error) throw error
       } else {
-        setInfo('')
-        setImageFile(null)
-        // file input 초기화를 위해 value 초기화가 필요하지만, 간단히 폼 리셋 효과를 위해 냅둠
-        fetchData() // 목록 새로고침
+        // 새 글 작성
+        const { error } = await supabase
+          .from('countries_data')
+          .insert([
+            { 
+              country_name: inputCountryName, 
+              content: info, 
+              link: countryId, // 고유 ID를 link에 몰래 저장
+              author_name: user?.user_metadata?.full_name || '익명 학생',
+              author_avatar: user?.user_metadata?.avatar_url || ''
+            }
+          ])
+
+        if (error) {
+          if (error.code === '42P01') {
+            alert('Supabase에 countries_data 테이블이 아직 생성되지 않았습니다!')
+          } else {
+            throw error
+          }
+        }
       }
+
+      setInfo('')
+      setInputCountryName('')
+      setEditingId(null)
+      fetchData() // 목록 새로고침
     } catch (err) {
-      alert("업로드 중 오류 발생: " + err.message)
+      alert("오류 발생: " + err.message)
     } finally {
       setLoading(false)
     }
   }
 
+  const handleEdit = (item) => {
+    setInputCountryName(item.country_name)
+    setInfo(item.content)
+    setEditingId(item.id)
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("정말 이 기록을 삭제하시겠습니까?")) return
+    try {
+      const { error } = await supabase.from('countries_data').delete().eq('id', id)
+      if (error) throw error
+      fetchData()
+    } catch (err) {
+      alert("삭제 실패: " + err.message)
+    }
+  }
+
+  const cancelEdit = () => {
+    setInfo('')
+    setInputCountryName('')
+    setEditingId(null)
+  }
+
   return (
     <aside className="country-panel">
       <div className="panel-header">
-        <h2>📍 {countryName}</h2>
+        <h2>📍 나라 정보</h2>
         <button onClick={onClose} className="close-btn">닫기</button>
       </div>
 
@@ -107,16 +125,20 @@ export default function CountryPanel({ countryName, onClose, user }) {
             <div className="records-list">
               {savedData.map((item) => (
                 <div key={item.id} className="record-card">
-                  <div className="record-author">
-                    <img src={item.author_avatar} alt="avatar" />
-                    <span>{item.author_name}</span>
-                  </div>
-                  <p className="record-text">{item.content}</p>
-                  {item.image_url && (
-                    <div className="record-image">
-                      <img src={item.image_url} alt="첨부 사진" />
+                  <div className="record-header">
+                    <div className="record-author">
+                      <img src={item.author_avatar} alt="avatar" />
+                      <span>{item.author_name}</span>
                     </div>
-                  )}
+                    {isAdmin && (
+                      <div className="admin-actions">
+                        <button onClick={() => handleEdit(item)} className="edit-btn">수정</button>
+                        <button onClick={() => handleDelete(item.id)} className="delete-btn">삭제</button>
+                      </div>
+                    )}
+                  </div>
+                  <h4 className="record-country-title">{item.country_name}</h4>
+                  <p className="record-text">{item.content}</p>
                 </div>
               ))}
             </div>
@@ -124,25 +146,32 @@ export default function CountryPanel({ countryName, onClose, user }) {
         </div>
 
         <div className="input-section">
-          <h3>새로운 정보 기록하기</h3>
+          <h3>{editingId ? '✏️ 정보 수정하기' : '새로운 정보 기록하기'}</h3>
           <form onSubmit={handleSubmit}>
+            <input 
+              type="text" 
+              className="country-name-input"
+              placeholder="이 나라의 이름을 적어주세요!"
+              value={inputCountryName}
+              onChange={(e) => setInputCountryName(e.target.value)}
+              required
+            />
             <textarea 
               placeholder="이 나라에 대해 조사한 내용을 자유롭게 적어주세요!"
               value={info}
               onChange={(e) => setInfo(e.target.value)}
               required
             />
-            <div className="file-input-wrapper">
-              <label>사진 첨부 (선택):</label>
-              <input 
-                type="file" 
-                accept="image/*"
-                onChange={(e) => setImageFile(e.target.files[0])}
-              />
+            <div className="form-actions">
+              <button type="submit" className="submit-btn" disabled={loading}>
+                {loading ? '저장 중...' : (editingId ? '수정 완료' : '기록 남기기')}
+              </button>
+              {editingId && (
+                <button type="button" className="cancel-btn" onClick={cancelEdit}>
+                  취소
+                </button>
+              )}
             </div>
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? '저장 중...' : '기록 남기기'}
-            </button>
           </form>
         </div>
       </div>

@@ -59,8 +59,7 @@ export default function WorldMap({ onCountryClick }) {
       click: (e) => {
         if (onCountryClick) {
           const iso2 = feature.properties['ISO3166-1-Alpha-2']
-          const koreanName = countries.getName(iso2, 'ko') || feature.properties.name
-          onCountryClick({ ...feature.properties, koreanName })
+          onCountryClick({ ...feature.properties, countryId: iso2 })
         }
       }
     })

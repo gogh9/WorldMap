@@ -56,8 +56,7 @@ export default function Home() {
   }
 
   const handleCountryClick = (properties) => {
-    console.log("Clicked:", properties)
-    setSelectedCountry(properties.koreanName || properties.ADMIN || properties.name)
+    setSelectedCountry(properties.countryId || properties.name)
   }
 
   if (!user) return <div className="loading">로딩 중...</div>
@@ -65,7 +64,6 @@ export default function Home() {
   return (
     <div className="home-container">
       <nav className="navbar">
-        <div className="nav-brand">🗺️ 우리 반 세계지도</div>
         <div className="nav-user">
           <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
           <span className="user-name">{user.user_metadata.full_name}님</span>
@@ -73,6 +71,7 @@ export default function Home() {
             <LogOut size={18} />
           </button>
         </div>
+        <div className="nav-brand">🗺️ 우리 반 세계지도</div>
       </nav>
       
       <main className="content-area">
@@ -82,7 +81,7 @@ export default function Home() {
         
         {selectedCountry && (
           <CountryPanel 
-            countryName={selectedCountry} 
+            countryId={selectedCountry} 
             user={user} 
             onClose={() => setSelectedCountry(null)} 
           />
