@@ -63,30 +63,36 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <nav className="navbar">
-        <div className="nav-user">
-          <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
-          <span className="user-name">{user.user_metadata.full_name}님</span>
-          <button onClick={handleLogout} className="logout-btn" title="로그아웃">
-            <LogOut size={18} />
-          </button>
-        </div>
-        <div className="nav-brand">🗺️ 우리 반 세계지도</div>
-      </nav>
-      
-      <main className="content-area">
-        <div className="map-section">
-          <WorldMap onCountryClick={handleCountryClick} />
-        </div>
-        
-        {selectedCountry && (
-          <CountryPanel 
-            countryId={selectedCountry} 
-            user={user} 
-            onClose={() => setSelectedCountry(null)} 
-          />
-        )}
+      <main className="map-section">
+        <WorldMap onCountryClick={handleCountryClick} />
       </main>
+      
+      <aside className="right-sidebar">
+        <header className="sidebar-header">
+          <div className="nav-brand">🗺️ 우리 반 세계지도</div>
+          <div className="nav-user">
+            <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
+            <span className="user-name">{user.user_metadata.full_name}님</span>
+            <button onClick={handleLogout} className="logout-btn" title="로그아웃">
+              <LogOut size={18} />
+            </button>
+          </div>
+        </header>
+
+        <div className="sidebar-content">
+          {selectedCountry ? (
+            <CountryPanel 
+              countryId={selectedCountry} 
+              user={user} 
+              onClose={() => setSelectedCountry(null)} 
+            />
+          ) : (
+            <div className="empty-selection">
+              <p>👆 지도에서 원하는 나라를 클릭해보세요!</p>
+            </div>
+          )}
+        </div>
+      </aside>
     </div>
   )
 }

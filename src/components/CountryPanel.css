@@ -1,12 +1,8 @@
 .country-panel {
-  width: 400px;
-  background-color: #fafbfc;
-  border-left: 1px solid #e0e0e0;
-  box-shadow: -4px 0 15px rgba(0,0,0,0.05);
-  animation: slideInRight 0.3s ease-out;
   display: flex;
   flex-direction: column;
-  z-index: 1000;
+  height: 100%;
+  background-color: #fafbfc;
 }
 
 .panel-header {
