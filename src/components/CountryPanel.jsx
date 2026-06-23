@@ -112,16 +112,21 @@ export default function CountryPanel({ countryId, onClose, user }) {
   return (
     <aside className="country-panel">
       <div className="panel-header">
-        <h2>📍 나라 정보</h2>
+        <input 
+          type="text" 
+          className="country-name-input-header"
+          placeholder="나라 이름을 적어주세요!"
+          value={inputCountryName}
+          onChange={(e) => setInputCountryName(e.target.value)}
+          required
+        />
         <button onClick={onClose} className="close-btn">닫기</button>
       </div>
 
       <div className="panel-content">
         <div className="records-section">
           <h3>우리 반 친구들의 기록</h3>
-          {savedData.length === 0 ? (
-            <p className="empty-msg">아직 기록된 내용이 없습니다. 첫 번째로 기록을 남겨보세요!</p>
-          ) : (
+          {savedData.length > 0 && (
             <div className="records-list">
               {savedData.map((item) => (
                 <div key={item.id} className="record-card">
@@ -148,14 +153,6 @@ export default function CountryPanel({ countryId, onClose, user }) {
         <div className="input-section">
           <h3>{editingId ? '✏️ 정보 수정하기' : '새로운 정보 기록하기'}</h3>
           <form onSubmit={handleSubmit}>
-            <input 
-              type="text" 
-              className="country-name-input"
-              placeholder="이 나라의 이름을 적어주세요!"
-              value={inputCountryName}
-              onChange={(e) => setInputCountryName(e.target.value)}
-              required
-            />
             <textarea 
               placeholder="이 나라에 대해 조사한 내용을 자유롭게 적어주세요!"
               value={info}

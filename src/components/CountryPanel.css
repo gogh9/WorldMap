@@ -64,18 +64,25 @@
   height: 100px;
   padding: 12px;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  resize: vertical;
-}
-
-.country-name-input {
+.country-name-input-header {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border: 2px dashed transparent;
   border-radius: 8px;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: bold;
+  color: #00838f;
+  background: transparent;
+  transition: all 0.2s;
+  margin-right: 15px;
+}
+
+.country-name-input-header:focus,
+.country-name-input-header:hover {
+  border-color: #b2ebf2;
+  background: #f5fcfd;
+  outline: none;
 }
 
 .form-actions {
