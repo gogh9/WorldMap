@@ -1,0 +1,168 @@
+.country-panel {
+  width: 400px;
+  background-color: #fafbfc;
+  border-left: 1px solid #e0e0e0;
+  box-shadow: -4px 0 15px rgba(0,0,0,0.05);
+  animation: slideInRight 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+}
+
+.panel-header h2 {
+  margin: 0;
+  color: #00838f;
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.panel-content {
+  padding: 25px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.input-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 25px;
+}
+
+.input-section h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.input-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-section textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.input-section input[type="url"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.submit-btn {
+  background-color: #00838f;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #006064;
+}
+
+.submit-btn:disabled {
+  background-color: #b2ebf2;
+  cursor: not-allowed;
+}
+
+.records-section h3 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.empty-msg {
+  color: #888;
+  text-align: center;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+}
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.record-card {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.record-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.record-author img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.record-author span {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.record-text {
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.record-link {
+  display: inline-block;
+  color: #00838f;
+  text-decoration: none;
+  font-size: 0.9rem;
+  background: #e0f7fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.record-link:hover {
+  text-decoration: underline;
+}

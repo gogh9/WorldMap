@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 import WorldMap from '../components/WorldMap'
+import CountryPanel from '../components/CountryPanel'
 import './Home.css'
 
 export default function Home() {
@@ -62,11 +63,11 @@ export default function Home() {
         </div>
         
         {selectedCountry && (
-          <aside className="side-panel">
-            <h2>{selectedCountry}</h2>
-            <p>이곳에 정보 입력 폼이 추가될 예정입니다.</p>
-            <button onClick={() => setSelectedCountry(null)} className="close-btn">닫기</button>
-          </aside>
+          <CountryPanel 
+            countryName={selectedCountry} 
+            user={user} 
+            onClose={() => setSelectedCountry(null)} 
+          />
         )}
       </main>
     </div>
