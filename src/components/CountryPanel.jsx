@@ -136,7 +136,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
           <input 
             type="text" 
             className="country-name-input-header"
-            placeholder="나라 이름을 적어주세요!"
+            placeholder="이 나라의 이름은?"
             value={inputCountryName}
             onChange={(e) => setInputCountryName(e.target.value)}
             required
