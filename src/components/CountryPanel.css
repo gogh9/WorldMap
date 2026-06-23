@@ -70,6 +70,8 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   resize: vertical;
+}
+
 .country-name-input {
   width: 100%;
   padding: 12px;
