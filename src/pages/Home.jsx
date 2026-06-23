@@ -17,8 +17,12 @@ export default function Home() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (mounted) {
-        // 해시(#access_token)가 있으면 Supabase가 로그인 처리 중이므로 리디렉션하지 않음
-        if (!session && !window.location.hash.includes('access_token') && !window.location.hash.includes('error_description')) {
+        // Supabase v2 PKCE(?code=) 또는 Implicit(#access_token=) 방식일 경우 대기
+        const isAuthCallback = window.location.search.includes('code=') || 
+                               window.location.hash.includes('access_token=') || 
+                               window.location.search.includes('error=');
+        
+        if (!session && !isAuthCallback) {
           navigate('/login')
         } else if (session) {
           setUser(session.user)
@@ -30,7 +34,10 @@ export default function Home() {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (mounted) {
-        if (!session && !window.location.hash.includes('access_token')) {
+        const isAuthCallback = window.location.search.includes('code=') || 
+                               window.location.hash.includes('access_token=');
+                               
+        if (!session && !isAuthCallback) {
           navigate('/login')
         } else if (session) {
           setUser(session.user)
