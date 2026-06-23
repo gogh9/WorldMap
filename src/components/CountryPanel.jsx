@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { X, Save, Edit2, Trash2 } from 'lucide-react'
+import { formatDisplayName } from '../utils/nameFormat'
 import './CountryPanel.css'
 
 export default function CountryPanel({ countryId, onClose, user }) {
@@ -169,8 +171,8 @@ export default function CountryPanel({ countryId, onClose, user }) {
         {savedData.length > 0 ? (
           <div className="header-title-row">
             <h2 className="country-title-display">{inputCountryName || '이름 없는 나라'}</h2>
-            <div className="discoverer-info" title={`${savedData[savedData.length - 1].author_name}님이 최초로 등록한 나라입니다`}>
-              🏅 {savedData[savedData.length - 1].author_name}
+            <div className="discoverer-info" title={`${formatDisplayName(savedData[savedData.length - 1].author_name)}님이 최초로 등록한 나라입니다`}>
+              🏅 {formatDisplayName(savedData[savedData.length - 1].author_name)}
             </div>
             {isAdmin && (
               <button className="admin-name-edit-btn" onClick={handleAdminEditName}>
@@ -203,7 +205,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
                   <div className="record-header">
                     <div className="record-author">
                       <img src={item.author_avatar} alt="avatar" />
-                      <span>{item.author_name}</span>
+                      <span>{formatDisplayName(item.author_name)}</span>
                     </div>
                     {isAdmin && (
                       <div className="admin-actions">

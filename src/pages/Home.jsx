@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 import WorldMap from '../components/WorldMap'
 import CountryPanel from '../components/CountryPanel'
+import { formatDisplayName } from '../utils/nameFormat'
 import './Home.css'
 
 export default function Home() {
@@ -72,7 +73,7 @@ export default function Home() {
           <div className="nav-brand">🗺️ 우리 반 세계지도</div>
           <div className="nav-user">
             <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
-            <span className="user-name">{user.user_metadata.full_name}님</span>
+            <span className="user-name">{formatDisplayName(user.user_metadata.full_name)}님</span>
             <button onClick={handleLogout} className="logout-btn" title="로그아웃">
               <LogOut size={18} />
             </button>
