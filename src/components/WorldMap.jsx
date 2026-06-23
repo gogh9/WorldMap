@@ -23,10 +23,10 @@ export default function WorldMap({ onCountryClick }) {
   const style = (feature) => {
     if (mapStyle === 'blank') {
       return {
-        fillColor: '#181818',
+        fillColor: 'white',
         weight: 1,
         opacity: 1,
-        color: '#4d4d4d', // 까만 테두리 대신 다크 테두리
+        color: '#444', // 까만 테두리
         fillOpacity: 1
       }
     }
@@ -44,11 +44,11 @@ export default function WorldMap({ onCountryClick }) {
       mouseover: (e) => {
         const layer = e.target
         layer.setStyle({
-          weight: 2,
-          color: '#1ed760',
+          weight: 3,
+          color: '#00838f',
           opacity: 1,
-          fillColor: '#1ed760',
-          fillOpacity: 0.3
+          fillColor: '#80deea',
+          fillOpacity: 0.4
         })
         layer.bringToFront()
       },
@@ -98,8 +98,8 @@ export default function WorldMap({ onCountryClick }) {
       >
         {mapStyle === 'topo' && (
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>'
+            url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
           />
         )}
         
