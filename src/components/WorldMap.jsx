@@ -12,8 +12,8 @@ export default function WorldMap({ onCountryClick }) {
   const [geoData, setGeoData] = useState(null)
 
   useEffect(() => {
-    // 세계 국가 GeoJSON 데이터 가져오기
-    fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+    // 고해상도(50m) 세계 국가 GeoJSON 데이터 가져오기
+    fetch('https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson')
       .then(response => response.json())
       .then(data => setGeoData(data))
       .catch(err => console.error("GeoJSON 로드 실패:", err))
@@ -48,7 +48,7 @@ export default function WorldMap({ onCountryClick }) {
       },
       click: (e) => {
         if (onCountryClick) {
-          const iso2 = feature.properties['ISO3166-1-Alpha-2']
+          const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
           onCountryClick({ ...feature.properties, countryId: iso2 })
         }
       }
