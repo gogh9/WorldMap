@@ -98,8 +98,8 @@ export default function WorldMap({ onCountryClick }) {
       >
         {mapStyle === 'topo' && (
           <TileLayer
-            attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>'
-            url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://maps.google.com">Google Maps</a>'
+            url="https://mt1.google.com/vt/lyrs=p&hl=ko&x={x}&y={y}&z={z}"
           />
         )}
         
