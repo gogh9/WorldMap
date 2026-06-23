@@ -8,7 +8,17 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+    // URL에 에러가 있는지 확인
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const queryParams = new URLSearchParams(window.location.search);
+    const errorDescription = hashParams.get('error_description') || queryParams.get('error_description');
+    
+    if (errorDescription) {
+      alert("로그인 에러 발생: " + decodeURIComponent(errorDescription).replace(/\+/g, ' '));
+    }
+
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth Event:", event, "Session:", session)
       if (session) {
         navigate('/')
       }

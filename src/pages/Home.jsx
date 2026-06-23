@@ -12,23 +12,34 @@ export default function Home() {
   const [selectedCountry, setSelectedCountry] = useState(null)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate('/login')
-      } else {
-        setUser(session.user)
+    let mounted = true
+
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (mounted) {
+        // 해시(#access_token)가 있으면 Supabase가 로그인 처리 중이므로 리디렉션하지 않음
+        if (!session && !window.location.hash.includes('access_token') && !window.location.hash.includes('error_description')) {
+          navigate('/login')
+        } else if (session) {
+          setUser(session.user)
+        }
       }
-    })
+    }
+
+    checkSession()
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate('/login')
-      } else {
-        setUser(session.user)
+      if (mounted) {
+        if (!session && !window.location.hash.includes('access_token')) {
+          navigate('/login')
+        } else if (session) {
+          setUser(session.user)
+        }
       }
     })
 
     return () => {
+      mounted = false
       authListener.subscription.unsubscribe()
     }
   }, [navigate])
