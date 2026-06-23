@@ -28,6 +28,11 @@ export default function CountryPanel({ countryId, onClose, user }) {
         if (error.code !== '42P01') console.error("Error fetching data:", error)
       } else {
         setSavedData(data || [])
+        if (data && data.length > 0) {
+          setInputCountryName(data[0].country_name)
+        } else {
+          setInputCountryName('')
+        }
       }
     } catch (err) {
       console.error(err)
@@ -76,7 +81,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
       }
 
       setInfo('')
-      setInputCountryName('')
+      // setInputCountryName('') -> 삭제 (이름은 그대로 유지)
       setEditingId(null)
       fetchData() // 목록 새로고침
     } catch (err) {
@@ -105,7 +110,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
 
   const cancelEdit = () => {
     setInfo('')
-    setInputCountryName('')
+    // setInputCountryName('') -> 취소해도 이름은 유지
     setEditingId(null)
   }
 
@@ -115,14 +120,26 @@ export default function CountryPanel({ countryId, onClose, user }) {
       return;
     }
     try {
-      const { error } = await supabase
-        .from('countries_data')
-        .update({ country_name: inputCountryName })
-        .eq('link', countryId);
-        
-      if (error && error.code !== '42P01') throw error;
+      if (savedData.length === 0) {
+        // 아무 기록이 없을 때 '입력'을 누르면 최초 발견자 기록 생성
+        const { error } = await supabase.from('countries_data').insert([{
+          country_name: inputCountryName,
+          content: `${user?.user_metadata?.full_name}님이 이 나라의 이름을 최초로 등록했습니다! 🎉`,
+          link: countryId,
+          author_name: user?.user_metadata?.full_name || '익명 학생',
+          author_avatar: user?.user_metadata?.avatar_url || ''
+        }]);
+        if (error && error.code !== '42P01') throw error;
+      } else {
+        // 이미 기록이 있으면 이름만 일괄 업데이트
+        const { error } = await supabase
+          .from('countries_data')
+          .update({ country_name: inputCountryName })
+          .eq('link', countryId);
+        if (error && error.code !== '42P01') throw error;
+      }
       
-      alert("나라 이름이 적용되었습니다! (아래에 기록도 남겨주세요)");
+      alert("나라 이름이 적용되었습니다!");
       fetchData();
     } catch (err) {
       console.error(err);
@@ -132,18 +149,27 @@ export default function CountryPanel({ countryId, onClose, user }) {
   return (
     <aside className="country-panel">
       <div className="panel-header">
-        <div className="header-input-group">
-          <input 
-            type="text" 
-            className="country-name-input-header"
-            placeholder="이 나라의 이름은?"
-            value={inputCountryName}
-            onChange={(e) => setInputCountryName(e.target.value)}
-            required
-          />
-          <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
+        <div className="header-top-row">
+          <div className="header-input-group">
+            <input 
+              type="text" 
+              className="country-name-input-header"
+              placeholder="이 나라의 이름은?"
+              value={inputCountryName}
+              onChange={(e) => setInputCountryName(e.target.value)}
+              required
+            />
+            <button className="name-apply-btn" onClick={handleNameUpdate}>
+              {savedData.length > 0 ? '수정' : '입력'}
+            </button>
+          </div>
+          <button onClick={onClose} className="close-btn">닫기</button>
         </div>
-        <button onClick={onClose} className="close-btn">닫기</button>
+        {savedData.length > 0 && (
+          <div className="discoverer-info">
+            🏅 {savedData[savedData.length - 1].author_name}님이 등록한 나라입니다
+          </div>
+        )}
       </div>
 
       <div className="panel-content">

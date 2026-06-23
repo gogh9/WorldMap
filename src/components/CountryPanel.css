@@ -7,12 +7,29 @@
 
 .panel-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 25px;
+  flex-direction: column;
+  padding: 20px 25px 15px 25px;
   background-color: white;
   border-bottom: 1px solid #eee;
+  gap: 12px;
+}
+
+.header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
   gap: 15px;
+}
+
+.discoverer-info {
+  font-size: 0.85rem;
+  color: #00838f;
+  background-color: #e0f7fa;
+  padding: 5px 12px;
+  border-radius: 12px;
+  align-self: flex-start;
+  font-weight: 600;
 }
 
 .header-input-group {
