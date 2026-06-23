@@ -1,0 +1,20 @@
+:root {
+  --primary-color: #4CAF50;
+  --primary-hover: #45a049;
+  --bg-color: #f0f4f8;
+  --text-color: #333;
+  --border-radius: 12px;
+  --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Noto Sans KR', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
