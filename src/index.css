@@ -1,15 +1,20 @@
 :root {
-  --primary-color: #4CAF50;
-  --primary-hover: #45a049;
-  --bg-color: #f0f4f8;
-  --text-color: #333;
-  --border-radius: 12px;
-  --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --primary-color: #1ed760;
+  --primary-hover: #1db954;
+  --bg-color: #121212;
+  --bg-surface: #181818;
+  --bg-elevated: #1f1f1f;
+  --text-color: #ffffff;
+  --text-secondary: #b3b3b3;
+  --border-color: #4d4d4d;
+  --border-radius: 6px;
+  --pill-radius: 500px;
+  --box-shadow: rgba(0,0,0,0.5) 0px 8px 24px;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', 'Noto Sans KR', sans-serif;
+  font-family: 'CircularSp', 'Helvetica Neue', helvetica, arial, 'Noto Sans KR', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   -webkit-font-smoothing: antialiased;

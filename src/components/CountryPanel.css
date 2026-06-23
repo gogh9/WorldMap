@@ -2,16 +2,16 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #fafbfc;
+  background-color: var(--bg-color); /* #121212 */
 }
 
 .panel-header {
   display: flex;
   flex-direction: column;
-  padding: 20px 25px 15px 25px;
-  background-color: white;
-  border-bottom: 1px solid #eee;
-  gap: 12px;
+  padding: 24px;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
 }
 
 .header-title-row {
@@ -23,8 +23,8 @@
 
 .country-title-display {
   margin: 0;
-  color: #00838f;
-  font-size: 1.8rem;
+  color: var(--text-color);
+  font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.5px;
   white-space: nowrap;
@@ -33,22 +33,24 @@
 
 .discoverer-info {
   font-size: 0.85rem;
-  color: #00838f;
-  background-color: #e0f7fa;
-  padding: 5px 12px;
-  border-radius: 12px;
-  font-weight: 600;
+  color: #000000;
+  background-color: var(--primary-color); /* Spotify Green */
+  padding: 4px 12px;
+  border-radius: var(--pill-radius);
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .admin-name-edit-btn {
-  background: none;
-  border: 1px solid #00838f;
-  color: #00838f;
-  border-radius: 4px;
-  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  border-radius: var(--pill-radius);
+  padding: 6px 16px;
   font-size: 0.8rem;
-  font-weight: bold;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
   cursor: pointer;
   margin-left: auto;
   transition: all 0.2s;
@@ -56,8 +58,8 @@
 }
 
 .admin-name-edit-btn:hover {
-  background: #00838f;
-  color: white;
+  border-color: var(--text-color);
+  transform: scale(1.04);
 }
 
 .header-input-group {
@@ -69,12 +71,15 @@
 }
 
 .name-apply-btn {
-  padding: 8px 16px;
-  background-color: #00838f;
-  color: white;
+  padding: 12px 24px;
+  background-color: var(--primary-color);
+  color: #000000;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: var(--pill-radius);
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -82,188 +87,220 @@
 }
 
 .name-apply-btn:hover {
-  background-color: #006064;
+  background-color: var(--primary-hover);
+  transform: scale(1.04);
 }
 
 .panel-content {
-  padding: 25px;
+  padding: 24px;
   overflow-y: auto;
   flex: 1;
 }
 
 .input-section {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: var(--bg-surface); /* #181818 */
+  padding: 24px;
+  border-radius: var(--border-radius);
+  box-shadow: rgba(0,0,0,0.3) 0px 8px 8px;
   margin-bottom: 25px;
 }
 
 .input-section h3 {
   margin-top: 0;
-  font-size: 1.1rem;
-  color: #333;
+  font-size: 1.13rem;
+  font-weight: 700;
+  color: var(--text-color);
 }
 
 .input-section form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .input-section textarea {
   width: 100%;
   height: 100px;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 16px;
+  background-color: var(--bg-elevated); /* #1f1f1f */
+  color: var(--text-color);
+  border: none;
+  box-shadow: rgb(18,18,18) 0px 1px 0px, rgb(124,124,124) 0px 0px 0px 1px inset;
+  border-radius: 6px;
   resize: vertical;
+  font-family: inherit;
+}
+
+.input-section textarea:focus {
+  outline: none;
+  box-shadow: rgb(18,18,18) 0px 1px 0px, var(--text-color) 0px 0px 0px 2px inset;
 }
 
 .country-name-input-header {
   width: 100%;
-  padding: 8px 12px;
-  border: 2px dashed transparent;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border: none;
+  box-shadow: rgb(18,18,18) 0px 1px 0px, rgb(124,124,124) 0px 0px 0px 1px inset;
+  border-radius: var(--pill-radius);
   font-family: inherit;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #00838f;
-  background: transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  background: var(--bg-elevated); /* #1f1f1f */
   transition: all 0.2s;
 }
 
 .country-name-input-header:focus,
 .country-name-input-header:hover {
-  border-color: #b2ebf2;
-  background: #f5fcfd;
   outline: none;
+  box-shadow: rgb(18,18,18) 0px 1px 0px, var(--text-color) 0px 0px 0px 2px inset;
 }
 
 .form-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .submit-btn {
   flex: 1;
-  background-color: #00838f;
-  color: white;
+  background-color: var(--primary-color);
+  color: #000000;
   border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: bold;
+  padding: 14px;
+  border-radius: var(--pill-radius);
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .submit-btn:hover {
-  background-color: #006064;
+  background-color: var(--primary-hover);
+  transform: scale(1.04);
 }
 
 .submit-btn:disabled {
-  background-color: #b2ebf2;
+  background-color: var(--bg-elevated);
+  color: var(--text-secondary);
   cursor: not-allowed;
+  transform: scale(1);
 }
 
 .cancel-btn {
   flex: 1;
-  background-color: #e0e0e0;
-  color: #333;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: bold;
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 14px;
+  border-radius: var(--pill-radius);
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .cancel-btn:hover {
-  background-color: #bdbdbd;
+  border-color: var(--text-color);
+  transform: scale(1.04);
 }
 
 .records-section h3 {
-  font-size: 1.1rem;
-  color: #333;
-  margin-bottom: 15px;
+  font-size: 1.13rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 20px;
 }
 
 .empty-msg {
-  color: #888;
+  color: var(--text-secondary);
   text-align: center;
-  padding: 20px;
-  background: white;
-  border-radius: 12px;
+  padding: 40px 20px;
+  background: var(--bg-surface);
+  border-radius: var(--border-radius);
 }
 
 .records-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
 .record-card {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: var(--bg-surface);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: rgba(0,0,0,0.3) 0px 8px 8px;
+  transition: background-color 0.2s;
+}
+
+.record-card:hover {
+  background-color: #252525;
 }
 
 .record-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .record-author {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .record-author img {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
 }
 
 .record-author span {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #555;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-color);
 }
 
 .admin-actions {
   display: flex;
-  gap: 5px;
+  gap: 8px;
 }
 
 .edit-btn, .delete-btn {
-  background: none;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 0.8rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--pill-radius);
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   cursor: pointer;
-  color: #666;
+  color: var(--text-secondary);
+  transition: all 0.2s;
 }
 
 .edit-btn:hover {
-  background: #f5f5f5;
-  color: #1976d2;
-  border-color: #1976d2;
+  color: var(--text-color);
+  border-color: var(--text-color);
+  transform: scale(1.05);
 }
 
 .delete-btn:hover {
-  background: #f5f5f5;
-  color: #d32f2f;
-  border-color: #d32f2f;
+  color: #f3727f;
+  border-color: #f3727f;
+  transform: scale(1.05);
 }
 
 .record-text {
   margin: 0;
   line-height: 1.5;
-  color: #333;
+  color: var(--text-secondary);
   white-space: pre-wrap;
+  font-size: 1rem;
 }
