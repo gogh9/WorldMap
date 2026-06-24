@@ -52,11 +52,7 @@ export default function Dashboard() {
       if (error) {
         if (error.code !== '42P01') console.error("Error fetching data:", error)
       } else {
-        // Filter out system messages
-        const filteredData = (data || []).filter(
-          item => !item.content.includes('이 나라의 이름을 최초로 등록했습니다! 🎉')
-        )
-        setRecords(filteredData)
+        setRecords(data || [])
       }
     } catch (err) {
       console.error(err)
