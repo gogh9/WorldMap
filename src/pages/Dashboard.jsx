@@ -29,6 +29,10 @@ export default function Dashboard() {
           navigate('/login')
           return
         }
+        if (session.user.email !== 'gogh999@gmail.com') {
+          navigate('/')
+          return
+        }
         setUser(session.user)
         fetchRecords()
       }
