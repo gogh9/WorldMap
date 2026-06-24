@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useNavigate, Link } from 'react-router-dom'
-import { Edit2, Trash2, ArrowLeft } from 'lucide-react'
+import { Edit2, Trash2, ArrowLeft, Download } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
 import './Dashboard.css'
 
@@ -141,6 +141,38 @@ export default function Dashboard() {
   
   const displayGroups = Object.values(groupedRecords);
 
+  const handleExportExcel = () => {
+    // CSV 헤더
+    const headers = ['작성자', '나라 이름', '작성 날짜', '조사한 내용'];
+    
+    // CSV 데이터
+    const csvData = filteredRecords.map(record => {
+      const author = formatDisplayName(record.author_name) || '익명 학생';
+      const country = record.country_name || '이름 없는 나라';
+      const date = new Date(record.created_at).toLocaleDateString();
+      // 내용의 줄바꿈과 쉼표 처리 (큰따옴표로 감싸기)
+      const content = `"${(record.content || '').replace(/"/g, '""')}"`;
+      
+      return `${author},${country},${date},${content}`;
+    });
+
+    // BOM(Byte Order Mark) 추가로 엑셀에서 한글 깨짐 방지
+    const csvString = '\uFEFF' + [headers.join(','), ...csvData].join('\n');
+    
+    // Blob 생성 및 다운로드
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', '우리반_세계지도_기록.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+
   if (!user) return null
 
   return (
@@ -153,6 +185,10 @@ export default function Dashboard() {
           </Link>
           <h1>모두의 기록 대시보드</h1>
         </div>
+        <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장">
+          <Download size={18} />
+          <span>엑셀 저장</span>
+        </button>
       </header>
 
       <main className="dashboard-content">

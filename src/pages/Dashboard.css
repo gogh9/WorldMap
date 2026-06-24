@@ -16,6 +16,26 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #1db954;
+  border: none;
+  border-radius: 20px;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-btn:hover {
+  background-color: #1ed760;
+  transform: translateY(-2px);
+}
+
 .dashboard-title {
   display: flex;
   align-items: center;
