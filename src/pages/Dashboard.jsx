@@ -128,10 +128,17 @@ export default function Dashboard() {
       acc[author] = {
         author_name: author,
         author_avatar: record.author_avatar,
-        records: []
+        registrations: [],
+        investigations: []
       };
     }
-    acc[author].records.push(record);
+    
+    if (record.content && record.content.includes('이 나라의 이름을 최초로 등록했습니다! 🎉')) {
+      acc[author].registrations.push(record);
+    } else {
+      acc[author].investigations.push(record);
+    }
+    
     return acc;
   }, {});
   
@@ -139,17 +146,26 @@ export default function Dashboard() {
 
   const handleExportExcel = () => {
     // CSV 헤더
-    const headers = ['작성자', '나라 이름', '작성 날짜', '조사한 내용'];
+    const headers = ['작성자', '구분', '나라 이름', '작성 날짜', '내용'];
     
     // CSV 데이터
     const csvData = filteredRecords.map(record => {
       const author = formatDisplayName(record.author_name) || '익명 학생';
       const country = record.country_name || '이름 없는 나라';
       const date = new Date(record.created_at).toLocaleDateString();
-      // 내용의 줄바꿈과 쉼표 처리 (큰따옴표로 감싸기)
-      const content = `"${(record.content || '').replace(/"/g, '""')}"`;
       
-      return `${author},${country},${date},${content}`;
+      let category = '조사 내용';
+      let cleanContent = record.content || '';
+      
+      if (cleanContent.includes('이 나라의 이름을 최초로 등록했습니다! 🎉')) {
+        category = '나라 이름 등록';
+        cleanContent = '이 나라의 이름을 최초로 등록했습니다! 🎉';
+      }
+      
+      // 내용의 줄바꿈과 쉼표 처리 (큰따옴표로 감싸기)
+      const content = `"${cleanContent.replace(/"/g, '""')}"`;
+      
+      return `${author},${category},${country},${date},${content}`;
     });
 
     // BOM(Byte Order Mark) 추가로 엑셀에서 한글 깨짐 방지
@@ -217,35 +233,70 @@ export default function Dashboard() {
                 </div>
                 
                 <div className="student-records-list">
-                  {group.records.map(record => {
-                    const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name
-
-                    return (
-                      <div key={record.id} className="sub-record-card">
-                        <div className="sub-record-header">
-                          <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
-                          <span className="sub-record-date">
-                            {new Date(record.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        
-                        <div className="sub-record-content">
-                          {record.content}
-                        </div>
-                        
-                        {canEdit && (
-                          <div className="sub-record-actions">
-                            <button onClick={() => handleEditClick(record)} className="action-btn edit-btn">
-                              <Edit2 size={14} /> 수정
-                            </button>
-                            <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn">
-                              <Trash2 size={14} /> 삭제
-                            </button>
-                          </div>
-                        )}
+                  {group.registrations.length > 0 && (
+                    <div className="record-category">
+                      <h4 className="category-title">🎯 등록한 나라</h4>
+                      <div className="category-items">
+                        {group.registrations.map(record => {
+                          const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name;
+                          return (
+                            <div key={record.id} className="sub-record-card">
+                              <div className="sub-record-header">
+                                <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
+                                <span className="sub-record-date">
+                                  {new Date(record.created_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="sub-record-content" style={{ color: '#1db954', fontStyle: 'italic' }}>
+                                최초로 등록했습니다! 🎉
+                              </div>
+                              {canEdit && (
+                                <div className="sub-record-actions">
+                                  <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn">
+                                    <Trash2 size={14} /> 삭제
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
-                    )
-                  })}
+                    </div>
+                  )}
+
+                  {group.investigations.length > 0 && (
+                    <div className="record-category">
+                      <h4 className="category-title">📝 조사한 내용</h4>
+                      <div className="category-items">
+                        {group.investigations.map(record => {
+                          const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name;
+                          return (
+                            <div key={record.id} className="sub-record-card">
+                              <div className="sub-record-header">
+                                <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
+                                <span className="sub-record-date">
+                                  {new Date(record.created_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="sub-record-content">
+                                {record.content}
+                              </div>
+                              {canEdit && (
+                                <div className="sub-record-actions">
+                                  <button onClick={() => handleEditClick(record)} className="action-btn edit-btn">
+                                    <Edit2 size={14} /> 수정
+                                  </button>
+                                  <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn">
+                                    <Trash2 size={14} /> 삭제
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
