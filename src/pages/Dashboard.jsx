@@ -125,6 +125,22 @@ export default function Dashboard() {
     ? records 
     : records.filter(r => r.author_name === filterAuthor)
 
+  // Group records by author
+  const groupedRecords = filteredRecords.reduce((acc, record) => {
+    const author = record.author_name || '익명 학생';
+    if (!acc[author]) {
+      acc[author] = {
+        author_name: author,
+        author_avatar: record.author_avatar,
+        records: []
+      };
+    }
+    acc[author].records.push(record);
+    return acc;
+  }, {});
+  
+  const displayGroups = Object.values(groupedRecords);
+
   if (!user) return null
 
   return (
@@ -155,48 +171,52 @@ export default function Dashboard() {
 
         {loading ? (
           <div className="loading-state">기록을 불러오는 중입니다...</div>
-        ) : filteredRecords.length === 0 ? (
+        ) : displayGroups.length === 0 ? (
           <div className="empty-state">
             <p>아직 작성된 기록이 없습니다.</p>
           </div>
         ) : (
-          <div className="records-grid">
-            {filteredRecords.map(record => {
-              // Can edit if admin, or if it's their own record
-              const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name
-
-              return (
-                <div key={record.id} className="record-card">
-                  <div className="record-header">
-                    <div className="author-info">
-                      <img src={record.author_avatar} alt="avatar" className="author-avatar" />
-                      <div className="author-details">
-                        <span className="author-name">{formatDisplayName(record.author_name)}</span>
-                        <span className="record-country">{record.country_name || '이름 없는 나라'}</span>
-                      </div>
-                    </div>
-                    <span className="record-date">
-                      {new Date(record.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  
-                  <div className="record-content">
-                    {record.content}
-                  </div>
-                  
-                  {canEdit && (
-                    <div className="record-actions">
-                      <button onClick={() => handleEditClick(record)} className="action-btn edit-btn">
-                        <Edit2 size={14} /> 수정
-                      </button>
-                      <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn">
-                        <Trash2 size={14} /> 삭제
-                      </button>
-                    </div>
-                  )}
+          <div className="students-grid">
+            {displayGroups.map(group => (
+              <div key={group.author_name} className="student-group-card">
+                <div className="student-header">
+                  <img src={group.author_avatar} alt="avatar" className="student-avatar" />
+                  <h2 className="student-name">{formatDisplayName(group.author_name)}의 기록</h2>
                 </div>
-              )
-            })}
+                
+                <div className="student-records-list">
+                  {group.records.map(record => {
+                    const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name
+
+                    return (
+                      <div key={record.id} className="sub-record-card">
+                        <div className="sub-record-header">
+                          <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
+                          <span className="sub-record-date">
+                            {new Date(record.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        
+                        <div className="sub-record-content">
+                          {record.content}
+                        </div>
+                        
+                        {canEdit && (
+                          <div className="sub-record-actions">
+                            <button onClick={() => handleEditClick(record)} className="action-btn edit-btn">
+                              <Edit2 size={14} /> 수정
+                            </button>
+                            <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn">
+                              <Trash2 size={14} /> 삭제
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </main>
