@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import countries from 'i18n-iso-countries'
 import koLocale from 'i18n-iso-countries/langs/ko.json'
+import { supabase } from '../lib/supabase'
 import 'leaflet/dist/leaflet.css'
 import './WorldMap.css'
 
@@ -10,6 +11,7 @@ countries.registerLocale(koLocale)
 
 export default function WorldMap({ onCountryClick }) {
   const [geoData, setGeoData] = useState(null)
+  const [registeredCountries, setRegisteredCountries] = useState({})
 
   useEffect(() => {
     // 고해상도(50m) 세계 국가 GeoJSON 데이터 가져오기
@@ -17,6 +19,35 @@ export default function WorldMap({ onCountryClick }) {
       .then(response => response.json())
       .then(data => setGeoData(data))
       .catch(err => console.error("GeoJSON 로드 실패:", err))
+
+    // DB에서 등록된 나라 정보 가져오기
+    const fetchCountries = async () => {
+      const { data, error } = await supabase
+        .from('countries_data')
+        .select('link, country_name')
+      
+      if (data && !error) {
+        const countryMap = {}
+        data.forEach(item => {
+           if (item.country_name) {
+             countryMap[item.link] = item.country_name
+           }
+        })
+        setRegisteredCountries(countryMap)
+      }
+    }
+    fetchCountries()
+
+    // 실시간 업데이트 구독
+    const channel = supabase.channel('countries_data_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'countries_data' }, payload => {
+        fetchCountries()
+      })
+      .subscribe()
+      
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const style = (feature) => {
@@ -30,6 +61,17 @@ export default function WorldMap({ onCountryClick }) {
   }
 
   const onEachFeature = (feature, layer) => {
+    const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
+    const customName = registeredCountries[iso2]
+
+    if (customName) {
+      layer.bindTooltip(customName, {
+        permanent: true,
+        direction: "center",
+        className: "country-label"
+      })
+    }
+
     layer.on({
       mouseover: (e) => {
         const layer = e.target
@@ -48,7 +90,6 @@ export default function WorldMap({ onCountryClick }) {
       },
       click: (e) => {
         if (onCountryClick) {
-          const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
           onCountryClick({ ...feature.properties, countryId: iso2 })
         }
       }
@@ -66,6 +107,7 @@ export default function WorldMap({ onCountryClick }) {
       >
         {geoData && (
           <GeoJSON 
+            key={JSON.stringify(registeredCountries)}
             data={geoData} 
             style={style} 
             onEachFeature={onEachFeature} 

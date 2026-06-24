@@ -19,3 +19,22 @@
 .leaflet-dragging .leaflet-grab {
   cursor: grabbing;
 }
+
+.leaflet-tooltip.country-label {
+  background-color: transparent;
+  border: transparent;
+  box-shadow: none;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9), 1px -1px 3px rgba(0,0,0,0.9), -1px 1px 3px rgba(0,0,0,0.9);
+  padding: 0;
+  pointer-events: none;
+}
+
+.leaflet-tooltip-top.country-label::before,
+.leaflet-tooltip-bottom.country-label::before,
+.leaflet-tooltip-left.country-label::before,
+.leaflet-tooltip-right.country-label::before {
+  display: none;
+}
