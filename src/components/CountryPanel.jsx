@@ -232,7 +232,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
                       <img src={item.author_avatar} alt="avatar" />
                       <span>{formatDisplayName(item.author_name)}</span>
                     </div>
-                    {isAdmin && (
+                    {(isAdmin || item.author_name === user?.user_metadata?.full_name) && (
                       <div className="admin-actions">
                         <button onClick={() => handleEdit(item)} className="edit-btn">수정</button>
                         <button onClick={() => handleDelete(item.id)} className="delete-btn">삭제</button>
