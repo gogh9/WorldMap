@@ -256,9 +256,6 @@ export default function Dashboard() {
                                     </div>
                                   )}
                                 </div>
-                                <span className="sub-record-date">
-                                  {new Date(record.created_at).toLocaleDateString()}
-                                </span>
                               </div>
                             </div>
                           );
@@ -289,9 +286,6 @@ export default function Dashboard() {
                                     </div>
                                   )}
                                 </div>
-                                <span className="sub-record-date">
-                                  {new Date(record.created_at).toLocaleDateString()}
-                                </span>
                               </div>
                               <div className="sub-record-content">
                                 {record.content}
