@@ -259,18 +259,11 @@ export default function CountryPanel({ countryId, onClose, user }) {
               <button type="submit" className="submit-btn" disabled={loading}>
                 {loading ? '저장 중...' : (editingId ? '수정 완료' : '기록')}
               </button>
-              {editingId ? (
+              {editingId && (
                 <button type="button" className="cancel-btn" onClick={cancelEdit}>
                   취소
                 </button>
-              ) : (
-                <button type="button" className="cancel-btn" onClick={() => setInfo('')}>
-                  삭제
-                </button>
               )}
-              <button type="button" className="cancel-btn" onClick={onClose}>
-                닫기
-              </button>
             </div>
           </form>
         </div>
