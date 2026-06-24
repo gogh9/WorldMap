@@ -246,21 +246,20 @@ export default function Dashboard() {
                           return (
                             <div key={record.id} className="sub-record-card">
                               <div className="sub-record-header">
-                                <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
+                                  {canEdit && (
+                                    <div className="sub-record-actions" style={{ marginTop: 0 }}>
+                                      <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn" style={{ flex: 0, padding: '4px 8px', fontSize: '11px' }}>
+                                        <Trash2 size={12} /> 삭제
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                                 <span className="sub-record-date">
                                   {new Date(record.created_at).toLocaleDateString()}
                                 </span>
                               </div>
-                              <div className="sub-record-content" style={{ color: '#1db954', fontStyle: 'italic' }}>
-                                최초로 등록했습니다! 🎉
-                              </div>
-                              {canEdit && (
-                                <div className="sub-record-actions">
-                                  <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn">
-                                    <Trash2 size={14} /> 삭제
-                                  </button>
-                                </div>
-                              )}
                             </div>
                           );
                         })}
@@ -277,7 +276,19 @@ export default function Dashboard() {
                           return (
                             <div key={record.id} className="sub-record-card">
                               <div className="sub-record-header">
-                                <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
+                                  {canEdit && (
+                                    <div className="sub-record-actions" style={{ marginTop: 0 }}>
+                                      <button onClick={() => handleEditClick(record)} className="action-btn edit-btn" style={{ flex: 0, padding: '4px 8px', fontSize: '11px' }}>
+                                        <Edit2 size={12} /> 수정
+                                      </button>
+                                      <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn" style={{ flex: 0, padding: '4px 8px', fontSize: '11px' }}>
+                                        <Trash2 size={12} /> 삭제
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                                 <span className="sub-record-date">
                                   {new Date(record.created_at).toLocaleDateString()}
                                 </span>
@@ -285,16 +296,6 @@ export default function Dashboard() {
                               <div className="sub-record-content">
                                 {record.content}
                               </div>
-                              {canEdit && (
-                                <div className="sub-record-actions">
-                                  <button onClick={() => handleEditClick(record)} className="action-btn edit-btn">
-                                    <Edit2 size={14} /> 수정
-                                  </button>
-                                  <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn">
-                                    <Trash2 size={14} /> 삭제
-                                  </button>
-                                </div>
-                              )}
                             </div>
                           );
                         })}
