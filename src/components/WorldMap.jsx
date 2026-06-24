@@ -51,8 +51,11 @@ export default function WorldMap({ onCountryClick }) {
   }, [])
 
   const style = (feature) => {
+    const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
+    const isRegistered = !!registeredCountries[iso2]
+    
     return {
-      fillColor: 'white',
+      fillColor: isRegistered ? '#d1d5db' : 'white',
       weight: 1,
       opacity: 1,
       color: '#444',
