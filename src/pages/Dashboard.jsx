@@ -202,7 +202,7 @@ export default function Dashboard() {
             <ArrowLeft size={16} />
             지도 화면으로
           </Link>
-          <h1>{isAdmin ? '모두의 기록 대시보드' : '내 기록 모아보기'}</h1>
+          <h1>{isAdmin ? '우리 반 세계지도' : '내 기록 모아보기'}</h1>
         </div>
         <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장">
           <Download size={18} />
