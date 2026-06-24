@@ -10,6 +10,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
   const [loading, setLoading] = useState(false)
   const [savedData, setSavedData] = useState([])
   const [editingId, setEditingId] = useState(null)
+  const [editContent, setEditContent] = useState('')
   const [hasCountryName, setHasCountryName] = useState(false)
 
   const isAdmin = user?.email === 'gogh999@gmail.com'
@@ -52,42 +53,28 @@ export default function CountryPanel({ countryId, onClose, user }) {
     setLoading(true)
 
     try {
-      if (editingId) {
-        // 수정 모드
-        const { error } = await supabase
-          .from('countries_data')
-          .update({
-            country_name: inputCountryName,
-            content: info
-          })
-          .eq('id', editingId)
-          
-        if (error) throw error
-      } else {
-        // 새 글 작성
-        const { error } = await supabase
-          .from('countries_data')
-          .insert([
-            { 
-              country_name: inputCountryName, 
-              content: info, 
-              link: countryId,
-              author_name: user?.user_metadata?.full_name || '익명 학생',
-              author_avatar: user?.user_metadata?.avatar_url || ''
-            }
-          ])
-
-        if (error) {
-          if (error.code === '42P01') {
-            alert('Supabase에 countries_data 테이블이 아직 생성되지 않았습니다!')
-          } else {
-            throw error
+      // 새 글 작성
+      const { error } = await supabase
+        .from('countries_data')
+        .insert([
+          { 
+            country_name: inputCountryName, 
+            content: info, 
+            link: countryId,
+            author_name: user?.user_metadata?.full_name || '익명 학생',
+            author_avatar: user?.user_metadata?.avatar_url || ''
           }
+        ])
+
+      if (error) {
+        if (error.code === '42P01') {
+          alert('Supabase에 countries_data 테이블이 아직 생성되지 않았습니다!')
+        } else {
+          throw error
         }
       }
 
       setInfo('')
-      setEditingId(null)
       fetchData() // 목록 새로고침
     } catch (err) {
       alert("오류 발생: " + err.message)
@@ -97,9 +84,23 @@ export default function CountryPanel({ countryId, onClose, user }) {
   }
 
   const handleEdit = (item) => {
-    setInputCountryName(item.country_name)
-    setInfo(item.content)
+    setEditContent(item.content)
     setEditingId(item.id)
+  }
+
+  const saveEdit = async (id) => {
+    if (!editContent.trim()) return;
+    try {
+      const { error } = await supabase
+        .from('countries_data')
+        .update({ content: editContent })
+        .eq('id', id);
+      if (error) throw error;
+      setEditingId(null);
+      fetchData();
+    } catch (err) {
+      alert("수정 실패: " + err.message);
+    }
   }
 
   const handleDelete = async (id) => {
@@ -111,11 +112,6 @@ export default function CountryPanel({ countryId, onClose, user }) {
     } catch (err) {
       alert("삭제 실패: " + err.message)
     }
-  }
-
-  const cancelEdit = () => {
-    setInfo('')
-    setEditingId(null)
   }
 
   const handleNameUpdate = async () => {
@@ -234,12 +230,41 @@ export default function CountryPanel({ countryId, onClose, user }) {
                     </div>
                     {(isAdmin || item.author_name === user?.user_metadata?.full_name) && (
                       <div className="admin-actions">
-                        <button onClick={() => handleEdit(item)} className="edit-btn">수정</button>
-                        <button onClick={() => handleDelete(item.id)} className="delete-btn">삭제</button>
+                        {editingId === item.id ? (
+                          <>
+                            <button onClick={() => saveEdit(item.id)} className="edit-btn">저장</button>
+                            <button onClick={() => setEditingId(null)} className="delete-btn">취소</button>
+                          </>
+                        ) : (
+                          <>
+                            <button onClick={() => handleEdit(item)} className="edit-btn">수정</button>
+                            <button onClick={() => handleDelete(item.id)} className="delete-btn">삭제</button>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
-                  <p className="record-text">{item.content}</p>
+                  {editingId === item.id ? (
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      style={{ 
+                        width: '100%', 
+                        height: '80px', 
+                        padding: '12px', 
+                        marginTop: '12px', 
+                        borderRadius: '6px', 
+                        background: 'var(--bg-elevated)', 
+                        color: 'var(--text-color)', 
+                        border: '1px solid var(--border-color)', 
+                        resize: 'vertical',
+                        fontFamily: 'inherit',
+                        fontSize: '0.95rem'
+                      }}
+                    />
+                  ) : (
+                    <p className="record-text">{item.content}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -247,7 +272,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
         </div>
 
         <div className="input-section">
-          <h3>{editingId ? '✏️ 정보 수정하기' : '새로운 정보 기록하기'}</h3>
+          <h3>새로운 정보 기록하기</h3>
           <form onSubmit={handleSubmit}>
             <textarea 
               placeholder="이 나라에 대해 조사한 내용을 자유롭게 적어주세요!"
@@ -257,13 +282,8 @@ export default function CountryPanel({ countryId, onClose, user }) {
             />
             <div className="form-actions">
               <button type="submit" className="submit-btn" disabled={loading}>
-                {loading ? '저장 중...' : (editingId ? '수정 완료' : '기록')}
+                {loading ? '저장 중...' : '기록'}
               </button>
-              {editingId && (
-                <button type="button" className="cancel-btn" onClick={cancelEdit}>
-                  취소
-                </button>
-              )}
             </div>
           </form>
         </div>
