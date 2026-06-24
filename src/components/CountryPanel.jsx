@@ -10,6 +10,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
   const [loading, setLoading] = useState(false)
   const [savedData, setSavedData] = useState([])
   const [editingId, setEditingId] = useState(null)
+  const [hasCountryName, setHasCountryName] = useState(false)
 
   const isAdmin = user?.email === 'gogh999@gmail.com'
 
@@ -33,8 +34,10 @@ export default function CountryPanel({ countryId, onClose, user }) {
         const validNameRecord = data?.find(r => r.country_name && r.country_name.trim() !== '')
         if (validNameRecord) {
           setInputCountryName(validNameRecord.country_name)
+          setHasCountryName(true)
         } else {
           setInputCountryName('')
+          setHasCountryName(false)
         }
       }
     } catch (err) {
@@ -162,18 +165,18 @@ export default function CountryPanel({ countryId, onClose, user }) {
     }
   }
 
-  const handleAdminDeleteCountry = async () => {
-    if (!window.confirm("이 나라의 모든 기록이 삭제됩니다. 계속하시겠습니까?")) return;
+  const handleAdminDeleteCountryName = async () => {
+    if (!window.confirm("나라 이름을 초기화하시겠습니까? (학생들의 기록은 유지됩니다)")) return;
     try {
       const { error } = await supabase
         .from('countries_data')
-        .delete()
+        .update({ country_name: '' })
         .eq('link', countryId);
       if (error) throw error;
-      alert("나라가 삭제되었습니다.");
+      alert("나라 이름이 초기화되었습니다.");
       fetchData();
     } catch (err) {
-      alert("삭제 실패: " + err.message);
+      alert("초기화 실패: " + err.message);
     }
   }
 
@@ -183,18 +186,20 @@ export default function CountryPanel({ countryId, onClose, user }) {
   return (
     <aside className="country-panel">
       <div className="panel-header">
-        {savedData.length > 0 ? (
-          <div className="header-title-row">
-            <h2 className="country-title-display">{inputCountryName || '이름 없는 나라'}</h2>
-            <div className="discoverer-info" title={`${formatDisplayName(savedData[savedData.length - 1].author_name)}님이 최초로 등록한 나라입니다`}>
-              🏅 {formatDisplayName(savedData[savedData.length - 1].author_name)}
+        {hasCountryName ? (
+          <div className="header-title-container" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+            <div className="header-title-row" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <h2 className="country-title-display">{inputCountryName}</h2>
+              <div className="discoverer-info" title={`${formatDisplayName(savedData[savedData.length - 1]?.author_name)}님이 최초로 등록한 나라입니다`}>
+                🏅 {formatDisplayName(savedData[savedData.length - 1]?.author_name)}
+              </div>
             </div>
             {isAdmin && (
               <div className="admin-actions-header">
                 <button className="admin-name-edit-btn" onClick={handleAdminEditName}>
                   수정
                 </button>
-                <button className="admin-name-delete-btn" onClick={handleAdminDeleteCountry}>
+                <button className="admin-name-delete-btn" onClick={handleAdminDeleteCountryName}>
                   삭제
                 </button>
               </div>
@@ -254,9 +259,13 @@ export default function CountryPanel({ countryId, onClose, user }) {
               <button type="submit" className="submit-btn" disabled={loading}>
                 {loading ? '저장 중...' : (editingId ? '수정 완료' : '기록 남기기')}
               </button>
-              {editingId && (
+              {editingId ? (
                 <button type="button" className="cancel-btn" onClick={cancelEdit}>
                   취소
+                </button>
+              ) : (
+                <button type="button" className="cancel-btn" onClick={() => setInfo('')}>
+                  삭제
                 </button>
               )}
               <button type="button" className="cancel-btn" onClick={onClose}>
