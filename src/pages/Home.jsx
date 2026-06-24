@@ -74,11 +74,9 @@ export default function Home() {
           <div className="nav-user">
             <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
             <span className="user-name">{formatDisplayName(user.user_metadata.full_name)}</span>
-            {user.email === 'gogh999@gmail.com' && (
-              <button onClick={() => navigate('/dashboard')} className="dashboard-btn" title="대시보드" style={{ background: 'transparent', border: 'none', color: '#a7a7a7', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s', padding: '4px' }} onMouseEnter={(e) => e.currentTarget.style.color = '#fff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a7a7a7'}>
-                <LayoutDashboard size={18} />
-              </button>
-            )}
+            <button onClick={() => navigate('/dashboard')} className="dashboard-btn" title={user.email === 'gogh999@gmail.com' ? "전체 대시보드" : "내 기록 보기"} style={{ background: 'transparent', border: 'none', color: '#a7a7a7', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s', padding: '4px' }} onMouseEnter={(e) => e.currentTarget.style.color = '#fff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a7a7a7'}>
+              <LayoutDashboard size={18} />
+            </button>
             <button onClick={handleLogout} className="logout-btn" title="로그아웃">
               <LogOut size={18} />
             </button>

@@ -29,12 +29,8 @@ export default function Dashboard() {
           navigate('/login')
           return
         }
-        if (session.user.email !== 'gogh999@gmail.com') {
-          navigate('/')
-          return
-        }
         setUser(session.user)
-        fetchRecords()
+        fetchRecords(session.user)
       }
     }
 
@@ -45,13 +41,20 @@ export default function Dashboard() {
     }
   }, [navigate])
 
-  const fetchRecords = async () => {
+  const fetchRecords = async (currentUser = user) => {
+    if (!currentUser) return;
     try {
       setLoading(true)
-      const { data, error } = await supabase
+      let query = supabase
         .from('countries_data')
         .select('*')
         .order('created_at', { ascending: false })
+        
+      if (currentUser.email !== 'gogh999@gmail.com') {
+        query = query.eq('author_name', currentUser.user_metadata?.full_name)
+      }
+      
+      const { data, error } = await query
       
       if (error) {
         if (error.code !== '42P01') console.error("Error fetching data:", error)
@@ -199,7 +202,7 @@ export default function Dashboard() {
             <ArrowLeft size={16} />
             지도 화면으로
           </Link>
-          <h1>모두의 기록 대시보드</h1>
+          <h1>{isAdmin ? '모두의 기록 대시보드' : '내 기록 모아보기'}</h1>
         </div>
         <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장">
           <Download size={18} />
