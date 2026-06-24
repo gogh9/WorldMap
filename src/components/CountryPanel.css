@@ -52,13 +52,38 @@
   text-transform: uppercase;
   letter-spacing: 1.4px;
   cursor: pointer;
-  margin-left: auto;
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .admin-name-edit-btn:hover {
   border-color: var(--text-color);
+  transform: scale(1.04);
+}
+
+.admin-actions-header {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.admin-name-delete-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: #f3727f;
+  border-radius: var(--pill-radius);
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.admin-name-delete-btn:hover {
+  border-color: #f3727f;
   transform: scale(1.04);
 }
 

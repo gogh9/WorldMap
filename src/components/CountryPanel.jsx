@@ -162,6 +162,21 @@ export default function CountryPanel({ countryId, onClose, user }) {
     }
   }
 
+  const handleAdminDeleteCountry = async () => {
+    if (!window.confirm("이 나라의 모든 기록이 삭제됩니다. 계속하시겠습니까?")) return;
+    try {
+      const { error } = await supabase
+        .from('countries_data')
+        .delete()
+        .eq('link', countryId);
+      if (error) throw error;
+      alert("나라가 삭제되었습니다.");
+      fetchData();
+    } catch (err) {
+      alert("삭제 실패: " + err.message);
+    }
+  }
+
   // 시스템이 자동 생성한 '최초 등록' 메시지는 목록에서 숨김
   const displayRecords = savedData.filter(item => !item.content.includes('이 나라의 이름을 최초로 등록했습니다! 🎉'))
 
@@ -175,9 +190,14 @@ export default function CountryPanel({ countryId, onClose, user }) {
               🏅 {formatDisplayName(savedData[savedData.length - 1].author_name)}
             </div>
             {isAdmin && (
-              <button className="admin-name-edit-btn" onClick={handleAdminEditName}>
-                수정
-              </button>
+              <div className="admin-actions-header">
+                <button className="admin-name-edit-btn" onClick={handleAdminEditName}>
+                  수정
+                </button>
+                <button className="admin-name-delete-btn" onClick={handleAdminDeleteCountry}>
+                  삭제
+                </button>
+              </div>
             )}
           </div>
         ) : (
