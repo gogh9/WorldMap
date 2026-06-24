@@ -65,7 +65,7 @@
 .admin-actions-header {
   margin-left: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
 }
 
