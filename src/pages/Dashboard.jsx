@@ -208,18 +208,7 @@ export default function Dashboard() {
       </header>
 
       <main className="dashboard-content">
-        <div className="filters">
-          <select 
-            className="filter-select"
-            value={filterAuthor}
-            onChange={(e) => setFilterAuthor(e.target.value)}
-          >
-            <option value="ALL">모든 학생</option>
-            {authors.map(author => (
-              <option key={author} value={author}>{formatDisplayName(author)}</option>
-            ))}
-          </select>
-        </div>
+
 
         {loading ? (
           <div className="loading-state">기록을 불러오는 중입니다...</div>
