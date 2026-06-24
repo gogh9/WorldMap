@@ -196,10 +196,10 @@ export default function CountryPanel({ countryId, onClose, user }) {
             </div>
             {isAdmin && (
               <div className="admin-actions-header">
-                <button className="admin-name-edit-btn" onClick={handleAdminEditName}>
+                <button className="edit-btn" onClick={handleAdminEditName}>
                   수정
                 </button>
-                <button className="admin-name-delete-btn" onClick={handleAdminDeleteCountryName}>
+                <button className="delete-btn" onClick={handleAdminDeleteCountryName}>
                   삭제
                 </button>
               </div>
