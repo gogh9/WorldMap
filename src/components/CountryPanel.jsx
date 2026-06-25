@@ -192,9 +192,9 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       <div className="panel-header">
         {hasCountryName ? (
           <div className="header-title-container" style={{ display: 'flex', alignItems: 'flex-start', width: '100%', justifyContent: 'space-between' }}>
-            <div className="header-title-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+            <div className="header-title-row" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
               <h2 className="country-title-display">{inputCountryName}</h2>
-              <div className="discoverer-info" title={`${formatDisplayName(savedData[savedData.length - 1]?.author_name)}님이 최초로 등록한 나라입니다`}>
+              <div className="discoverer-info" title={`${formatDisplayName(savedData[savedData.length - 1]?.author_name)}님이 최초로 등록한 나라입니다`} style={{ whiteSpace: 'nowrap' }}>
                 🏅 {formatDisplayName(savedData[savedData.length - 1]?.author_name)}
               </div>
             </div>
