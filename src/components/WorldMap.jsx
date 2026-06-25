@@ -169,7 +169,9 @@ export default function WorldMap({ onCountryClick, mapId }) {
           )}
 
           {/* 등록된 국가 이름 표시 */}
-          {centroids.map(({ iso2, name, coordinates }) => {
+          {[...centroids]
+            .sort((a, b) => (a.iso2 === hoveredCountry ? 1 : b.iso2 === hoveredCountry ? -1 : 0))
+            .map(({ iso2, name, coordinates }) => {
             const isHovered = hoveredCountry === iso2;
             return (
               <Marker key={iso2} coordinates={coordinates}>
@@ -179,7 +181,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
                   style={{
                     fontFamily: "system-ui",
                     fill: isHovered ? "#ffeb3b" : "#fff",
-                    fontSize: isHovered ? 12 : 6,
+                    fontSize: isHovered ? 8 : 6,
                     fontWeight: 800,
                     pointerEvents: "none",
                     textShadow: "1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9), 1px -1px 3px rgba(0,0,0,0.9), -1px 1px 3px rgba(0,0,0,0.9)",
