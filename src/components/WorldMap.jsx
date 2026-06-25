@@ -11,6 +11,12 @@ countries.registerLocale(koLocale)
 
 const geoUrl = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson"
 
+const mapWidth = 800;
+const mapHeight = 600;
+const projection = geoNaturalEarth1()
+  .translate([mapWidth / 2, mapHeight / 2])
+  .scale(160)
+
 export default function WorldMap({ onCountryClick, mapId }) {
   const [geoData, setGeoData] = useState(null)
   const [registeredCountries, setRegisteredCountries] = useState({})
@@ -71,12 +77,6 @@ export default function WorldMap({ onCountryClick, mapId }) {
       }
     }).filter(d => d.name) // 이름이 있는 곳만 마커용으로 반환
   }, [geoData, registeredCountries])
-
-  const mapWidth = 800;
-  const mapHeight = 600;
-  const projection = geoNaturalEarth1()
-    .translate([mapWidth / 2, mapHeight / 2])
-    .scale(160)
 
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
