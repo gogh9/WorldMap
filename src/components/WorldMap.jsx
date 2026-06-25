@@ -67,7 +67,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
   // 중심점 계산
   const centroids = useMemo(() => {
     if (!geoData) return []
-    return geoData.features.map(feature => {
+    const list = geoData.features.map(feature => {
       const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
       const customName = registeredCountries[iso2]
       return {
@@ -76,6 +76,43 @@ export default function WorldMap({ onCountryClick, mapId }) {
         coordinates: geoCentroid(feature)
       }
     }).filter(d => d.name) // 이름이 있는 곳만 마커용으로 반환
+
+    // 글씨가 겹치지 않도록 밀어내는 로직 (간단한 충돌 해결)
+    for (let i = 0; i < 50; i++) {
+      let moved = false;
+      for (let j = 0; j < list.length; j++) {
+        for (let k = j + 1; k < list.length; k++) {
+          const dx = list[j].coordinates[0] - list[k].coordinates[0];
+          const dy = list[j].coordinates[1] - list[k].coordinates[1];
+          const avgLat = (list[j].coordinates[1] + list[k].coordinates[1]) / 2;
+          const cosLat = Math.max(0.2, Math.cos(avgLat * Math.PI / 180));
+          
+          // 폰트 크기(6)에 비례하는 필요 위경도 거리 (조정 가능)
+          const minDx = ((list[j].name.length + list[k].name.length) * 0.7) / cosLat;
+          const minDy = 2.0;
+
+          if (Math.abs(dx) < minDx && Math.abs(dy) < minDy) {
+            const overlapX = minDx - Math.abs(dx);
+            const overlapY = minDy - Math.abs(dy);
+            
+            // 더 적게 겹친 방향으로 살짝씩 밀어냄
+            if (overlapX < overlapY) {
+              const push = (overlapX / 2 + 0.05) * Math.sign(dx || 1);
+              list[j].coordinates[0] += push;
+              list[k].coordinates[0] -= push;
+            } else {
+              const push = (overlapY / 2 + 0.05) * Math.sign(dy || 1);
+              list[j].coordinates[1] += push;
+              list[k].coordinates[1] -= push;
+            }
+            moved = true;
+          }
+        }
+      }
+      if (!moved) break;
+    }
+    
+    return list;
   }, [geoData, registeredCountries])
 
   return (
