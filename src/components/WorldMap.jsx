@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from 'react-simple-maps'
+import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker, Sphere, Graticule } from 'react-simple-maps'
 import { geoCentroid, geoEqualEarth } from 'd3-geo'
 import countries from 'i18n-iso-countries'
 import koLocale from 'i18n-iso-countries/langs/ko.json'
@@ -79,9 +79,11 @@ export default function WorldMap({ onCountryClick, mapId }) {
     .scale(160)
 
   return (
-    <div className="map-wrapper">
-      <ComposableMap projection={projection} width={mapWidth} height={mapHeight} style={{ width: "100%", height: "100%", background: "#aad3df", borderRadius: "8px" }}>
+    <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
+      <ComposableMap projection={projection} width={mapWidth} height={mapHeight} style={{ width: "100%", height: "100%" }}>
         <ZoomableGroup center={[0, 0]} zoom={1} minZoom={1} maxZoom={10}>
+          <Sphere stroke="#80deea" strokeWidth={1} fill="#aad3df" />
+          <Graticule stroke="#b2ebf2" strokeWidth={0.5} />
           {geoData && (
             <Geographies geography={geoData}>
               {({ geographies }) =>
