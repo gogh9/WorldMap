@@ -43,7 +43,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           setInputCountryName(validNameRecord.country_name)
           setHasCountryName(true)
         } else {
-          setInputCountryName(validNameRecord?.country_name || '')
+          setInputCountryName('')
           setHasCountryName(false)
         }
 
