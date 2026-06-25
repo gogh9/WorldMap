@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
+import { useEffect, useState, useMemo } from 'react'
+import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from 'react-simple-maps'
+import { geoCentroid } from 'd3-geo'
 import countries from 'i18n-iso-countries'
 import koLocale from 'i18n-iso-countries/langs/ko.json'
 import { supabase } from '../lib/supabase'
-import 'leaflet/dist/leaflet.css'
 import './WorldMap.css'
 
 // 한국어 번역 로케일 등록
 countries.registerLocale(koLocale)
+
+const geoUrl = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson"
 
 export default function WorldMap({ onCountryClick, mapId }) {
   const [geoData, setGeoData] = useState(null)
@@ -15,7 +17,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
 
   useEffect(() => {
     // 고해상도(50m) 세계 국가 GeoJSON 데이터 가져오기
-    fetch('https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson')
+    fetch(geoUrl)
       .then(response => response.json())
       .then(data => setGeoData(data))
       .catch(err => console.error("GeoJSON 로드 실패:", err))
@@ -56,73 +58,89 @@ export default function WorldMap({ onCountryClick, mapId }) {
     }
   }, [mapId])
 
-  const style = (feature) => {
-    const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
-    const isRegistered = !!registeredCountries[iso2]
-    
-    return {
-      fillColor: isRegistered ? '#d1d5db' : 'white',
-      weight: 1,
-      opacity: 1,
-      color: '#444',
-      fillOpacity: 1
-    }
-  }
-
-  const onEachFeature = (feature, layer) => {
-    const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
-    const customName = registeredCountries[iso2]
-
-    if (customName) {
-      layer.bindTooltip(customName, {
-        permanent: true,
-        direction: "center",
-        className: "country-label"
-      })
-    }
-
-    layer.on({
-      mouseover: (e) => {
-        const layer = e.target
-        layer.setStyle({
-          weight: 3,
-          color: '#00838f',
-          opacity: 1,
-          fillColor: '#80deea',
-          fillOpacity: 0.4
-        })
-        layer.bringToFront()
-      },
-      mouseout: (e) => {
-        const layer = e.target
-        layer.setStyle(style(feature))
-      },
-      click: (e) => {
-        if (onCountryClick) {
-          onCountryClick({ ...feature.properties, countryId: iso2 })
-        }
+  // 중심점 계산
+  const centroids = useMemo(() => {
+    if (!geoData) return []
+    return geoData.features.map(feature => {
+      const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
+      const customName = registeredCountries[iso2]
+      return {
+        iso2,
+        name: customName,
+        coordinates: geoCentroid(feature)
       }
-    })
-  }
+    }).filter(d => d.name) // 이름이 있는 곳만 마커용으로 반환
+  }, [geoData, registeredCountries])
 
   return (
     <div className="map-wrapper">
-      <MapContainer 
-        center={[20, 0]} 
-        zoom={2} 
-        minZoom={2}
-        className="leaflet-container"
-        maxBounds={[[-90, -180], [90, 180]]}
-      >
-        {geoData && (
-          <GeoJSON 
-            key={JSON.stringify(registeredCountries)}
-            data={geoData} 
-            style={style} 
-            onEachFeature={onEachFeature} 
-          />
-        )}
-      </MapContainer>
+      <ComposableMap projection="geoEqualEarth" projectionConfig={{ scale: 160 }} style={{ width: "100%", height: "100%", background: "#aad3df", borderRadius: "8px" }}>
+        <ZoomableGroup center={[0, 0]} zoom={1} minZoom={1} maxZoom={10}>
+          {geoData && (
+            <Geographies geography={geoData}>
+              {({ geographies }) =>
+                geographies.map((geo) => {
+                  const iso2 = geo.properties.iso_a2 || geo.properties['ISO3166-1-Alpha-2']
+                  const isRegistered = !!registeredCountries[iso2]
+
+                  return (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      onClick={() => {
+                        if (onCountryClick) {
+                          onCountryClick({ ...geo.properties, countryId: iso2 })
+                        }
+                      }}
+                      style={{
+                        default: {
+                          fill: isRegistered ? '#d1d5db' : '#f0f0f0',
+                          stroke: '#444',
+                          strokeWidth: 0.5,
+                          outline: 'none',
+                        },
+                        hover: {
+                          fill: '#80deea',
+                          stroke: '#00838f',
+                          strokeWidth: 1.5,
+                          outline: 'none',
+                          cursor: 'pointer',
+                        },
+                        pressed: {
+                          fill: '#26c6da',
+                          stroke: '#00838f',
+                          strokeWidth: 1.5,
+                          outline: 'none',
+                        },
+                      }}
+                    />
+                  )
+                })
+              }
+            </Geographies>
+          )}
+
+          {/* 등록된 국가 이름 표시 */}
+          {centroids.map(({ iso2, name, coordinates }) => (
+            <Marker key={iso2} coordinates={coordinates}>
+              <text
+                textAnchor="middle"
+                y={0}
+                style={{
+                  fontFamily: "system-ui",
+                  fill: "#fff",
+                  fontSize: 13,
+                  fontWeight: 800,
+                  pointerEvents: "none",
+                  textShadow: "1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9), 1px -1px 3px rgba(0,0,0,0.9), -1px 1px 3px rgba(0,0,0,0.9)"
+                }}
+              >
+                {name}
+              </text>
+            </Marker>
+          ))}
+        </ZoomableGroup>
+      </ComposableMap>
     </div>
   )
 }

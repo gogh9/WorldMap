@@ -4,37 +4,5 @@
   position: relative;
 }
 
-.leaflet-container {
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  background-color: #aad3df; /* 바다 색상 통일 */
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-}
-
-.leaflet-grab {
-  cursor: grab;
-}
-
-.leaflet-dragging .leaflet-grab {
-  cursor: grabbing;
-}
-
-.leaflet-tooltip.country-label {
-  background-color: transparent;
-  border: transparent;
-  box-shadow: none;
-  color: #fff;
-  font-weight: 800;
-  font-size: 13px;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9), 1px -1px 3px rgba(0,0,0,0.9), -1px 1px 3px rgba(0,0,0,0.9);
-  padding: 0;
-  pointer-events: none;
-}
-
-.leaflet-tooltip-top.country-label::before,
-.leaflet-tooltip-bottom.country-label::before,
-.leaflet-tooltip-left.country-label::before,
-.leaflet-tooltip-right.country-label::before {
-  display: none;
-}
+/* react-simple-maps uses svg elements, we added inline styles for background in the component */
+/* You can add any additional hover or text styling here if needed */
