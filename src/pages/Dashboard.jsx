@@ -354,8 +354,8 @@ export default function Dashboard() {
                         {group.registrations.map(record => {
                           const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name;
                           return (
-                            <div key={record.id} className="sub-record-card" style={{ marginBottom: 0 }}>
-                              <div className="sub-record-header">
+                            <div key={record.id} className="sub-record-card" style={{ padding: '10px 16px', marginBottom: 0 }}>
+                              <div className="sub-record-header" style={{ marginBottom: 0 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                                   <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
                                   {canEdit && (
