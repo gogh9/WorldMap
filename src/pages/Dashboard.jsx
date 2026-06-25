@@ -318,22 +318,19 @@ export default function Dashboard() {
             {myMaps.map(map => (
               <div key={map.id} style={{ padding: '16px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === map.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === map.id ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '250px', position: 'relative' }}>
                 <div onClick={() => handleMapSelect(map.id)}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                    <MapIcon size={18} color="var(--primary-color)" />
-                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{map.name}</h3>
-                  </div>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>생성일: {new Date(map.created_at).toLocaleDateString()}</p>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem' }}>{new Date(map.created_at).toLocaleDateString()}</h3>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>{map.name}</p>
                 </div>
                 
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
-                  <button onClick={(e) => { e.stopPropagation(); copyMapLink(map.id); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid var(--text-muted)', color: 'var(--text-color)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>
-                    <Copy size={14} /> 링크 복사
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
+                  <button onClick={(e) => { e.stopPropagation(); copyMapLink(map.id); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                    <Copy size={16} /> 학생 배부용 링크 복사
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); navigate(`/map/${map.id}`); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>
-                    <ExternalLink size={14} /> 이동
+                    <ExternalLink size={14} /> 지도 입장
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); handleDeleteMap(map.id); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer' }}>
-                    <Trash2 size={14} />
+                    <Trash2 size={14} /> 삭제
                   </button>
                 </div>
               </div>
