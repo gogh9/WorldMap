@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker, Sphere, Graticule } from 'react-simple-maps'
-import { geoCentroid, geoEqualEarth } from 'd3-geo'
+import { geoCentroid, geoNaturalEarth1 } from 'd3-geo'
 import countries from 'i18n-iso-countries'
 import koLocale from 'i18n-iso-countries/langs/ko.json'
 import { supabase } from '../lib/supabase'
@@ -74,7 +74,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
 
   const mapWidth = 800;
   const mapHeight = 600;
-  const projectionFunction = (width, height) => geoEqualEarth()
+  const projectionFunction = (width, height) => geoNaturalEarth1()
     .translate([width / 2, height / 2])
     .scale(160)
 
