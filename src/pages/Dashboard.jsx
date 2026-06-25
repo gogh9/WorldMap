@@ -397,7 +397,7 @@ export default function Dashboard() {
                                   )}
                                 </div>
                               </div>
-                              <div className="sub-record-content">
+                              <div className="sub-record-content" style={{ marginBottom: 0 }}>
                                 {record.content}
                               </div>
                             </div>
