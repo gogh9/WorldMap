@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useNavigate, Link } from 'react-router-dom'
-import { Edit2, Trash2, ArrowLeft, Download } from 'lucide-react'
+import { Edit2, Trash2, ArrowLeft, Download, Plus, Copy, Map as MapIcon, ExternalLink } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
 import './Dashboard.css'
 
@@ -12,6 +12,12 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [filterAuthor, setFilterAuthor] = useState('ALL')
   
+  // Maps state
+  const [myMaps, setMyMaps] = useState([])
+  const [selectedMapId, setSelectedMapId] = useState(null) // null = '내 기록'
+  const [newMapName, setNewMapName] = useState('')
+  const [isCreatingMap, setIsCreatingMap] = useState(false)
+
   // Edit state
   const [editingRecord, setEditingRecord] = useState(null)
   const [editCountryName, setEditCountryName] = useState('')
@@ -30,7 +36,8 @@ export default function Dashboard() {
           return
         }
         setUser(session.user)
-        fetchRecords(session.user)
+        fetchMyMaps(session.user)
+        fetchRecords(session.user, null)
       }
     }
 
@@ -41,7 +48,26 @@ export default function Dashboard() {
     }
   }, [navigate])
 
-  const fetchRecords = async (currentUser = user) => {
+  const fetchMyMaps = async (currentUser = user) => {
+    if (!currentUser) return;
+    try {
+      const { data, error } = await supabase
+        .from('maps')
+        .select('*')
+        .eq('teacher_email', currentUser.email)
+        .order('created_at', { ascending: false })
+      
+      if (error && error.code !== '42P01') {
+        console.error("Error fetching maps:", error)
+      } else if (data) {
+        setMyMaps(data)
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const fetchRecords = async (currentUser = user, mapId = selectedMapId) => {
     if (!currentUser) return;
     try {
       setLoading(true)
@@ -50,8 +76,12 @@ export default function Dashboard() {
         .select('*')
         .order('created_at', { ascending: false })
         
-      if (currentUser.email !== 'gogh999@gmail.com') {
-        query = query.eq('author_name', currentUser.user_metadata?.full_name)
+      if (mapId) {
+        query = query.eq('map_id', mapId)
+      } else {
+        if (currentUser.email !== 'gogh999@gmail.com') {
+          query = query.eq('author_name', currentUser.user_metadata?.full_name)
+        }
       }
       
       const { data, error } = await query
@@ -68,6 +98,52 @@ export default function Dashboard() {
     }
   }
 
+  const handleMapSelect = (mapId) => {
+    setSelectedMapId(mapId)
+    fetchRecords(user, mapId)
+  }
+
+  const handleCreateMap = async (e) => {
+    e.preventDefault()
+    if (!newMapName.trim() || myMaps.length >= 3) return
+    
+    try {
+      const { error } = await supabase.from('maps').insert([{
+        name: newMapName,
+        teacher_email: user.email
+      }])
+      if (error) throw error
+      
+      setNewMapName('')
+      setIsCreatingMap(false)
+      fetchMyMaps()
+    } catch (err) {
+      alert("지도 생성 실패: " + err.message)
+    }
+  }
+
+  const handleDeleteMap = async (mapId) => {
+    if (!window.confirm("정말 이 지도를 삭제하시겠습니까? 관련된 학생들의 기록도 함께 삭제될 수 있습니다.")) return
+    try {
+      const { error } = await supabase.from('maps').delete().eq('id', mapId)
+      if (error) throw error
+      
+      if (selectedMapId === mapId) {
+        setSelectedMapId(null)
+        fetchRecords(user, null)
+      }
+      fetchMyMaps()
+    } catch (err) {
+      alert("지도 삭제 실패: " + err.message)
+    }
+  }
+
+  const copyMapLink = (mapId) => {
+    const link = `${window.location.origin}/map/${mapId}`
+    navigator.clipboard.writeText(link)
+    alert("학생 초대 링크가 복사되었습니다!\n" + link)
+  }
+
   const handleDelete = async (id) => {
     if (!window.confirm("정말 이 기록을 삭제하시겠습니까?")) return
     
@@ -75,7 +151,6 @@ export default function Dashboard() {
       const { error } = await supabase.from('countries_data').delete().eq('id', id)
       if (error) throw error
       
-      // Update local state instead of refetching to be faster
       setRecords(records.filter(record => record.id !== id))
     } catch (err) {
       alert("삭제 실패: " + err.message)
@@ -104,7 +179,6 @@ export default function Dashboard() {
         
       if (error) throw error
       
-      // Update local state
       setRecords(records.map(record => 
         record.id === editingRecord.id 
           ? { ...record, country_name: editCountryName, content: editContent }
@@ -119,16 +193,16 @@ export default function Dashboard() {
     }
   }
 
-  const isAdmin = user?.email === 'gogh999@gmail.com'
+  const isGlobalAdmin = user?.email === 'gogh999@gmail.com'
+  const isTeacher = selectedMapId !== null || isGlobalAdmin
+  const isAdmin = isTeacher
 
-  // Get unique authors for filter
   const authors = [...new Set(records.map(r => r.author_name))].filter(Boolean)
   
   const filteredRecords = filterAuthor === 'ALL' 
     ? records 
     : records.filter(r => r.author_name === filterAuthor)
 
-  // Group records by author
   const groupedRecords = filteredRecords.reduce((acc, record) => {
     const author = record.author_name || '익명 학생';
     if (!acc[author]) {
@@ -152,10 +226,7 @@ export default function Dashboard() {
   const displayGroups = Object.values(groupedRecords);
 
   const handleExportExcel = () => {
-    // CSV 헤더
     const headers = ['작성자', '구분', '나라 이름', '작성 날짜', '내용'];
-    
-    // CSV 데이터
     const csvData = filteredRecords.map(record => {
       const author = formatDisplayName(record.author_name) || '익명 학생';
       const country = record.country_name || '이름 없는 나라';
@@ -169,16 +240,11 @@ export default function Dashboard() {
         cleanContent = '이 나라의 이름을 최초로 등록했습니다! 🎉';
       }
       
-      // 내용의 줄바꿈과 쉼표 처리 (큰따옴표로 감싸기)
       const content = `"${cleanContent.replace(/"/g, '""')}"`;
-      
       return `${author},${category},${country},${date},${content}`;
     });
 
-    // BOM(Byte Order Mark) 추가로 엑셀에서 한글 깨짐 방지
     const csvString = '\uFEFF' + [headers.join(','), ...csvData].join('\n');
-    
-    // Blob 생성 및 다운로드
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     if (link.download !== undefined) {
@@ -198,20 +264,86 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="dashboard-title">
-          <Link to="/" className="back-btn">
+          <Link to={selectedMapId ? `/map/${selectedMapId}` : "/"} className="back-btn">
             <ArrowLeft size={16} />
             지도 화면으로
           </Link>
-          <h1>{isAdmin ? '우리 반 세계지도' : '내 기록 모아보기'}</h1>
+          <h1>대시보드</h1>
         </div>
-        <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장">
-          <Download size={18} />
-          <span>엑셀 저장</span>
-        </button>
+        {selectedMapId && (
+          <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장">
+            <Download size={18} />
+            <span>엑셀 저장</span>
+          </button>
+        )}
       </header>
 
       <main className="dashboard-content">
+        
+        {/* Maps Management Section */}
+        <div className="maps-section" style={{ marginBottom: '30px', background: 'var(--bg-elevated)', padding: '20px', borderRadius: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2>나의 지도 관리 (최대 3개)</h2>
+            {!isCreatingMap && myMaps.length < 3 && (
+              <button onClick={() => setIsCreatingMap(true)} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>
+                <Plus size={16} /> 새 지도 만들기
+              </button>
+            )}
+          </div>
 
+          {isCreatingMap && (
+            <form onSubmit={handleCreateMap} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+              <input
+                type="text"
+                value={newMapName}
+                onChange={(e) => setNewMapName(e.target.value)}
+                placeholder="새로운 지도 이름을 입력하세요"
+                required
+                style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'white' }}
+              />
+              <button type="submit" style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '0 20px', borderRadius: '6px', cursor: 'pointer' }}>생성</button>
+              <button type="button" onClick={() => setIsCreatingMap(false)} style={{ background: 'var(--border-color)', color: 'white', border: 'none', padding: '0 20px', borderRadius: '6px', cursor: 'pointer' }}>취소</button>
+            </form>
+          )}
+
+          <div className="maps-list" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+            <div 
+              onClick={() => handleMapSelect(null)}
+              style={{ padding: '16px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === null ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === null ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '200px' }}
+            >
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem' }}>개인 기록 보기</h3>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>내가 작성한 모든 기록</p>
+            </div>
+            
+            {myMaps.map(map => (
+              <div key={map.id} style={{ padding: '16px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === map.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === map.id ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '250px', position: 'relative' }}>
+                <div onClick={() => handleMapSelect(map.id)}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <MapIcon size={18} color="var(--primary-color)" />
+                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{map.name}</h3>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>생성일: {new Date(map.created_at).toLocaleDateString()}</p>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
+                  <button onClick={(e) => { e.stopPropagation(); copyMapLink(map.id); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid var(--text-muted)', color: 'var(--text-color)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                    <Copy size={14} /> 링크 복사
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); navigate(`/map/${map.id}`); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                    <ExternalLink size={14} /> 이동
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteMap(map.id); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer' }}>
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <h2 style={{ marginBottom: '20px' }}>
+          {selectedMapId ? (myMaps.find(m => m.id === selectedMapId)?.name + ' 의 기록') : '나의 모든 기록'}
+        </h2>
 
         {loading ? (
           <div className="loading-state">기록을 불러오는 중입니다...</div>

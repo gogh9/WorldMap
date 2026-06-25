@@ -4,7 +4,7 @@ import { X, Save, Edit2, Trash2 } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
 import './CountryPanel.css'
 
-export default function CountryPanel({ countryId, onClose, user }) {
+export default function CountryPanel({ countryId, onClose, user, mapId, isTeacher }) {
   const [info, setInfo] = useState('')
   const [inputCountryName, setInputCountryName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -13,12 +13,14 @@ export default function CountryPanel({ countryId, onClose, user }) {
   const [editContent, setEditContent] = useState('')
   const [hasCountryName, setHasCountryName] = useState(false)
 
-  const isAdmin = user?.email === 'gogh999@gmail.com'
+  const isAdmin = user?.email === 'gogh999@gmail.com' || isTeacher
 
   // 저장된 데이터 불러오기
   useEffect(() => {
-    fetchData()
-  }, [countryId])
+    if (mapId) {
+      fetchData()
+    }
+  }, [countryId, mapId])
 
   const fetchData = async () => {
     try {
@@ -26,6 +28,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
         .from('countries_data')
         .select('*')
         .eq('link', countryId)
+        .eq('map_id', mapId)
         .order('created_at', { ascending: false })
       
       if (error) {
@@ -61,6 +64,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
             country_name: inputCountryName, 
             content: info, 
             link: countryId,
+            map_id: mapId,
             author_name: user?.user_metadata?.full_name || '익명 학생',
             author_avatar: user?.user_metadata?.avatar_url || ''
           }
@@ -125,6 +129,7 @@ export default function CountryPanel({ countryId, onClose, user }) {
           country_name: inputCountryName,
           content: `${user?.user_metadata?.full_name}님이 이 나라의 이름을 최초로 등록했습니다! 🎉`,
           link: countryId,
+          map_id: mapId,
           author_name: user?.user_metadata?.full_name || '익명 학생',
           author_avatar: user?.user_metadata?.avatar_url || ''
         }]);
@@ -133,7 +138,8 @@ export default function CountryPanel({ countryId, onClose, user }) {
         const { error } = await supabase
           .from('countries_data')
           .update({ country_name: inputCountryName })
-          .eq('link', countryId);
+          .eq('link', countryId)
+          .eq('map_id', mapId);
         if (error && error.code !== '42P01') throw error;
       }
       
@@ -151,7 +157,8 @@ export default function CountryPanel({ countryId, onClose, user }) {
         const { error } = await supabase
           .from('countries_data')
           .update({ country_name: newName.trim() })
-          .eq('link', countryId);
+          .eq('link', countryId)
+          .eq('map_id', mapId);
         if (error) throw error;
         alert("나라 이름이 수정되었습니다.");
         fetchData();
@@ -167,7 +174,8 @@ export default function CountryPanel({ countryId, onClose, user }) {
       const { error } = await supabase
         .from('countries_data')
         .update({ country_name: '' })
-        .eq('link', countryId);
+        .eq('link', countryId)
+        .eq('map_id', mapId);
       if (error) throw error;
       alert("나라 이름이 초기화되었습니다.");
       fetchData();

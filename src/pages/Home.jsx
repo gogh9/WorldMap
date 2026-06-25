@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { LogOut, LayoutDashboard } from 'lucide-react'
 import WorldMap from '../components/WorldMap'
 import CountryPanel from '../components/CountryPanel'
@@ -9,8 +9,39 @@ import './Home.css'
 
 export default function Home() {
   const navigate = useNavigate()
+  const { mapId } = useParams()
   const [user, setUser] = useState(null)
   const [selectedCountry, setSelectedCountry] = useState(null)
+  const [mapName, setMapName] = useState('우리 반 세계지도')
+  const [isTeacher, setIsTeacher] = useState(false)
+
+  useEffect(() => {
+    if (user && !mapId) {
+      navigate('/dashboard')
+    }
+  }, [user, mapId, navigate])
+
+  useEffect(() => {
+    if (mapId) {
+      const fetchMapDetails = async () => {
+        const { data } = await supabase
+          .from('maps')
+          .select('name, teacher_email')
+          .eq('id', mapId)
+          .single()
+        
+        if (data) {
+          setMapName(data.name)
+          if (user && data.teacher_email === user.email) {
+            setIsTeacher(true)
+          }
+        }
+      }
+      if (user) {
+        fetchMapDetails()
+      }
+    }
+  }, [mapId, user])
 
   useEffect(() => {
     let mounted = true
@@ -70,7 +101,7 @@ export default function Home() {
       
       <aside className="right-sidebar">
         <header className="sidebar-header">
-          <div className="nav-brand">🗺️ 우리 반 세계지도</div>
+          <div className="nav-brand">🗺️ {mapName}</div>
           <div className="nav-user">
             <img src={user.user_metadata.avatar_url} alt="Profile" className="avatar" />
             <span className="user-name">{formatDisplayName(user.user_metadata.full_name)}</span>
@@ -88,6 +119,8 @@ export default function Home() {
             <CountryPanel 
               countryId={selectedCountry} 
               user={user} 
+              mapId={mapId}
+              isTeacher={isTeacher}
               onClose={() => setSelectedCountry(null)} 
             />
           ) : (
