@@ -299,7 +299,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="maps-list" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+          <div className="maps-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
             
             {[...myMaps].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).map(map => (
               <div key={map.id} style={{ padding: '16px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === map.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === map.id ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '250px', position: 'relative' }}>
