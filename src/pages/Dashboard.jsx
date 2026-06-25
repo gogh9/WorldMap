@@ -288,7 +288,7 @@ export default function Dashboard() {
         {/* Maps Management Section */}
         <div className="maps-section" style={{ marginBottom: '30px', background: 'var(--bg-elevated)', padding: '20px', borderRadius: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h2>우리반 지도</h2>
+            <h2>우리 반 백지도</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{user.email}</span>
               {myMaps.length < 3 && (
