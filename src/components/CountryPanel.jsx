@@ -12,6 +12,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   const [editingId, setEditingId] = useState(null)
   const [editContent, setEditContent] = useState('')
   const [hasCountryName, setHasCountryName] = useState(false)
+  const [countryMedal, setCountryMedal] = useState('🏅')
 
   const isAdmin = user?.email === 'gogh999@gmail.com' || isTeacher
 
@@ -43,6 +44,47 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           setInputCountryName('')
           setHasCountryName(false)
         }
+
+        const { data: allCountries, error: err2 } = await supabase
+          .from('countries_data')
+          .select('link, created_at')
+          .eq('map_id', mapId)
+          .order('created_at', { ascending: true })
+        
+        let assignedMedal = '🏅';
+        if (allCountries && !err2) {
+          const MEDAL_TYPES = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟'];
+          const firstRegs = [];
+          const seen = new Set();
+          for (const row of allCountries) {
+            if (!seen.has(row.link)) {
+              seen.add(row.link);
+              firstRegs.push(row.link);
+            }
+          }
+          
+          const counts = {};
+          MEDAL_TYPES.forEach(m => counts[m] = 0);
+          
+          for (const link of firstRegs) {
+            let minCount = Infinity;
+            for (const m of MEDAL_TYPES) if (counts[m] < minCount) minCount = counts[m];
+            
+            const candidates = MEDAL_TYPES.filter(m => counts[m] === minCount);
+            
+            let hash = 0;
+            for (let i = 0; i < link.length; i++) hash = Math.imul(31, hash) + link.charCodeAt(i) | 0;
+            const rngValue = Math.abs(hash) % candidates.length;
+            
+            const chosenMedal = candidates[rngValue];
+            counts[chosenMedal]++;
+            if (link === countryId) {
+              assignedMedal = chosenMedal;
+              break;
+            }
+          }
+        }
+        setCountryMedal(assignedMedal);
       }
     } catch (err) {
       console.error(err)
@@ -195,7 +237,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
             <div className="header-title-row" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
               <h2 className="country-title-display">{inputCountryName}</h2>
               <div className="discoverer-info" title={`${formatDisplayName(savedData[savedData.length - 1]?.author_name)}님이 최초로 등록한 나라입니다`} style={{ whiteSpace: 'nowrap' }}>
-                🏅 {formatDisplayName(savedData[savedData.length - 1]?.author_name)}
+                {countryMedal} {formatDisplayName(savedData[savedData.length - 1]?.author_name)}
               </div>
             </div>
             {isAdmin && (
