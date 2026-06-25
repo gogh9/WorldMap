@@ -350,18 +350,18 @@ export default function Dashboard() {
                   {group.registrations.length > 0 && (
                     <div className="record-category">
                       <h4 className="category-title">🎯 등록한 나라</h4>
-                      <div className="category-items">
+                      <div className="category-items" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                         {group.registrations.map(record => {
                           const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name;
                           return (
-                            <div key={record.id} className="sub-record-card">
+                            <div key={record.id} className="sub-record-card" style={{ marginBottom: 0 }}>
                               <div className="sub-record-header">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                                   <span className="sub-record-country">{record.country_name || '이름 없는 나라'}</span>
                                   {canEdit && (
                                     <div className="sub-record-actions" style={{ marginTop: 0 }}>
-                                      <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn" style={{ flex: 0, padding: '4px 8px', fontSize: '11px' }}>
-                                        <Trash2 size={12} /> 삭제
+                                      <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn" style={{ flex: 0, padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="삭제">
+                                        <Trash2 size={14} />
                                       </button>
                                     </div>
                                   )}
