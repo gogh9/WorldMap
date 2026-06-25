@@ -350,7 +350,7 @@ export default function Dashboard() {
                   {group.registrations.length > 0 && (
                     <div className="record-category">
                       <h4 className="category-title">🎯 등록한 나라</h4>
-                      <div className="category-items" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      <div className="category-items" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '8px' }}>
                         {group.registrations.map(record => {
                           const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name;
                           return (

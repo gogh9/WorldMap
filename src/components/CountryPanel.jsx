@@ -37,11 +37,13 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       } else {
         setSavedData(data || [])
         const validNameRecord = data?.find(r => r.country_name && r.country_name.trim() !== '')
-        if (validNameRecord) {
+        const uniqueAuthors = new Set((data || []).map(r => r.author_name).filter(Boolean)).size;
+
+        if (validNameRecord && uniqueAuthors >= 5) {
           setInputCountryName(validNameRecord.country_name)
           setHasCountryName(true)
         } else {
-          setInputCountryName('')
+          setInputCountryName(validNameRecord?.country_name || '')
           setHasCountryName(false)
         }
 
@@ -166,23 +168,37 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       return;
     }
     try {
-      if (savedData.length === 0) {
-        const { error } = await supabase.from('countries_data').insert([{
-          country_name: inputCountryName,
-          content: `${user?.user_metadata?.full_name}님이 이 나라의 이름을 최초로 등록했습니다! 🎉`,
-          link: countryId,
-          map_id: mapId,
-          author_name: user?.user_metadata?.full_name || '익명 학생',
-          author_avatar: user?.user_metadata?.avatar_url || ''
-        }]);
-        if (error && error.code !== '42P01') throw error;
-      } else {
+      const currentUserName = user?.user_metadata?.full_name || '익명 학생';
+      const userAlreadyRegistered = savedData.some(r => r.author_name === currentUserName);
+
+      if (userAlreadyRegistered) {
         const { error } = await supabase
           .from('countries_data')
           .update({ country_name: inputCountryName })
           .eq('link', countryId)
           .eq('map_id', mapId);
         if (error && error.code !== '42P01') throw error;
+        alert("나라 이름이 수정되었습니다!");
+      } else {
+        const isFirst = savedData.length === 0;
+        const { error } = await supabase.from('countries_data').insert([{
+          country_name: inputCountryName,
+          content: `${currentUserName}님이 이 나라의 이름을 ${isFirst ? '최초로 ' : ''}등록했습니다! 🎉`,
+          link: countryId,
+          map_id: mapId,
+          author_name: currentUserName,
+          author_avatar: user?.user_metadata?.avatar_url || ''
+        }]);
+        if (error && error.code !== '42P01') throw error;
+
+        if (!isFirst) {
+          await supabase
+            .from('countries_data')
+            .update({ country_name: inputCountryName })
+            .eq('link', countryId)
+            .eq('map_id', mapId);
+        }
+        alert("나라 이름 등록에 참여하셨습니다!");
       }
       
       alert("나라 이름이 적용되었습니다!");
