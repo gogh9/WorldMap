@@ -14,9 +14,7 @@ export default function Dashboard() {
   
   // Maps state
   const [myMaps, setMyMaps] = useState([])
-  const [selectedMapId, setSelectedMapId] = useState(null) // null = '내 기록'
-  const [newMapName, setNewMapName] = useState('')
-  const [isCreatingMap, setIsCreatingMap] = useState(false)
+  const [selectedMapId, setSelectedMapId] = useState(null)
 
   // Edit state
   const [editingRecord, setEditingRecord] = useState(null)
@@ -103,19 +101,18 @@ export default function Dashboard() {
     fetchRecords(user, mapId)
   }
 
-  const handleCreateMap = async (e) => {
-    e.preventDefault()
-    if (!newMapName.trim() || myMaps.length >= 3) return
+  const handleCreateMap = async () => {
+    if (myMaps.length >= 3) return
+    
+    const autoName = `${myMaps.length + 1}회`
     
     try {
       const { error } = await supabase.from('maps').insert([{
-        name: newMapName,
+        name: autoName,
         teacher_email: user.email
       }])
       if (error) throw error
       
-      setNewMapName('')
-      setIsCreatingMap(false)
       fetchMyMaps()
     } catch (err) {
       alert("지도 생성 실패: " + err.message)
@@ -264,7 +261,11 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="dashboard-title">
-          <Link to={selectedMapId ? `/map/${selectedMapId}` : "/"} className="back-btn">
+          <Link 
+            to={selectedMapId ? `/map/${selectedMapId}` : (myMaps.length > 0 ? `/map/${myMaps[0].id}` : "#")} 
+            onClick={(e) => { if(!selectedMapId && myMaps.length === 0) { e.preventDefault(); alert("먼저 지도를 생성해주세요."); } }}
+            className="back-btn"
+          >
             <ArrowLeft size={16} />
             지도 화면으로
           </Link>
@@ -284,36 +285,14 @@ export default function Dashboard() {
         <div className="maps-section" style={{ marginBottom: '30px', background: 'var(--bg-elevated)', padding: '20px', borderRadius: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h2>나의 지도 관리 (최대 3개)</h2>
-            {!isCreatingMap && myMaps.length < 3 && (
-              <button onClick={() => setIsCreatingMap(true)} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>
+            {myMaps.length < 3 && (
+              <button onClick={handleCreateMap} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>
                 <Plus size={16} /> 새 지도 만들기
               </button>
             )}
           </div>
 
-          {isCreatingMap && (
-            <form onSubmit={handleCreateMap} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-              <input
-                type="text"
-                value={newMapName}
-                onChange={(e) => setNewMapName(e.target.value)}
-                placeholder="새로운 지도 이름을 입력하세요"
-                required
-                style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'white' }}
-              />
-              <button type="submit" style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '0 20px', borderRadius: '6px', cursor: 'pointer' }}>생성</button>
-              <button type="button" onClick={() => setIsCreatingMap(false)} style={{ background: 'var(--border-color)', color: 'white', border: 'none', padding: '0 20px', borderRadius: '6px', cursor: 'pointer' }}>취소</button>
-            </form>
-          )}
-
           <div className="maps-list" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-            <div 
-              onClick={() => handleMapSelect(null)}
-              style={{ padding: '16px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === null ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === null ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '200px' }}
-            >
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem' }}>개인 기록 보기</h3>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>내가 작성한 모든 기록</p>
-            </div>
             
             {myMaps.map(map => (
               <div key={map.id} style={{ padding: '16px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === map.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === map.id ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '250px', position: 'relative' }}>
