@@ -36,15 +36,26 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
         if (error.code !== '42P01') console.error("Error fetching data:", error)
       } else {
         setSavedData(data || [])
-        const validNameRecord = data?.find(r => r.country_name && r.country_name.trim() !== '')
-        const uniqueAuthors = new Set((data || [])
-          .filter(r => r.content && r.content.includes('등록했습니다! 🎉'))
-          .map(r => r.author_name)
-          .filter(Boolean)
-        ).size;
+        
+        const nameCounts = {};
+        (data || []).forEach(r => {
+          if (r.country_name && r.content && r.content.includes('등록했습니다! 🎉') && r.author_name) {
+            const name = r.country_name.trim();
+            if (!nameCounts[name]) nameCounts[name] = new Set();
+            nameCounts[name].add(r.author_name);
+          }
+        });
 
-        if (validNameRecord && uniqueAuthors >= 5) {
-          setInputCountryName(validNameRecord.country_name)
+        let winningName = null;
+        for (const [name, authorsSet] of Object.entries(nameCounts)) {
+          if (authorsSet.size >= 5) {
+            winningName = name;
+            break;
+          }
+        }
+
+        if (winningName) {
+          setInputCountryName(winningName)
           setHasCountryName(true)
         } else {
           setInputCountryName('')
@@ -180,11 +191,14 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       );
 
       if (userAlreadyRegistered) {
+        // Only update the current user's registration record!
         const { error } = await supabase
           .from('countries_data')
           .update({ country_name: inputCountryName })
           .eq('link', countryId)
-          .eq('map_id', mapId);
+          .eq('map_id', mapId)
+          .eq('author_name', currentUserName)
+          .like('content', '%등록했습니다! 🎉%');
         if (error && error.code !== '42P01') throw error;
         alert("나라 이름이 수정되었습니다!");
       } else {
@@ -199,13 +213,6 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
         }]);
         if (error && error.code !== '42P01') throw error;
 
-        if (!isFirst) {
-          await supabase
-            .from('countries_data')
-            .update({ country_name: inputCountryName })
-            .eq('link', countryId)
-            .eq('map_id', mapId);
-        }
         alert("나라 이름 등록에 참여하셨습니다!");
       }
       

@@ -46,19 +46,34 @@ export default function WorldMap({ onCountryClick, mapId }) {
         data.forEach(item => {
            if (item.country_name) {
              if (!countryStats[item.link]) {
-               countryStats[item.link] = { name: item.country_name, authors: new Set() }
+               countryStats[item.link] = { nameCounts: {} }
              }
              if (item.author_name && item.content && item.content.includes('등록했습니다! 🎉')) {
-               countryStats[item.link].authors.add(item.author_name)
+               const name = item.country_name.trim()
+               if (!countryStats[item.link].nameCounts[name]) {
+                 countryStats[item.link].nameCounts[name] = new Set()
+               }
+               countryStats[item.link].nameCounts[name].add(item.author_name)
              }
            }
         })
         
         const formattedStats = {}
         Object.keys(countryStats).forEach(link => {
-           formattedStats[link] = {
-             name: countryStats[link].name,
-             count: countryStats[link].authors.size || 0 // 0 if no one explicitly registered
+           let maxCount = 0;
+           let maxName = '';
+           Object.entries(countryStats[link].nameCounts).forEach(([name, authorsSet]) => {
+             if (authorsSet.size > maxCount) {
+               maxCount = authorsSet.size;
+               maxName = name;
+             }
+           });
+           
+           if (maxName) {
+             formattedStats[link] = {
+               name: maxName,
+               count: maxCount
+             }
            }
         })
         setRegisteredCountries(formattedStats)

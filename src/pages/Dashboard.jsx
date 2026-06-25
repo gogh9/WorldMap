@@ -357,6 +357,9 @@ export default function Dashboard() {
                                   <span className="sub-record-country" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{record.country_name || '이름 없는 나라'}</span>
                                   {canEdit && (
                                     <div className="sub-record-actions" style={{ marginTop: 0 }}>
+                                      <button onClick={() => handleEditClick(record)} className="action-btn edit-btn" style={{ flex: 0, padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="수정">
+                                        <Edit2 size={14} />
+                                      </button>
                                       <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn" style={{ flex: 0, padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="삭제">
                                         <Trash2 size={14} />
                                       </button>
@@ -425,15 +428,17 @@ export default function Dashboard() {
                   placeholder="나라 이름을 입력하세요"
                 />
               </div>
-              <div className="form-group">
-                <label>조사한 내용</label>
-                <textarea 
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
-                  placeholder="내용을 입력하세요"
-                  required
-                />
-              </div>
+              {(!editingRecord.content || !editingRecord.content.includes('등록했습니다! 🎉')) && (
+                <div className="form-group">
+                  <label>내용</label>
+                  <textarea 
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    placeholder="내용을 입력하세요"
+                    rows={5}
+                  />
+                </div>
+              )}
               <div className="modal-actions">
                 <button type="submit" className="save-btn" disabled={isSaving}>
                   {isSaving ? '저장 중...' : '저장하기'}
