@@ -33,7 +33,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
     const fetchCountries = async () => {
       let query = supabase
         .from('countries_data')
-        .select('link, country_name')
+        .select('link, country_name, author_name')
         
       if (mapId) {
         query = query.eq('map_id', mapId)
@@ -42,13 +42,26 @@ export default function WorldMap({ onCountryClick, mapId }) {
       const { data, error } = await query
       
       if (data && !error) {
-        const countryMap = {}
+        const countryStats = {}
         data.forEach(item => {
            if (item.country_name) {
-             countryMap[item.link] = item.country_name
+             if (!countryStats[item.link]) {
+               countryStats[item.link] = { name: item.country_name, authors: new Set() }
+             }
+             if (item.author_name) {
+               countryStats[item.link].authors.add(item.author_name)
+             }
            }
         })
-        setRegisteredCountries(countryMap)
+        
+        const formattedStats = {}
+        Object.keys(countryStats).forEach(link => {
+           formattedStats[link] = {
+             name: countryStats[link].name,
+             count: countryStats[link].authors.size || 1
+           }
+        })
+        setRegisteredCountries(formattedStats)
       }
     }
     fetchCountries()
@@ -70,7 +83,21 @@ export default function WorldMap({ onCountryClick, mapId }) {
     if (!geoData) return []
     const list = geoData.features.map(feature => {
       const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
-      const customName = registeredCountries[iso2]
+      const stats = registeredCountries[iso2]
+      let customName = null
+      
+      if (stats && stats.count > 0) {
+        if (stats.count >= 5) {
+          customName = stats.name
+        } else {
+          const nameLen = stats.name.length;
+          const unmaskedLen = Math.floor((stats.count / 5) * nameLen);
+          const maskedLen = nameLen - unmaskedLen;
+          const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
+          customName = `${masked} (${stats.count}/5)`
+        }
+      }
+
       return {
         iso2,
         name: customName,
