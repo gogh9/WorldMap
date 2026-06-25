@@ -37,7 +37,11 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       } else {
         setSavedData(data || [])
         const validNameRecord = data?.find(r => r.country_name && r.country_name.trim() !== '')
-        const uniqueAuthors = new Set((data || []).map(r => r.author_name).filter(Boolean)).size;
+        const uniqueAuthors = new Set((data || [])
+          .filter(r => r.content && r.content.includes('등록했습니다! 🎉'))
+          .map(r => r.author_name)
+          .filter(Boolean)
+        ).size;
 
         if (validNameRecord && uniqueAuthors >= 5) {
           setInputCountryName(validNameRecord.country_name)
@@ -169,7 +173,11 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
     }
     try {
       const currentUserName = user?.user_metadata?.full_name || '익명 학생';
-      const userAlreadyRegistered = savedData.some(r => r.author_name === currentUserName);
+      const userAlreadyRegistered = savedData.some(r => 
+        r.author_name === currentUserName && 
+        r.content && 
+        r.content.includes('등록했습니다! 🎉')
+      );
 
       if (userAlreadyRegistered) {
         const { error } = await supabase

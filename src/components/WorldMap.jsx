@@ -33,7 +33,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
     const fetchCountries = async () => {
       let query = supabase
         .from('countries_data')
-        .select('link, country_name, author_name')
+        .select('link, country_name, author_name, content')
         
       if (mapId) {
         query = query.eq('map_id', mapId)
@@ -48,7 +48,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
              if (!countryStats[item.link]) {
                countryStats[item.link] = { name: item.country_name, authors: new Set() }
              }
-             if (item.author_name) {
+             if (item.author_name && item.content && item.content.includes('등록했습니다! 🎉')) {
                countryStats[item.link].authors.add(item.author_name)
              }
            }
@@ -58,7 +58,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
         Object.keys(countryStats).forEach(link => {
            formattedStats[link] = {
              name: countryStats[link].name,
-             count: countryStats[link].authors.size || 1
+             count: countryStats[link].authors.size || 0 // 0 if no one explicitly registered
            }
         })
         setRegisteredCountries(formattedStats)
