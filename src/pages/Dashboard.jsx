@@ -274,10 +274,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="dashboard-title">
-          <h1>대시보드</h1>
-        </div>
+      <header className="dashboard-header" style={{ justifyContent: 'flex-end' }}>
         {selectedMapId && (
           <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장">
             <Download size={18} />
@@ -292,11 +289,14 @@ export default function Dashboard() {
         <div className="maps-section" style={{ marginBottom: '30px', background: 'var(--bg-elevated)', padding: '20px', borderRadius: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h2>우리반 지도</h2>
-            {myMaps.length < 3 && (
-              <button onClick={handleCreateMap} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>
-                <Plus size={16} /> 새 지도 만들기
-              </button>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{user.email}</span>
+              {myMaps.length < 3 && (
+                <button onClick={handleCreateMap} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>
+                  <Plus size={16} /> 새 지도 만들기
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="maps-list" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
@@ -312,14 +312,14 @@ export default function Dashboard() {
                   <button onClick={(e) => { e.stopPropagation(); copyMapLink(map.id); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
                     <Copy size={16} /> 학생 배부용 링크 복사
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); navigate(`/map/${map.id}`); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>
-                    <ExternalLink size={14} /> 지도 입장
+                  <button onClick={(e) => { e.stopPropagation(); navigate(`/map/${map.id}`); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', padding: '4px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                    <ExternalLink size={12} /> 지도 입장
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); handleResetMap(map.id); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }} title="기록 초기화">
-                    <RefreshCcw size={14} /> 초기화
+                  <button onClick={(e) => { e.stopPropagation(); handleResetMap(map.id); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b', padding: '4px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }} title="기록 초기화">
+                    <RefreshCcw size={12} /> 초기화
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); handleDeleteMap(map.id); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }} title="지도 삭제">
-                    <Trash2 size={14} /> 삭제
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteMap(map.id); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '4px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }} title="지도 삭제">
+                    <Trash2 size={12} /> 삭제
                   </button>
                 </div>
               </div>
