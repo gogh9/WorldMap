@@ -20,6 +20,7 @@ const projection = geoNaturalEarth1()
 export default function WorldMap({ onCountryClick, mapId }) {
   const [geoData, setGeoData] = useState(null)
   const [registeredCountries, setRegisteredCountries] = useState({})
+  const [hoveredCountry, setHoveredCountry] = useState(null)
 
   useEffect(() => {
     // 고해상도(50m) 세계 국가 GeoJSON 데이터 가져오기
@@ -137,6 +138,8 @@ export default function WorldMap({ onCountryClick, mapId }) {
                           onCountryClick({ ...geo.properties, countryId: iso2 })
                         }
                       }}
+                      onMouseEnter={() => setHoveredCountry(iso2)}
+                      onMouseLeave={() => setHoveredCountry(null)}
                       style={{
                         default: {
                           fill: isRegistered ? '#d1d5db' : '#f0f0f0',
@@ -166,24 +169,29 @@ export default function WorldMap({ onCountryClick, mapId }) {
           )}
 
           {/* 등록된 국가 이름 표시 */}
-          {centroids.map(({ iso2, name, coordinates }) => (
-            <Marker key={iso2} coordinates={coordinates}>
-              <text
-                textAnchor="middle"
-                y={0}
-                style={{
-                  fontFamily: "system-ui",
-                  fill: "#fff",
-                  fontSize: 6,
-                  fontWeight: 800,
-                  pointerEvents: "none",
-                  textShadow: "1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9), 1px -1px 3px rgba(0,0,0,0.9), -1px 1px 3px rgba(0,0,0,0.9)"
-                }}
-              >
-                {name}
-              </text>
-            </Marker>
-          ))}
+          {centroids.map(({ iso2, name, coordinates }) => {
+            const isHovered = hoveredCountry === iso2;
+            return (
+              <Marker key={iso2} coordinates={coordinates}>
+                <text
+                  textAnchor="middle"
+                  y={0}
+                  style={{
+                    fontFamily: "system-ui",
+                    fill: isHovered ? "#ffeb3b" : "#fff",
+                    fontSize: isHovered ? 12 : 6,
+                    fontWeight: 800,
+                    pointerEvents: "none",
+                    textShadow: "1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9), 1px -1px 3px rgba(0,0,0,0.9), -1px 1px 3px rgba(0,0,0,0.9)",
+                    transition: "all 0.2s ease-in-out",
+                    zIndex: isHovered ? 10 : 1
+                  }}
+                >
+                  {name}
+                </text>
+              </Marker>
+            )
+          })}
         </ZoomableGroup>
       </ComposableMap>
     </div>
