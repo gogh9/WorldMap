@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useNavigate, Link } from 'react-router-dom'
-import { Edit2, Trash2, ArrowLeft, Download, Plus, Copy, Map as MapIcon, ExternalLink } from 'lucide-react'
+import { Edit2, Trash2, ArrowLeft, Download, Plus, Copy, Map as MapIcon, ExternalLink, RefreshCcw } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
 import './Dashboard.css'
 
@@ -132,6 +132,21 @@ export default function Dashboard() {
       fetchMyMaps()
     } catch (err) {
       alert("지도 삭제 실패: " + err.message)
+    }
+  }
+
+  const handleResetMap = async (mapId) => {
+    if (!window.confirm("정말 이 지도의 모든 학생 기록을 초기화하시겠습니까? (복구할 수 없습니다)")) return
+    try {
+      const { error } = await supabase.from('countries_data').delete().eq('map_id', mapId)
+      if (error) throw error
+      
+      alert("지도의 모든 기록이 초기화되었습니다.")
+      if (selectedMapId === mapId) {
+        fetchRecords(user, mapId)
+      }
+    } catch (err) {
+      alert("초기화 실패: " + err.message)
     }
   }
 
@@ -308,7 +323,10 @@ export default function Dashboard() {
                   <button onClick={(e) => { e.stopPropagation(); navigate(`/map/${map.id}`); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>
                     <ExternalLink size={14} /> 지도 입장
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); handleDeleteMap(map.id); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer' }}>
+                  <button onClick={(e) => { e.stopPropagation(); handleResetMap(map.id); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer' }} title="기록 초기화">
+                    <RefreshCcw size={14} /> 초기화
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteMap(map.id); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer' }} title="지도 삭제">
                     <Trash2 size={14} /> 삭제
                   </button>
                 </div>

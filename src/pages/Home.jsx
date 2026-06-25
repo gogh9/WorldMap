@@ -96,7 +96,7 @@ export default function Home() {
   return (
     <div className="home-container">
       <main className="map-section">
-        <WorldMap onCountryClick={handleCountryClick} />
+        <WorldMap onCountryClick={handleCountryClick} mapId={mapId} />
       </main>
       
       <aside className="right-sidebar">

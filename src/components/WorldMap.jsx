@@ -9,7 +9,7 @@ import './WorldMap.css'
 // 한국어 번역 로케일 등록
 countries.registerLocale(koLocale)
 
-export default function WorldMap({ onCountryClick }) {
+export default function WorldMap({ onCountryClick, mapId }) {
   const [geoData, setGeoData] = useState(null)
   const [registeredCountries, setRegisteredCountries] = useState({})
 
@@ -22,9 +22,15 @@ export default function WorldMap({ onCountryClick }) {
 
     // DB에서 등록된 나라 정보 가져오기
     const fetchCountries = async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('countries_data')
         .select('link, country_name')
+        
+      if (mapId) {
+        query = query.eq('map_id', mapId)
+      }
+      
+      const { data, error } = await query
       
       if (data && !error) {
         const countryMap = {}
@@ -48,7 +54,7 @@ export default function WorldMap({ onCountryClick }) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [])
+  }, [mapId])
 
   const style = (feature) => {
     const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
