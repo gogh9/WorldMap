@@ -276,14 +276,6 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="dashboard-title">
-          <Link 
-            to={selectedMapId ? `/map/${selectedMapId}` : (myMaps.length > 0 ? `/map/${myMaps[0].id}` : "#")} 
-            onClick={(e) => { if(!selectedMapId && myMaps.length === 0) { e.preventDefault(); alert("먼저 지도를 생성해주세요."); } }}
-            className="back-btn"
-          >
-            <ArrowLeft size={16} />
-            지도 화면으로
-          </Link>
           <h1>대시보드</h1>
         </div>
         {selectedMapId && (
@@ -299,7 +291,7 @@ export default function Dashboard() {
         {/* Maps Management Section */}
         <div className="maps-section" style={{ marginBottom: '30px', background: 'var(--bg-elevated)', padding: '20px', borderRadius: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h2>나의 지도 관리 (최대 3개)</h2>
+            <h2>우리반 지도</h2>
             {myMaps.length < 3 && (
               <button onClick={handleCreateMap} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>
                 <Plus size={16} /> 새 지도 만들기
@@ -323,10 +315,10 @@ export default function Dashboard() {
                   <button onClick={(e) => { e.stopPropagation(); navigate(`/map/${map.id}`); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>
                     <ExternalLink size={14} /> 지도 입장
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); handleResetMap(map.id); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer' }} title="기록 초기화">
+                  <button onClick={(e) => { e.stopPropagation(); handleResetMap(map.id); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }} title="기록 초기화">
                     <RefreshCcw size={14} /> 초기화
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); handleDeleteMap(map.id); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer' }} title="지도 삭제">
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteMap(map.id); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }} title="지도 삭제">
                     <Trash2 size={14} /> 삭제
                   </button>
                 </div>
@@ -335,9 +327,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <h2 style={{ marginBottom: '20px' }}>
-          {selectedMapId ? (myMaps.find(m => m.id === selectedMapId)?.name + ' 의 기록') : '나의 모든 기록'}
-        </h2>
+
 
         {loading ? (
           <div className="loading-state">기록을 불러오는 중입니다...</div>
