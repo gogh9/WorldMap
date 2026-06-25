@@ -347,11 +347,11 @@ export default function Dashboard() {
                   {group.registrations.length > 0 && (
                     <div className="record-category">
                       <h4 className="category-title">🎯 등록한 나라</h4>
-                      <div className="category-items" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '8px' }}>
+                      <div className="category-items" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '6px' }}>
                         {group.registrations.map(record => {
                           const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name;
                           return (
-                            <div key={record.id} className="sub-record-card" style={{ padding: '10px 14px', marginBottom: 0, flex: '1 1 auto', minWidth: '120px', maxWidth: '100%' }}>
+                            <div key={record.id} className="sub-record-card" style={{ padding: '8px 10px', marginBottom: 0, flex: '1 1 auto', minWidth: 0, maxWidth: '100%' }}>
                               <div className="sub-record-header" style={{ marginBottom: 0 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
                                   <span className="sub-record-country" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{record.country_name || '이름 없는 나라'}</span>
