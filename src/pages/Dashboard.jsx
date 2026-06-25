@@ -274,15 +274,6 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header" style={{ justifyContent: 'flex-end' }}>
-        {selectedMapId && (
-          <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장">
-            <Download size={18} />
-            <span>엑셀 저장</span>
-          </button>
-        )}
-      </header>
-
       <main className="dashboard-content">
         
         {/* Maps Management Section */}
@@ -291,6 +282,12 @@ export default function Dashboard() {
             <h2>우리 반 백지도</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{user.email}</span>
+              {selectedMapId && (
+                <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장" style={{ borderRadius: '6px', padding: '8px 16px' }}>
+                  <Download size={16} />
+                  <span>엑셀 저장</span>
+                </button>
+              )}
               {myMaps.length < 3 && (
                 <button onClick={handleCreateMap} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>
                   <Plus size={16} /> 새 지도 만들기
