@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from 'react-simple-maps'
-import { geoCentroid } from 'd3-geo'
+import { geoCentroid, geoEqualEarth } from 'd3-geo'
 import countries from 'i18n-iso-countries'
 import koLocale from 'i18n-iso-countries/langs/ko.json'
 import { supabase } from '../lib/supabase'
@@ -72,9 +72,15 @@ export default function WorldMap({ onCountryClick, mapId }) {
     }).filter(d => d.name) // 이름이 있는 곳만 마커용으로 반환
   }, [geoData, registeredCountries])
 
+  const mapWidth = 800;
+  const mapHeight = 600;
+  const projection = geoEqualEarth()
+    .translate([mapWidth / 2, mapHeight / 2])
+    .scale(160)
+
   return (
     <div className="map-wrapper">
-      <ComposableMap projection="geoEqualEarth" projectionConfig={{ scale: 160 }} style={{ width: "100%", height: "100%", background: "#aad3df", borderRadius: "8px" }}>
+      <ComposableMap projection={projection} width={mapWidth} height={mapHeight} style={{ width: "100%", height: "100%", background: "#aad3df", borderRadius: "8px" }}>
         <ZoomableGroup center={[0, 0]} zoom={1} minZoom={1} maxZoom={10}>
           {geoData && (
             <Geographies geography={geoData}>
