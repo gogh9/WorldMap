@@ -233,7 +233,6 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
                 <div key={item.id} className="record-card">
                   <div className="record-header">
                     <div className="record-author">
-                      <img src={item.author_avatar} alt="avatar" />
                       <span>{formatDisplayName(item.author_name)}</span>
                     </div>
                     {(isAdmin || item.author_name === user?.user_metadata?.full_name) && (

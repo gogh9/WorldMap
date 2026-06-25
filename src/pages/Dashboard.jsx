@@ -343,7 +343,6 @@ export default function Dashboard() {
             {displayGroups.map(group => (
               <div key={group.author_name} className="student-group-card">
                 <div className="student-header">
-                  <img src={group.author_avatar} alt="avatar" className="student-avatar" />
                   <h2 className="student-name">{formatDisplayName(group.author_name)}의 기록</h2>
                 </div>
                 
