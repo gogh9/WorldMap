@@ -137,7 +137,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
                 style={{
                   fontFamily: "system-ui",
                   fill: "#fff",
-                  fontSize: 7,
+                  fontSize: 6,
                   fontWeight: 800,
                   pointerEvents: "none",
                   textShadow: "1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9), 1px -1px 3px rgba(0,0,0,0.9), -1px 1px 3px rgba(0,0,0,0.9)"
