@@ -354,10 +354,10 @@ export default function Dashboard() {
                         {group.registrations.map(record => {
                           const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name;
                           return (
-                            <div key={record.id} className="sub-record-card" style={{ padding: '10px 14px', marginBottom: 0, flex: '1 1 auto', minWidth: 'min-content' }}>
+                            <div key={record.id} className="sub-record-card" style={{ padding: '10px 14px', marginBottom: 0, flex: '1 1 auto', minWidth: '120px', maxWidth: '100%' }}>
                               <div className="sub-record-header" style={{ marginBottom: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                                  <span className="sub-record-country" style={{ whiteSpace: 'nowrap' }}>{record.country_name || '이름 없는 나라'}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                                  <span className="sub-record-country" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{record.country_name || '이름 없는 나라'}</span>
                                   {canEdit && (
                                     <div className="sub-record-actions" style={{ marginTop: 0 }}>
                                       <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn" style={{ flex: 0, padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="삭제">
