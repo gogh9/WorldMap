@@ -74,13 +74,13 @@ export default function WorldMap({ onCountryClick, mapId }) {
 
   const mapWidth = 800;
   const mapHeight = 600;
-  const projectionFunction = (width, height) => geoNaturalEarth1()
-    .translate([width / 2, height / 2])
+  const projection = geoNaturalEarth1()
+    .translate([mapWidth / 2, mapHeight / 2])
     .scale(160)
 
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
-      <ComposableMap projection={projectionFunction} width={mapWidth} height={mapHeight} style={{ width: "100%", height: "100%" }}>
+      <ComposableMap projection={projection} width={mapWidth} height={mapHeight} style={{ width: "100%", height: "100%" }}>
         <ZoomableGroup center={[0, 0]} zoom={1} minZoom={1} maxZoom={10}>
           <Sphere stroke="#80deea" strokeWidth={1} fill="#aad3df" />
           <Graticule stroke="#b2ebf2" strokeWidth={0.5} />
