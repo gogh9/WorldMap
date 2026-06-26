@@ -111,7 +111,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!info.trim()) return
-    if (!isActive && !isTeacher) {
+    if (!isActive) {
       alert("현재 입력이 중지되었습니다.");
       return;
     }
@@ -190,7 +190,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       alert("나라 이름을 먼저 입력해주세요!");
       return;
     }
-    if (!isActive && !isTeacher) {
+    if (!isActive) {
       alert("현재 입력이 중지되었습니다.");
       return;
     }
@@ -312,7 +312,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-            {(!isActive && !isTeacher) ? (
+            {(!isActive) ? (
               <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
                 선생님께서 입력을 일시 중지하셨습니다.
               </div>
@@ -411,7 +411,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           )}
         </div>
 
-        {(!isActive && !isTeacher) ? (
+        {(!isActive) ? (
           <div className="input-section" style={{ textAlign: 'center', padding: '30px 20px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px' }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#fff' }}>새로운 정보 기록하기</h3>
             <p style={{ color: '#a7a7a7', fontSize: '0.9rem', margin: 0 }}>현재 기록 입력이 일시 중지된 상태입니다.</p>
