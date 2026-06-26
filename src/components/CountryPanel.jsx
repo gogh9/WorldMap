@@ -312,18 +312,23 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <div className="header-input-group">
-              <input 
-                type="text" 
-                className="country-name-input-header"
-                placeholder={isActive ? "이 나라의 이름은?" : "입력이 중지되었습니다."}
-                value={inputCountryName}
-                onChange={(e) => setInputCountryName(e.target.value)}
-                required
-                disabled={!isActive && !isTeacher}
-              />
-              <button className="name-apply-btn" onClick={handleNameUpdate} disabled={!isActive && !isTeacher} style={{ opacity: (!isActive && !isTeacher) ? 0.5 : 1, cursor: (!isActive && !isTeacher) ? 'not-allowed' : 'pointer' }}>입력</button>
-            </div>
+            {(!isActive && !isTeacher) ? (
+              <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
+                선생님께서 입력을 일시 중지하셨습니다.
+              </div>
+            ) : (
+              <div className="header-input-group">
+                <input 
+                  type="text" 
+                  className="country-name-input-header"
+                  placeholder="이 나라의 이름은?"
+                  value={inputCountryName}
+                  onChange={(e) => setInputCountryName(e.target.value)}
+                  required
+                />
+                <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
+              </div>
+            )}
             {/* 비공개 시에도 이름 표시 */}
             <div className="discoverers-list" style={{ marginTop: '12px' }}>
               {(() => {
@@ -406,23 +411,29 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           )}
         </div>
 
-        <div className="input-section">
-          <h3>새로운 정보 기록하기</h3>
-          <form onSubmit={handleSubmit}>
-            <textarea 
-              placeholder={isActive ? "이 나라에 대해 조사한 내용을 자유롭게 적어주세요!" : "입력이 중지되었습니다."}
-              value={info}
-              onChange={(e) => setInfo(e.target.value)}
-              required
-              disabled={!isActive && !isTeacher}
-            />
-            <div className="form-actions">
-              <button type="submit" className="submit-btn" disabled={loading || (!isActive && !isTeacher)} style={{ opacity: (!isActive && !isTeacher) ? 0.5 : 1, cursor: (!isActive && !isTeacher) ? 'not-allowed' : 'pointer' }}>
-                {loading ? '저장 중...' : '기록'}
-              </button>
-            </div>
-          </form>
-        </div>
+        {(!isActive && !isTeacher) ? (
+          <div className="input-section" style={{ textAlign: 'center', padding: '30px 20px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px' }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#fff' }}>새로운 정보 기록하기</h3>
+            <p style={{ color: '#a7a7a7', fontSize: '0.9rem', margin: 0 }}>현재 기록 입력이 일시 중지된 상태입니다.</p>
+          </div>
+        ) : (
+          <div className="input-section">
+            <h3>새로운 정보 기록하기</h3>
+            <form onSubmit={handleSubmit}>
+              <textarea 
+                placeholder="이 나라에 대해 조사한 내용을 자유롭게 적어주세요!"
+                value={info}
+                onChange={(e) => setInfo(e.target.value)}
+                required
+              />
+              <div className="form-actions">
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? '저장 중...' : '기록'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </aside>
   )
