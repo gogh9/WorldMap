@@ -275,12 +275,13 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
                 {(() => {
                   const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
                   const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
-                  return regs.map((reg) => {
+                  let countryHash = 0;
+                  if (countryId) {
+                    for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
+                  }
+                  return regs.map((reg, index) => {
                     const authorName = reg.author_name || '익명 학생';
-                    const str = authorName + countryId;
-                    let hash = 0;
-                    for (let i = 0; i < str.length; i++) hash = Math.imul(31, hash) + str.charCodeAt(i) | 0;
-                    const item = RANDOM_ITEMS[Math.abs(hash) % RANDOM_ITEMS.length];
+                    const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
                     return (
                       <div key={reg.id} className="discoverer-badge" title={`${formatDisplayName(authorName)}님이 나라 이름 등록에 참여했습니다`}>
                         <span className="discoverer-emoji">{item}</span>

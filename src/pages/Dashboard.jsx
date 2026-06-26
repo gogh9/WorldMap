@@ -78,7 +78,7 @@ export default function Dashboard() {
         query = query.eq('map_id', mapId)
       } else {
         if (currentUser.email !== 'gogh999@gmail.com') {
-          query = query.eq('author_name', currentUser.user_metadata?.full_name)
+          query = query.eq('author_name', currentUser.user_metadata?.full_name || '익명 학생')
         }
       }
       
@@ -226,7 +226,7 @@ export default function Dashboard() {
       };
     }
     
-    if (record.content && record.content.includes('이 나라의 이름을 최초로 등록했습니다! 🎉')) {
+    if (record.content && record.content.includes('등록했습니다! 🎉')) {
       acc[author].registrations.push(record);
     } else {
       acc[author].investigations.push(record);
@@ -247,9 +247,9 @@ export default function Dashboard() {
       let category = '조사 내용';
       let cleanContent = record.content || '';
       
-      if (cleanContent.includes('이 나라의 이름을 최초로 등록했습니다! 🎉')) {
+      if (cleanContent.includes('등록했습니다! 🎉')) {
         category = '나라 이름 등록';
-        cleanContent = '이 나라의 이름을 최초로 등록했습니다! 🎉';
+        cleanContent = '나라 이름 등록 참여 🎉';
       }
       
       const content = `"${cleanContent.replace(/"/g, '""')}"`;

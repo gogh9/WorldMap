@@ -32,16 +32,24 @@
   flex-shrink: 1;
 }
 
+.discoverers-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
 .discoverer-badge {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   font-size: 0.85rem;
-  color: #000000;
+  color: #ffffff;
   background: linear-gradient(135deg, #1ed760, #15a34a);
   padding: 6px 14px;
   border-radius: 20px;
-  font-weight: 800;
+  font-weight: 500;
   white-space: nowrap;
   box-shadow: 0 4px 12px rgba(30, 215, 96, 0.2);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
