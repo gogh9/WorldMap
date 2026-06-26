@@ -377,7 +377,7 @@ export default function Dashboard() {
                       fontWeight: 'bold'
                     }}
                   >
-                    {map.is_active !== false ? '✅ 나라 이름 입력 가능' : '⏸️ 나라 이름 입력 중지'}
+                    {map.is_active !== false ? '✅ 입력 가능' : '⏸️ 입력 중지'}
                   </button>
                 </div>
                 
