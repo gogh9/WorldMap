@@ -341,7 +341,7 @@ export default function Dashboard() {
                         const newActive = map.is_active === false ? true : false;
                         setMyMaps(prev => prev.map(m => m.id === map.id ? { ...m, is_active: newActive } : m));
                         supabase.from('maps').update({ is_active: newActive }).eq('id', map.id).then(({error}) => {
-                          if(error) alert('상태 변경 실패');
+                          if(error) alert('상태 변경 실패: ' + error.message);
                         });
                       }}
                       style={{ 
