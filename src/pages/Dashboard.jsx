@@ -323,7 +323,7 @@ export default function Dashboard() {
                 </button>
               )}
               {myMaps.length < 3 && (
-                <button onClick={handleCreateMap} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}>
+                <button onClick={handleCreateMap} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
                   <Plus size={16} /> 새 지도 만들기
                 </button>
               )}
@@ -382,7 +382,7 @@ export default function Dashboard() {
                 </div>
                 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
-                  <button onClick={(e) => { e.stopPropagation(); copyMapLink(map.id); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                  <button onClick={(e) => { e.stopPropagation(); copyMapLink(map.id); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'var(--primary-color)', color: '#000', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
                     <Copy size={16} /> 학생 배부용 링크 복사
                   </button>
                   <div style={{ display: 'flex', width: '100%', gap: '4px' }}>
