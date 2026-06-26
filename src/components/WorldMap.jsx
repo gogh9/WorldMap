@@ -97,12 +97,18 @@ export default function WorldMap({ onCountryClick, mapId }) {
   // 중심점 계산
   const centroids = useMemo(() => {
     if (!geoData) return []
-    const list = geoData.features.map(feature => {
+    const seen = new Set()
+    const list = []
+    
+    geoData.features.forEach(feature => {
       const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
+      if (!iso2 || seen.has(iso2)) return;
+      
       const stats = registeredCountries[iso2]
       let customName = null
       
       if (stats && stats.count > 0) {
+        seen.add(iso2);
         if (stats.count >= 5) {
           customName = stats.name
         } else {
@@ -112,14 +118,14 @@ export default function WorldMap({ onCountryClick, mapId }) {
           const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
           customName = `${masked} (${stats.count}/5)`
         }
+        
+        list.push({
+          iso2,
+          name: customName,
+          coordinates: geoCentroid(feature)
+        })
       }
-
-      return {
-        iso2,
-        name: customName,
-        coordinates: geoCentroid(feature)
-      }
-    }).filter(d => d.name) // 이름이 있는 곳만 마커용으로 반환
+    })
 
     // 글씨가 겹치지 않도록 밀어내는 로직 (간단한 충돌 해결)
     for (let i = 0; i < 50; i++) {
@@ -220,10 +226,10 @@ export default function WorldMap({ onCountryClick, mapId }) {
           {/* 등록된 국가 이름 표시 */}
           {[...centroids]
             .sort((a, b) => (a.iso2 === hoveredCountry ? 1 : b.iso2 === hoveredCountry ? -1 : 0))
-            .map(({ iso2, name, coordinates }) => {
+            .map(({ iso2, name, coordinates }, idx) => {
             const isHovered = hoveredCountry === iso2;
             return (
-              <Marker key={iso2} coordinates={coordinates}>
+              <Marker key={`${iso2}-${idx}`} coordinates={coordinates}>
                 <text
                   textAnchor="middle"
                   y={0}
