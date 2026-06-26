@@ -341,33 +341,8 @@ export default function Dashboard() {
                 </div>
                 
                 <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>나라 이름 표시 조건:</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        const newActive = map.is_active === false ? true : false;
-                        setMyMaps(prev => prev.map(m => m.id === map.id ? { ...m, is_active: newActive } : m));
-                        supabase.from('maps').update({ is_active: newActive }).eq('id', map.id).then(({error}) => {
-                          if(error) alert('상태 변경 실패: ' + error.message);
-                        });
-                      }}
-                      style={{ 
-                        padding: '4px 8px', 
-                        borderRadius: '4px', 
-                        border: 'none', 
-                        background: map.is_active !== false ? 'var(--primary-color)' : '#ef4444', 
-                        color: map.is_active !== false ? '#000' : '#fff', 
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        fontSize: '0.75rem',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {map.is_active !== false ? '✅ 입력 가능' : '⏸️ 입력 중지'}
-                    </button>
+                    <span style={{ color: 'var(--text-muted)' }}>나라 이름 표시 조건:</span>
                     <select 
                       value={map.reveal_threshold || 5} 
                       onChange={(e) => handleUpdateThreshold(map.id, parseInt(e.target.value))}
@@ -379,6 +354,31 @@ export default function Dashboard() {
                       ))}
                     </select>
                   </div>
+                  <button 
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      const newActive = map.is_active === false ? true : false;
+                      setMyMaps(prev => prev.map(m => m.id === map.id ? { ...m, is_active: newActive } : m));
+                      supabase.from('maps').update({ is_active: newActive }).eq('id', map.id).then(({error}) => {
+                        if(error) alert('상태 변경 실패: ' + error.message);
+                      });
+                    }}
+                    style={{ 
+                      padding: '4px 8px', 
+                      borderRadius: '4px', 
+                      border: 'none', 
+                      background: map.is_active !== false ? 'var(--primary-color)' : '#ef4444', 
+                      color: map.is_active !== false ? '#000' : '#fff', 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {map.is_active !== false ? '✅ 나라 이름 입력 가능' : '⏸️ 나라 이름 입력 중지'}
+                  </button>
                 </div>
                 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
