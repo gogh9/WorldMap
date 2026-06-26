@@ -131,9 +131,9 @@ export default function WorldMap({ onCountryClick, mapId }) {
           const avgLat = (list[j].coordinates[1] + list[k].coordinates[1]) / 2;
           const cosLat = Math.max(0.2, Math.cos(avgLat * Math.PI / 180));
           
-          // 폰트 크기(6)에 비례하는 필요 위경도 거리 (조정 가능)
-          const minDx = ((list[j].name.length + list[k].name.length) * 0.7) / cosLat;
-          const minDy = 2.0;
+          // 폰트 크기에 비례하는 필요 위경도 거리 (줌 레벨에 따라 겹침 허용 거리 축소)
+          const minDx = (((list[j].name.length + list[k].name.length) * 0.7) / cosLat) / position.zoom;
+          const minDy = 2.0 / position.zoom;
 
           if (Math.abs(dx) < minDx && Math.abs(dy) < minDy) {
             const overlapX = minDx - Math.abs(dx);
@@ -141,11 +141,11 @@ export default function WorldMap({ onCountryClick, mapId }) {
             
             // 더 적게 겹친 방향으로 살짝씩 밀어냄
             if (overlapX < overlapY) {
-              const push = (overlapX / 2 + 0.05) * Math.sign(dx || 1);
+              const push = (overlapX / 2 + 0.05 / position.zoom) * Math.sign(dx || 1);
               list[j].coordinates[0] += push;
               list[k].coordinates[0] -= push;
             } else {
-              const push = (overlapY / 2 + 0.05) * Math.sign(dy || 1);
+              const push = (overlapY / 2 + 0.05 / position.zoom) * Math.sign(dy || 1);
               list[j].coordinates[1] += push;
               list[k].coordinates[1] -= push;
             }
@@ -157,7 +157,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
     }
     
     return list;
-  }, [geoData, registeredCountries])
+  }, [geoData, registeredCountries, position.zoom])
 
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
@@ -230,7 +230,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
                   style={{
                     fontFamily: "system-ui",
                     fill: isHovered ? "#ffeb3b" : "#fff",
-                    fontSize: ((isHovered ? 8 : 6) + position.zoom * 1.5) / position.zoom,
+                    fontSize: ((isHovered ? 10 : 8) + position.zoom * 1.5) / position.zoom,
                     fontWeight: 800,
                     pointerEvents: "none",
                     textShadow: `${(1 + position.zoom * 0.2)/position.zoom}px ${(1 + position.zoom * 0.2)/position.zoom}px ${(3 + position.zoom * 0.5)/position.zoom}px rgba(0,0,0,0.9), -${(1 + position.zoom * 0.2)/position.zoom}px -${(1 + position.zoom * 0.2)/position.zoom}px ${(3 + position.zoom * 0.5)/position.zoom}px rgba(0,0,0,0.9), ${(1 + position.zoom * 0.2)/position.zoom}px -${(1 + position.zoom * 0.2)/position.zoom}px ${(3 + position.zoom * 0.5)/position.zoom}px rgba(0,0,0,0.9), -${(1 + position.zoom * 0.2)/position.zoom}px ${(1 + position.zoom * 0.2)/position.zoom}px ${(3 + position.zoom * 0.5)/position.zoom}px rgba(0,0,0,0.9)`,
