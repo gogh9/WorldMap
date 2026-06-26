@@ -387,21 +387,23 @@ export default function Dashboard() {
                   {group.registrations.length > 0 && (
                     <div className="record-category">
                       <h4 className="category-title">🎯 등록한 나라</h4>
-                      <div className="category-items" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '6px' }}>
+                      <div className="category-items" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
                         {group.registrations.map(record => {
                           const canEdit = isAdmin || record.author_name === user.user_metadata?.full_name;
                           return (
-                            <div key={record.id} className="sub-record-card" style={{ padding: '8px 10px', marginBottom: 0, flex: '1 1 auto', minWidth: 0, maxWidth: '100%' }}>
-                              <div className="sub-record-header" style={{ marginBottom: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
-                                  <span className="sub-record-country" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{record.country_name || '이름 없는 나라'}</span>
+                            <div key={record.id} className="sub-record-card" style={{ padding: '8px 10px', marginBottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                              <div className="sub-record-header" style={{ marginBottom: 0, width: '100%' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '4px' }}>
+                                  <span className="sub-record-country" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.9rem' }} title={record.country_name || '이름 없는 나라'}>
+                                    {record.country_name || '이름 없는 나라'}
+                                  </span>
                                   {canEdit && (
-                                    <div className="sub-record-actions" style={{ marginTop: 0 }}>
-                                      <button onClick={() => handleEditClick(record)} className="action-btn edit-btn" style={{ flex: 0, padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="수정">
-                                        <Edit2 size={14} />
+                                    <div className="sub-record-actions" style={{ marginTop: 0, flexShrink: 0 }}>
+                                      <button onClick={() => handleEditClick(record)} className="action-btn edit-btn" style={{ padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="수정">
+                                        <Edit2 size={12} />
                                       </button>
-                                      <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn" style={{ flex: 0, padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="삭제">
-                                        <Trash2 size={14} />
+                                      <button onClick={() => handleDelete(record.id)} className="action-btn delete-btn" style={{ padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="삭제">
+                                        <Trash2 size={12} />
                                       </button>
                                     </div>
                                   )}
