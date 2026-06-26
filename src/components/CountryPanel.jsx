@@ -4,7 +4,7 @@ import { X, Save, Edit2, Trash2 } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
 import './CountryPanel.css'
 
-export default function CountryPanel({ countryId, onClose, user, mapId, isTeacher, revealThreshold = 5 }) {
+export default function CountryPanel({ countryId, onClose, user, mapId, isTeacher, revealThreshold = 5, isActive = true }) {
   const [info, setInfo] = useState('')
   const [inputCountryName, setInputCountryName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -110,11 +110,15 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!info.trim()) return
+    if (!isActive && !isTeacher) {
+      alert("현재 입력이 중지되었습니다.");
+      return;
+    }
     if (!inputCountryName.trim()) {
       alert("나라 이름을 먼저 입력해주세요!");
       return;
     }
-    if (!info.trim()) return;
 
     setLoading(true)
 
@@ -184,6 +188,10 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   const handleNameUpdate = async () => {
     if (!inputCountryName.trim()) {
       alert("나라 이름을 먼저 입력해주세요!");
+      return;
+    }
+    if (!isActive && !isTeacher) {
+      alert("현재 입력이 중지되었습니다.");
       return;
     }
     try {
@@ -308,12 +316,13 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
               <input 
                 type="text" 
                 className="country-name-input-header"
-                placeholder="이 나라의 이름은?"
+                placeholder={isActive ? "이 나라의 이름은?" : "입력이 중지되었습니다."}
                 value={inputCountryName}
                 onChange={(e) => setInputCountryName(e.target.value)}
                 required
+                disabled={!isActive && !isTeacher}
               />
-              <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
+              <button className="name-apply-btn" onClick={handleNameUpdate} disabled={!isActive && !isTeacher} style={{ opacity: (!isActive && !isTeacher) ? 0.5 : 1, cursor: (!isActive && !isTeacher) ? 'not-allowed' : 'pointer' }}>입력</button>
             </div>
             {/* 비공개 시에도 이름 표시 */}
             <div className="discoverers-list" style={{ marginTop: '12px' }}>
@@ -401,13 +410,14 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           <h3>새로운 정보 기록하기</h3>
           <form onSubmit={handleSubmit}>
             <textarea 
-              placeholder="이 나라에 대해 조사한 내용을 자유롭게 적어주세요!"
+              placeholder={isActive ? "이 나라에 대해 조사한 내용을 자유롭게 적어주세요!" : "입력이 중지되었습니다."}
               value={info}
               onChange={(e) => setInfo(e.target.value)}
               required
+              disabled={!isActive && !isTeacher}
             />
             <div className="form-actions">
-              <button type="submit" className="submit-btn" disabled={loading}>
+              <button type="submit" className="submit-btn" disabled={loading || (!isActive && !isTeacher)} style={{ opacity: (!isActive && !isTeacher) ? 0.5 : 1, cursor: (!isActive && !isTeacher) ? 'not-allowed' : 'pointer' }}>
                 {loading ? '저장 중...' : '기록'}
               </button>
             </div>

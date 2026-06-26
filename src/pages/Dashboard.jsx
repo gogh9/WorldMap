@@ -334,16 +334,43 @@ export default function Dashboard() {
                 
                 <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                   <span style={{ color: 'var(--text-muted)' }}>나라 이름 표시 조건:</span>
-                  <select 
-                    value={map.reveal_threshold || 5} 
-                    onChange={(e) => handleUpdateThreshold(map.id, parseInt(e.target.value))}
-                    onClick={(e) => e.stopPropagation()}
-                    style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-color)', cursor: 'pointer' }}
-                  >
-                    {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                      <option key={num} value={num}>{num}명 입력시</option>
-                    ))}
-                  </select>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button 
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        const newActive = map.is_active === false ? true : false;
+                        setMyMaps(prev => prev.map(m => m.id === map.id ? { ...m, is_active: newActive } : m));
+                        supabase.from('maps').update({ is_active: newActive }).eq('id', map.id).then(({error}) => {
+                          if(error) alert('상태 변경 실패');
+                        });
+                      }}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: 'none', 
+                        background: map.is_active !== false ? 'var(--primary-color)' : '#ef4444', 
+                        color: map.is_active !== false ? '#000' : '#fff', 
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {map.is_active !== false ? '✅ 입력 가능' : '⏸️ 입력 중지'}
+                    </button>
+                    <select 
+                      value={map.reveal_threshold || 5} 
+                      onChange={(e) => handleUpdateThreshold(map.id, parseInt(e.target.value))}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-color)', cursor: 'pointer' }}
+                    >
+                      {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                        <option key={num} value={num}>{num}명 입력시</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
