@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useNavigate, Link } from 'react-router-dom'
-import { Edit2, Trash2, ArrowLeft, Download, Plus, Copy, Map as MapIcon, ExternalLink, RefreshCcw } from 'lucide-react'
+import { Edit2, Trash2, ArrowLeft, Download, Plus, Copy, Map as MapIcon, ExternalLink, RefreshCcw, LogOut } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
 import './Dashboard.css'
 
@@ -308,6 +308,14 @@ export default function Dashboard() {
             <h2>우리 반 백지도</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{user.email}</span>
+              <button 
+                onClick={async () => { await supabase.auth.signOut(); navigate('/login'); }} 
+                className="logout-btn" 
+                title="로그아웃"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}
+              >
+                <LogOut size={18} />
+              </button>
               {selectedMapId && (
                 <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장" style={{ borderRadius: '6px', padding: '8px 16px' }}>
                   <Download size={16} />

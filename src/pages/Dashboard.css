@@ -1,9 +1,8 @@
 .dashboard-container {
   min-height: 100vh;
-  background-color: var(--bg-primary, #121212);
-  color: var(--text-primary, #ffffff);
+  background-color: var(--bg-color);
+  color: var(--text-color);
   padding: 40px 20px;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .dashboard-header {
