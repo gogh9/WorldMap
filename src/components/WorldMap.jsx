@@ -21,6 +21,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
   const [geoData, setGeoData] = useState(null)
   const [registeredCountries, setRegisteredCountries] = useState({})
   const [hoveredCountry, setHoveredCountry] = useState(null)
+  const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 })
 
   useEffect(() => {
     // 고해상도(50m) 세계 국가 GeoJSON 데이터 가져오기
@@ -161,7 +162,13 @@ export default function WorldMap({ onCountryClick, mapId }) {
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
       <ComposableMap projection={projection} width={mapWidth} height={mapHeight} style={{ width: "100%", height: "100%" }}>
-        <ZoomableGroup center={[0, 0]} zoom={1} minZoom={1} maxZoom={10}>
+        <ZoomableGroup 
+          center={position.coordinates} 
+          zoom={position.zoom} 
+          onMoveEnd={setPosition} 
+          minZoom={1} 
+          maxZoom={10}
+        >
           <Sphere stroke="#80deea" strokeWidth={1} fill="#aad3df" />
           <Graticule stroke="#b2ebf2" strokeWidth={0.5} />
           {geoData && (
@@ -223,10 +230,10 @@ export default function WorldMap({ onCountryClick, mapId }) {
                   style={{
                     fontFamily: "system-ui",
                     fill: isHovered ? "#ffeb3b" : "#fff",
-                    fontSize: isHovered ? 8 : 6,
+                    fontSize: (isHovered ? 8 : 6) / position.zoom,
                     fontWeight: 800,
                     pointerEvents: "none",
-                    textShadow: "1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(0,0,0,0.9), 1px -1px 3px rgba(0,0,0,0.9), -1px 1px 3px rgba(0,0,0,0.9)",
+                    textShadow: `${1/position.zoom}px ${1/position.zoom}px ${3/position.zoom}px rgba(0,0,0,0.9), -${1/position.zoom}px -${1/position.zoom}px ${3/position.zoom}px rgba(0,0,0,0.9), ${1/position.zoom}px -${1/position.zoom}px ${3/position.zoom}px rgba(0,0,0,0.9), -${1/position.zoom}px ${1/position.zoom}px ${3/position.zoom}px rgba(0,0,0,0.9)`,
                     transition: "all 0.2s ease-in-out",
                     zIndex: isHovered ? 10 : 1
                   }}
