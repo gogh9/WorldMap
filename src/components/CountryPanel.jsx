@@ -4,7 +4,7 @@ import { X, Save, Edit2, Trash2 } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
 import './CountryPanel.css'
 
-export default function CountryPanel({ countryId, onClose, user, mapId, isTeacher }) {
+export default function CountryPanel({ countryId, onClose, user, mapId, isTeacher, revealThreshold = 5 }) {
   const [info, setInfo] = useState('')
   const [inputCountryName, setInputCountryName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -48,7 +48,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
 
         let winningName = null;
         for (const [name, authorsSet] of Object.entries(nameCounts)) {
-          if (authorsSet.size >= 5) {
+          if (authorsSet.size >= revealThreshold) {
             winningName = name;
             break;
           }
@@ -271,6 +271,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           <div className="header-title-container" style={{ display: 'flex', alignItems: 'flex-start', width: '100%', justifyContent: 'space-between' }}>
             <div className="header-title-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', width: '100%' }}>
               <h2 className="country-title-display">{inputCountryName}</h2>
+              {/* 공개 시 이름 표시 */}
               <div className="discoverers-list">
                 {(() => {
                   const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
@@ -294,26 +295,46 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
             </div>
             {isAdmin && (
               <div className="admin-actions-header">
-                <button className="edit-btn" onClick={handleAdminEditName}>
-                  수정
-                </button>
-                <button className="delete-btn" onClick={handleAdminDeleteCountryName}>
-                  삭제
-                </button>
+                <button className="edit-btn" onClick={handleAdminEditName}>수정</button>
+                <button className="delete-btn" onClick={handleAdminDeleteCountryName}>삭제</button>
               </div>
             )}
           </div>
         ) : (
-          <div className="header-input-group">
-            <input 
-              type="text" 
-              className="country-name-input-header"
-              placeholder="이 나라의 이름은?"
-              value={inputCountryName}
-              onChange={(e) => setInputCountryName(e.target.value)}
-              required
-            />
-            <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <div className="header-input-group">
+              <input 
+                type="text" 
+                className="country-name-input-header"
+                placeholder="이 나라의 이름은?"
+                value={inputCountryName}
+                onChange={(e) => setInputCountryName(e.target.value)}
+                required
+              />
+              <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
+            </div>
+            {/* 비공개 시에도 이름 표시 */}
+            <div className="discoverers-list" style={{ marginTop: '12px' }}>
+              {(() => {
+                const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
+                if (regs.length === 0) return null;
+                const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
+                let countryHash = 0;
+                if (countryId) {
+                  for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
+                }
+                return regs.map((reg, index) => {
+                  const authorName = reg.author_name || '익명 학생';
+                  const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
+                  return (
+                    <div key={reg.id} className="discoverer-badge" title={`${formatDisplayName(authorName)}님이 나라 이름 등록에 참여했습니다`}>
+                      <span className="discoverer-emoji">{item}</span>
+                      <span className="discoverer-name">{formatDisplayName(authorName)}</span>
+                    </div>
+                  )
+                })
+              })()}
+            </div>
           </div>
         )}
       </div>

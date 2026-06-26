@@ -125,6 +125,7 @@ export default function Home() {
               user={user} 
               mapId={mapId}
               isTeacher={isTeacher}
+              revealThreshold={revealThreshold}
               onClose={() => setSelectedCountry(null)} 
             />
           ) : (

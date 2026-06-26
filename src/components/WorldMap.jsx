@@ -130,14 +130,7 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
           const unmaskedLen = Math.floor((stats.count / revealThreshold) * nameLen);
           const maskedLen = nameLen - unmaskedLen;
           const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
-          
-          const authorsArr = Array.from(stats.authors || []).map(name => {
-            const cleanName = name.replace(/^.*반/, '').trim();
-            return formatDisplayName(cleanName || name);
-          });
-          const authorStr = authorsArr.join(', ');
-          
-          customName = `${masked} (${authorStr})`
+          customName = `${masked} (${stats.count}/${revealThreshold})`
         }
         
         list.push({
