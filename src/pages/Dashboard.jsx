@@ -165,6 +165,17 @@ export default function Dashboard() {
     }
   }
 
+  const handleUpdateThreshold = async (mapId, newThreshold) => {
+    try {
+      setMyMaps(prev => prev.map(m => m.id === mapId ? { ...m, reveal_threshold: newThreshold } : m))
+      const { error } = await supabase.from('maps').update({ reveal_threshold: newThreshold }).eq('id', mapId)
+      if (error) throw error
+    } catch (err) {
+      alert("설정 변경 실패: " + err.message)
+      fetchMyMaps()
+    }
+  }
+
   const copyMapLink = (mapId) => {
     const link = `${window.location.origin}/map/${mapId}`
     navigator.clipboard.writeText(link)
@@ -319,6 +330,20 @@ export default function Dashboard() {
                   <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem' }}>
                     {`${map.name}(${new Date(map.created_at).toLocaleDateString()})`}
                   </h3>
+                </div>
+                
+                <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>이름 표시 조건:</span>
+                  <select 
+                    value={map.reveal_threshold || 5} 
+                    onChange={(e) => handleUpdateThreshold(map.id, parseInt(e.target.value))}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-color)', cursor: 'pointer' }}
+                  >
+                    {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                      <option key={num} value={num}>{num}명 참여시</option>
+                    ))}
+                  </select>
                 </div>
                 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>

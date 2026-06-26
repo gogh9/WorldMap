@@ -13,6 +13,7 @@ export default function Home() {
   const [user, setUser] = useState(null)
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [mapName, setMapName] = useState('우리 반 세계지도')
+  const [revealThreshold, setRevealThreshold] = useState(5)
   const [isTeacher, setIsTeacher] = useState(false)
 
   useEffect(() => {
@@ -26,12 +27,13 @@ export default function Home() {
       const fetchMapDetails = async () => {
         const { data } = await supabase
           .from('maps')
-          .select('name, teacher_email')
+          .select('name, teacher_email, reveal_threshold')
           .eq('id', mapId)
           .single()
         
         if (data) {
           setMapName(data.name)
+          setRevealThreshold(data.reveal_threshold || 5)
           if (user && data.teacher_email === user.email) {
             setIsTeacher(true)
           }
@@ -96,7 +98,7 @@ export default function Home() {
   return (
     <div className="home-container">
       <main className="map-section">
-        <WorldMap onCountryClick={handleCountryClick} mapId={mapId} />
+        <WorldMap onCountryClick={handleCountryClick} mapId={mapId} revealThreshold={revealThreshold} />
       </main>
       
       <aside className="right-sidebar">

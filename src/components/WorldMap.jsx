@@ -17,7 +17,7 @@ const projection = geoNaturalEarth1()
   .translate([mapWidth / 2, mapHeight / 2])
   .scale(160)
 
-export default function WorldMap({ onCountryClick, mapId }) {
+export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5 }) {
   const [geoData, setGeoData] = useState(null)
   const [registeredCountries, setRegisteredCountries] = useState({})
   const [hoveredCountry, setHoveredCountry] = useState(null)
@@ -109,14 +109,14 @@ export default function WorldMap({ onCountryClick, mapId }) {
       
       if (stats && stats.count > 0) {
         seen.add(iso2);
-        if (stats.count >= 5) {
+        if (stats.count >= revealThreshold) {
           customName = stats.name
         } else {
           const nameLen = stats.name.length;
-          const unmaskedLen = Math.floor((stats.count / 5) * nameLen);
+          const unmaskedLen = Math.floor((stats.count / revealThreshold) * nameLen);
           const maskedLen = nameLen - unmaskedLen;
           const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
-          customName = `${masked} (${stats.count}/5)`
+          customName = `${masked} (${stats.count}/${revealThreshold})`
         }
         
         list.push({
@@ -163,7 +163,7 @@ export default function WorldMap({ onCountryClick, mapId }) {
     }
     
     return list;
-  }, [geoData, registeredCountries, position.zoom])
+  }, [geoData, registeredCountries, position.zoom, revealThreshold])
 
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
