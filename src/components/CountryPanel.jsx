@@ -282,9 +282,9 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
                     for (let i = 0; i < str.length; i++) hash = Math.imul(31, hash) + str.charCodeAt(i) | 0;
                     const item = RANDOM_ITEMS[Math.abs(hash) % RANDOM_ITEMS.length];
                     return (
-                      <div key={reg.id} className="discoverer-info" title={`${formatDisplayName(authorName)}님이 나라 이름 등록에 참여했습니다`} style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-elevated)', padding: '4px 8px', borderRadius: '12px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}>
-                        <span>{item}</span>
-                        <span>{formatDisplayName(authorName)}</span>
+                      <div key={reg.id} className="discoverer-badge" title={`${formatDisplayName(authorName)}님이 나라 이름 등록에 참여했습니다`}>
+                        <span className="discoverer-emoji">{item}</span>
+                        <span className="discoverer-name">{formatDisplayName(authorName)}</span>
                       </div>
                     )
                   })

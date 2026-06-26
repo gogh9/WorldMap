@@ -32,14 +32,34 @@
   flex-shrink: 1;
 }
 
-.discoverer-info {
+.discoverer-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.85rem;
   color: #000000;
-  background-color: var(--primary-color); /* Spotify Green */
-  padding: 4px 12px;
-  border-radius: var(--pill-radius);
-  font-weight: 700;
+  background: linear-gradient(135deg, #1ed760, #15a34a);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 800;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(30, 215, 96, 0.2);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: default;
+}
+
+.discoverer-badge:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 16px rgba(30, 215, 96, 0.4);
+}
+
+.discoverer-emoji {
+  font-size: 1rem;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+}
+
+.discoverer-name {
+  letter-spacing: -0.3px;
 }
 
 .admin-name-edit-btn {
