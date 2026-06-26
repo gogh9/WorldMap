@@ -198,6 +198,20 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
                   const iso2 = geo.properties.iso_a2 || geo.properties['ISO3166-1-Alpha-2']
                   const isRegistered = !!registeredCountries[iso2]
 
+                  const continentColors = {
+                    'North America': '#81c784',
+                    'South America': '#4db6ac',
+                    'Europe': '#7986cb',
+                    'Africa': '#ffb74d',
+                    'Asia': '#ba68c8',
+                    'Oceania': '#4dd0e1',
+                    'Antarctica': '#e0e0e0'
+                  };
+                  
+                  const defaultFill = !isRegistered ? '#ff6b6b' : (continentColors[geo.properties.continent] || '#d1d5db');
+                  const hoverFill = !isRegistered ? '#ff5252' : '#80deea';
+                  const pressedFill = !isRegistered ? '#ff1744' : '#26c6da';
+
                   return (
                     <Geography
                       key={geo.rsmKey}
@@ -211,20 +225,20 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
                       onMouseLeave={() => setHoveredCountry(null)}
                       style={{
                         default: {
-                          fill: isRegistered ? '#d1d5db' : '#f0f0f0',
+                          fill: defaultFill,
                           stroke: '#444',
                           strokeWidth: 0.5,
                           outline: 'none',
                         },
                         hover: {
-                          fill: '#80deea',
+                          fill: hoverFill,
                           stroke: '#00838f',
                           strokeWidth: 1.5,
                           outline: 'none',
                           cursor: 'pointer',
                         },
                         pressed: {
-                          fill: '#26c6da',
+                          fill: pressedFill,
                           stroke: '#00838f',
                           strokeWidth: 1.5,
                           outline: 'none',
