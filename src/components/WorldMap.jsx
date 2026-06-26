@@ -230,10 +230,10 @@ export default function WorldMap({ onCountryClick, mapId }) {
                   style={{
                     fontFamily: "system-ui",
                     fill: isHovered ? "#ffeb3b" : "#fff",
-                    fontSize: (isHovered ? 8 : 6) / position.zoom,
+                    fontSize: ((isHovered ? 8 : 6) + position.zoom * 1.5) / position.zoom,
                     fontWeight: 800,
                     pointerEvents: "none",
-                    textShadow: `${1/position.zoom}px ${1/position.zoom}px ${3/position.zoom}px rgba(0,0,0,0.9), -${1/position.zoom}px -${1/position.zoom}px ${3/position.zoom}px rgba(0,0,0,0.9), ${1/position.zoom}px -${1/position.zoom}px ${3/position.zoom}px rgba(0,0,0,0.9), -${1/position.zoom}px ${1/position.zoom}px ${3/position.zoom}px rgba(0,0,0,0.9)`,
+                    textShadow: `${(1 + position.zoom * 0.2)/position.zoom}px ${(1 + position.zoom * 0.2)/position.zoom}px ${(3 + position.zoom * 0.5)/position.zoom}px rgba(0,0,0,0.9), -${(1 + position.zoom * 0.2)/position.zoom}px -${(1 + position.zoom * 0.2)/position.zoom}px ${(3 + position.zoom * 0.5)/position.zoom}px rgba(0,0,0,0.9), ${(1 + position.zoom * 0.2)/position.zoom}px -${(1 + position.zoom * 0.2)/position.zoom}px ${(3 + position.zoom * 0.5)/position.zoom}px rgba(0,0,0,0.9), -${(1 + position.zoom * 0.2)/position.zoom}px ${(1 + position.zoom * 0.2)/position.zoom}px ${(3 + position.zoom * 0.5)/position.zoom}px rgba(0,0,0,0.9)`,
                     transition: "all 0.2s ease-in-out",
                     zIndex: isHovered ? 10 : 1
                   }}
