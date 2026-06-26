@@ -110,7 +110,11 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!info.trim() || !inputCountryName.trim()) return
+    if (!inputCountryName.trim()) {
+      alert("나라 이름을 먼저 입력해주세요!");
+      return;
+    }
+    if (!info.trim()) return;
 
     setLoading(true)
 
