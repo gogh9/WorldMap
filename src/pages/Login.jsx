@@ -17,10 +17,12 @@ export default function Login() {
       alert("로그인 에러 발생: " + decodeURIComponent(errorDescription).replace(/\+/g, ' '));
     }
 
+    const returnTo = queryParams.get('returnTo') || '/';
+
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth Event:", event, "Session:", session)
       if (session) {
-        navigate('/')
+        navigate(returnTo)
       }
     })
     return () => {
@@ -31,10 +33,13 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true)
+      const queryParams = new URLSearchParams(window.location.search);
+      const returnTo = queryParams.get('returnTo') || '/';
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin
+          redirectTo: `${window.location.origin}${returnTo}`
         }
       })
       if (error) throw error

@@ -57,7 +57,7 @@ export default function Home() {
                                window.location.search.includes('error=');
         
         if (!session && !isAuthCallback) {
-          navigate('/login')
+          navigate(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`)
         } else if (session) {
           setUser(session.user)
         }
@@ -72,7 +72,7 @@ export default function Home() {
                                window.location.hash.includes('access_token=');
                                
         if (!session && !isAuthCallback) {
-          navigate('/login')
+          navigate(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`)
         } else if (session) {
           setUser(session.user)
         }
