@@ -34,8 +34,20 @@ export default function Dashboard() {
           return
         }
         setUser(session.user)
-        fetchMyMaps(session.user)
-        fetchRecords(session.user, null)
+        
+        const { data: maps } = await supabase
+          .from('maps')
+          .select('*')
+          .eq('teacher_email', session.user.email)
+          .order('created_at', { ascending: false })
+          
+        if (maps && maps.length > 0) {
+          setMyMaps(maps)
+          setSelectedMapId(maps[0].id)
+          fetchRecords(session.user, maps[0].id)
+        } else {
+          fetchRecords(session.user, null)
+        }
       }
     }
 
@@ -77,9 +89,12 @@ export default function Dashboard() {
       if (mapId) {
         query = query.eq('map_id', mapId)
       } else {
-        if (currentUser.email !== 'gogh999@gmail.com') {
-          query = query.eq('author_name', currentUser.user_metadata?.full_name || '익명 학생')
+        if (currentUser.email === 'gogh999@gmail.com') {
+          setRecords([])
+          setLoading(false)
+          return
         }
+        query = query.eq('author_name', currentUser.user_metadata?.full_name || '익명 학생')
       }
       
       const { data, error } = await query
