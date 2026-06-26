@@ -103,6 +103,15 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
     const seen = new Set()
     const list = []
     
+    // 일부 영토가 떨어져 있어 수학적 중심점이 이상하게 나오는 나라들의 중심점 수동 보정 (경도, 위도)
+    const CENTROID_OVERRIDES = {
+      "FR": [2.2137, 46.2276], // 프랑스 (해외 영토 때문에 대서양으로 잡히는 문제 보정)
+      "US": [-95.7129, 37.0902], // 미국 (알래스카 때문에 치우치는 현상 보정)
+      "RU": [90.0, 60.0], // 러시아
+      "NL": [5.2913, 52.1326], // 네덜란드
+      "GB": [-3.4360, 55.3781], // 영국
+    }
+    
     geoData.features.forEach(feature => {
       const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
       if (!iso2 || seen.has(iso2)) return;
@@ -113,7 +122,7 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
       if (stats && stats.count > 0) {
         seen.add(iso2);
         
-        const currentName = currentUser?.user_metadata?.full_name;
+        const currentName = currentUser?.user_metadata?.full_name || '익명 학생';
         const hasUserRegistered = currentName && stats.authors && stats.authors.has(currentName);
 
         if (stats.count >= revealThreshold || hasUserRegistered) {
@@ -129,7 +138,7 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
         list.push({
           iso2,
           name: customName,
-          coordinates: geoCentroid(feature)
+          coordinates: CENTROID_OVERRIDES[iso2] || geoCentroid(feature)
         })
       }
     })
