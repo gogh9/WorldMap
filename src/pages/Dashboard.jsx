@@ -366,7 +366,7 @@ export default function Dashboard() {
                       onClick={(e) => e.stopPropagation()}
                       style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-color)', cursor: 'pointer' }}
                     >
-                      {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                      {[1,2,3,4,5,6,7,8].map(num => (
                         <option key={num} value={num}>{num}명 입력시</option>
                       ))}
                     </select>
