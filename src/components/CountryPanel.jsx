@@ -194,13 +194,21 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       alert("현재 입력이 중지되었습니다.");
       return;
     }
+
+    const currentUserName = user?.user_metadata?.full_name || '익명 학생';
+    const totalRegistrations = savedData.filter(r => r.content && r.content.includes('등록했습니다! 🎉')).length;
+    const userAlreadyRegistered = savedData.some(r => 
+      r.author_name === currentUserName && 
+      r.content && 
+      r.content.includes('등록했습니다! 🎉')
+    );
+
+    if (!userAlreadyRegistered && totalRegistrations >= 8 && !isTeacher) {
+      alert("이 나라는 이미 8명의 친구들이 모두 참여했습니다!");
+      return;
+    }
+
     try {
-      const currentUserName = user?.user_metadata?.full_name || '익명 학생';
-      const userAlreadyRegistered = savedData.some(r => 
-        r.author_name === currentUserName && 
-        r.content && 
-        r.content.includes('등록했습니다! 🎉')
-      );
 
       if (userAlreadyRegistered) {
         // Only update the current user's registration record!
@@ -276,39 +284,39 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
     <aside className="country-panel">
       <div className="panel-header">
         {hasCountryName ? (
-          <div className="header-title-container" style={{ display: 'flex', alignItems: 'flex-start', width: '100%', justifyContent: 'space-between' }}>
-            <div className="header-title-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', width: '100%' }}>
+          <div className="header-title-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
               <h2 className="country-title-display">{inputCountryName}</h2>
-              {/* 공개 시 이름 표시 */}
-              <div className="discoverers-list">
-                {(() => {
-                  const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
-                  const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
-                  let countryHash = 0;
-                  if (countryId) {
-                    for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
-                  }
-                  return regs.map((reg, index) => {
-                    const rawName = reg.author_name || '익명 학생';
-                    const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
-                    const finalName = formatDisplayName(cleanName);
-                    const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
-                    return (
-                      <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
-                        <span className="discoverer-emoji">{item}</span>
-                        <span className="discoverer-name">{finalName}</span>
-                      </div>
-                    )
-                  })
-                })()}
-              </div>
+              {isAdmin && (
+                <div className="admin-actions-header" style={{ flexShrink: 0, marginTop: '4px' }}>
+                  <button className="edit-btn" onClick={handleAdminEditName}>수정</button>
+                  <button className="delete-btn" onClick={handleAdminDeleteCountryName}>삭제</button>
+                </div>
+              )}
             </div>
-            {isAdmin && (
-              <div className="admin-actions-header">
-                <button className="edit-btn" onClick={handleAdminEditName}>수정</button>
-                <button className="delete-btn" onClick={handleAdminDeleteCountryName}>삭제</button>
-              </div>
-            )}
+            {/* 공개 시 이름 표시 */}
+            <div className="discoverers-list">
+              {(() => {
+                const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
+                const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
+                let countryHash = 0;
+                if (countryId) {
+                  for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
+                }
+                return regs.map((reg, index) => {
+                  const rawName = reg.author_name || '익명 학생';
+                  const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
+                  const finalName = formatDisplayName(cleanName);
+                  const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
+                  return (
+                    <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
+                      <span className="discoverer-emoji">{item}</span>
+                      <span className="discoverer-name">{finalName}</span>
+                    </div>
+                  )
+                })
+              })()}
+            </div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -316,19 +324,31 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
               <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
                 선생님께서 입력을 일시 중지하셨습니다.
               </div>
-            ) : (
-              <div className="header-input-group">
-                <input 
-                  type="text" 
-                  className="country-name-input-header"
-                  placeholder="이 나라의 이름은?"
-                  value={inputCountryName}
-                  onChange={(e) => setInputCountryName(e.target.value)}
-                  required
-                />
-                <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
-              </div>
-            )}
+            ) : (() => {
+              const currentUserName = user?.user_metadata?.full_name || '익명 학생';
+              const totalRegistrations = savedData.filter(r => r.content && r.content.includes('등록했습니다! 🎉')).length;
+              const userAlreadyRegistered = savedData.some(r => r.author_name === currentUserName && r.content && r.content.includes('등록했습니다! 🎉'));
+              if (totalRegistrations >= 8 && !userAlreadyRegistered && !isTeacher) {
+                return (
+                  <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
+                    이 나라는 이미 8명의 친구들이 모두 참여했습니다! 🚀
+                  </div>
+                );
+              }
+              return (
+                <div className="header-input-group">
+                  <input 
+                    type="text" 
+                    className="country-name-input-header"
+                    placeholder="이 나라의 이름은?"
+                    value={inputCountryName}
+                    onChange={(e) => setInputCountryName(e.target.value)}
+                    required
+                  />
+                  <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
+                </div>
+              );
+            })()}
             {/* 비공개 시에도 이름 표시 */}
             <div className="discoverers-list" style={{ marginTop: '12px' }}>
               {(() => {
