@@ -17,7 +17,7 @@ const projection = geoNaturalEarth1()
   .translate([mapWidth / 2, mapHeight / 2])
   .scale(160)
 
-export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5 }) {
+export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, currentUser }) {
   const [geoData, setGeoData] = useState(null)
   const [registeredCountries, setRegisteredCountries] = useState({})
   const [hoveredCountry, setHoveredCountry] = useState(null)
@@ -63,17 +63,20 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5 })
         Object.keys(countryStats).forEach(link => {
            let maxCount = 0;
            let maxName = '';
+           let allAuthorsForMaxName = new Set();
            Object.entries(countryStats[link].nameCounts).forEach(([name, authorsSet]) => {
              if (authorsSet.size > maxCount) {
                maxCount = authorsSet.size;
                maxName = name;
+               allAuthorsForMaxName = authorsSet;
              }
            });
            
            if (maxName) {
              formattedStats[link] = {
                name: maxName,
-               count: maxCount
+               count: maxCount,
+               authors: allAuthorsForMaxName
              }
            }
         })
@@ -109,7 +112,11 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5 })
       
       if (stats && stats.count > 0) {
         seen.add(iso2);
-        if (stats.count >= revealThreshold) {
+        
+        const currentName = currentUser?.user_metadata?.full_name;
+        const hasUserRegistered = currentName && stats.authors && stats.authors.has(currentName);
+
+        if (stats.count >= revealThreshold || hasUserRegistered) {
           customName = stats.name
         } else {
           const nameLen = stats.name.length;
@@ -163,7 +170,7 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5 })
     }
     
     return list;
-  }, [geoData, registeredCountries, position.zoom, revealThreshold])
+  }, [geoData, registeredCountries, position.zoom, revealThreshold, currentUser])
 
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>

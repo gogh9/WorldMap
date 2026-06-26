@@ -98,7 +98,7 @@ export default function Home() {
   return (
     <div className="home-container">
       <main className="map-section">
-        <WorldMap onCountryClick={handleCountryClick} mapId={mapId} revealThreshold={revealThreshold} />
+        <WorldMap onCountryClick={handleCountryClick} mapId={mapId} revealThreshold={revealThreshold} currentUser={user} />
       </main>
       
       <aside className="right-sidebar">
