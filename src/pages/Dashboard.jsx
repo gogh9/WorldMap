@@ -333,7 +333,7 @@ export default function Dashboard() {
                 </div>
                 
                 <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>이름 표시 조건:</span>
+                  <span style={{ color: 'var(--text-muted)' }}>나라 이름 표시 조건:</span>
                   <select 
                     value={map.reveal_threshold || 5} 
                     onChange={(e) => handleUpdateThreshold(map.id, parseInt(e.target.value))}
@@ -341,7 +341,7 @@ export default function Dashboard() {
                     style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-color)', cursor: 'pointer' }}
                   >
                     {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                      <option key={num} value={num}>{num}명 참여시</option>
+                      <option key={num} value={num}>{num}명 입력시</option>
                     ))}
                   </select>
                 </div>
