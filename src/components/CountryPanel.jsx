@@ -271,7 +271,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           <div className="header-title-container" style={{ display: 'flex', alignItems: 'flex-start', width: '100%', justifyContent: 'space-between' }}>
             <div className="header-title-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', width: '100%' }}>
               <h2 className="country-title-display">{inputCountryName}</h2>
-              <div className="discoverers-list" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <div className="discoverers-list">
                 {(() => {
                   const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
                   const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
