@@ -261,8 +261,8 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
     }
   }
 
-  // 시스템이 자동 생성한 '최초 등록' 메시지는 목록에서 숨김
-  const displayRecords = savedData.filter(item => !item.content.includes('이 나라의 이름을 최초로 등록했습니다! 🎉'))
+  // 시스템이 자동 생성한 '등록' 메시지는 목록에서 숨김
+  const displayRecords = savedData.filter(item => !item.content.includes('등록했습니다! 🎉'))
 
   return (
     <aside className="country-panel">
@@ -271,8 +271,24 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           <div className="header-title-container" style={{ display: 'flex', alignItems: 'flex-start', width: '100%', justifyContent: 'space-between' }}>
             <div className="header-title-row" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
               <h2 className="country-title-display">{inputCountryName}</h2>
-              <div className="discoverer-info" title={`${formatDisplayName(savedData[savedData.length - 1]?.author_name)}님이 최초로 등록한 나라입니다`} style={{ whiteSpace: 'nowrap' }}>
-                {countryMedal} {formatDisplayName(savedData[savedData.length - 1]?.author_name)}
+              <div className="discoverers-list" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {(() => {
+                  const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
+                  const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
+                  return regs.map((reg) => {
+                    const authorName = reg.author_name || '익명 학생';
+                    const str = authorName + countryId;
+                    let hash = 0;
+                    for (let i = 0; i < str.length; i++) hash = Math.imul(31, hash) + str.charCodeAt(i) | 0;
+                    const item = RANDOM_ITEMS[Math.abs(hash) % RANDOM_ITEMS.length];
+                    return (
+                      <div key={reg.id} className="discoverer-info" title={`${formatDisplayName(authorName)}님이 나라 이름 등록에 참여했습니다`} style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-elevated)', padding: '4px 8px', borderRadius: '12px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}>
+                        <span>{item}</span>
+                        <span>{formatDisplayName(authorName)}</span>
+                      </div>
+                    )
+                  })
+                })()}
               </div>
             </div>
             {isAdmin && (
