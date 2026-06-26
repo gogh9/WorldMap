@@ -4,6 +4,7 @@ import { geoCentroid, geoNaturalEarth1 } from 'd3-geo'
 import countries from 'i18n-iso-countries'
 import koLocale from 'i18n-iso-countries/langs/ko.json'
 import { supabase } from '../lib/supabase'
+import { formatDisplayName } from '../utils/nameFormat'
 import './WorldMap.css'
 
 // 한국어 번역 로케일 등록
@@ -121,18 +122,22 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
       
       if (stats && stats.count > 0) {
         seen.add(iso2);
-        
-        const currentName = currentUser?.user_metadata?.full_name || '익명 학생';
-        const hasUserRegistered = currentName && stats.authors && stats.authors.has(currentName);
 
-        if (stats.count >= revealThreshold || hasUserRegistered) {
+        if (stats.count >= revealThreshold) {
           customName = stats.name
         } else {
           const nameLen = stats.name.length;
           const unmaskedLen = Math.floor((stats.count / revealThreshold) * nameLen);
           const maskedLen = nameLen - unmaskedLen;
           const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
-          customName = `${masked} (${stats.count}/${revealThreshold})`
+          
+          const authorsArr = Array.from(stats.authors || []).map(name => {
+            const cleanName = name.replace(/^.*반/, '').trim();
+            return formatDisplayName(cleanName || name);
+          });
+          const authorStr = authorsArr.join(', ');
+          
+          customName = `${masked} (${authorStr})`
         }
         
         list.push({
