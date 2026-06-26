@@ -281,12 +281,14 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
                     for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
                   }
                   return regs.map((reg, index) => {
-                    const authorName = reg.author_name || '익명 학생';
+                    const rawName = reg.author_name || '익명 학생';
+                    const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
+                    const finalName = formatDisplayName(cleanName);
                     const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
                     return (
-                      <div key={reg.id} className="discoverer-badge" title={`${formatDisplayName(authorName)}님이 나라 이름 등록에 참여했습니다`}>
+                      <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
                         <span className="discoverer-emoji">{item}</span>
-                        <span className="discoverer-name">{formatDisplayName(authorName)}</span>
+                        <span className="discoverer-name">{finalName}</span>
                       </div>
                     )
                   })
@@ -324,12 +326,14 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
                   for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
                 }
                 return regs.map((reg, index) => {
-                  const authorName = reg.author_name || '익명 학생';
+                  const rawName = reg.author_name || '익명 학생';
+                  const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
+                  const finalName = formatDisplayName(cleanName);
                   const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
                   return (
-                    <div key={reg.id} className="discoverer-badge" title={`${formatDisplayName(authorName)}님이 나라 이름 등록에 참여했습니다`}>
+                    <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
                       <span className="discoverer-emoji">{item}</span>
-                      <span className="discoverer-name">{formatDisplayName(authorName)}</span>
+                      <span className="discoverer-name">{finalName}</span>
                     </div>
                   )
                 })
