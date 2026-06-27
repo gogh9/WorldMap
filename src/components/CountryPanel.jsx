@@ -322,7 +322,6 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
 
       <div className="panel-content">
         <div className="records-section">
-          <h3>우리 반 친구들의 기록</h3>
           {displayRecords.length > 0 && (
             <div className="records-list">
               {displayRecords.map((item) => (
