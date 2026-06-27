@@ -288,7 +288,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
         {hasCountryName && (
           <div className="header-title-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
-              <h2 className="country-title-display">{displayCountryName}</h2>
+              <h2 className="country-title-display">{countryMedal} {displayCountryName}</h2>
               {isAdmin && (
                 <div className="admin-actions-header" style={{ flexShrink: 0, marginTop: '4px' }}>
                   <button className="edit-btn" onClick={handleAdminEditName}>수정</button>
@@ -336,7 +336,9 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           {(() => {
             const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
             if (regs.length === 0) return null;
-            const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
+            
+            // 4등 이하 학생들에게 수여되는 무작위 데코 에모지 리스트
+            const DECORATIVE_ITEMS = ['🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
             let countryHash = 0;
             if (countryId) {
               for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
@@ -345,7 +347,19 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
               const rawName = reg.author_name || '익명 학생';
               const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
               const finalName = formatDisplayName(cleanName);
-              const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
+              
+              // 1등 🥇, 2등 🥈, 3등 🥉 고정 부여. 4등 이하부턴 나라별 해시값 기준으로 데코 에모지 랜덤 부여
+              let item;
+              if (index === 0) {
+                item = '🥇';
+              } else if (index === 1) {
+                item = '🥈';
+              } else if (index === 2) {
+                item = '🥉';
+              } else {
+                item = DECORATIVE_ITEMS[(index - 3 + countryHash) % DECORATIVE_ITEMS.length];
+              }
+
               return (
                 <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
                   <span className="discoverer-emoji">{item}</span>
