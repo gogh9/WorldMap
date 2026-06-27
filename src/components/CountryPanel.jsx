@@ -275,7 +275,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
               const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
 
               return (
-                <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
+                <div key={reg.id} className="discoverer-badge" title={`입력한 이름: ${reg.country_name}`}>
                   <span className="discoverer-emoji">{item}</span>
                   <span className="discoverer-name">{finalName}</span>
                 </div>
