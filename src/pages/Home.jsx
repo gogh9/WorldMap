@@ -112,7 +112,7 @@ export default function Home() {
               <div className="nav-subtitle" style={{ fontSize: '11px', color: '#888', fontWeight: 500 }}>Built by sota / gogh9@susaek.sen.es.kr</div>
               {progress.total > 0 && (
                 <div style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 600, background: 'rgba(56, 189, 248, 0.1)', padding: '2px 6px', borderRadius: '4px', whiteSpace: 'nowrap' }}>
-                  완료율: {progress.completed} / {progress.total} ({((progress.completed / progress.total) * 100).toFixed(1)}%)
+                  완료율({revealThreshold}명 완료): {progress.completed} / {progress.total} ({((progress.completed / progress.total) * 100).toFixed(1)}%)
                 </div>
               )}
             </div>
