@@ -43,7 +43,8 @@
 .nav-user {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .avatar {
@@ -60,6 +61,7 @@
   white-space: nowrap;
 }
 
+.dashboard-btn,
 .logout-btn {
   background-color: var(--bg-elevated);
   border: none;
@@ -71,9 +73,9 @@
   padding: 8px;
   border-radius: 50%;
   transition: all 0.2s ease;
-  margin-left: auto;
 }
 
+.dashboard-btn:hover,
 .logout-btn:hover {
   background-color: #333333;
   color: var(--text-color);

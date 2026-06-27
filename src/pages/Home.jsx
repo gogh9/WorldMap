@@ -105,26 +105,47 @@ export default function Home() {
       </main>
       
       <aside className="right-sidebar">
-        <header className="sidebar-header">
-          <div className="nav-brand-container" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <div className="nav-brand">우리반 백지도 🗺️ {mapName}</div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <div className="nav-subtitle" style={{ fontSize: '11px', color: '#888', fontWeight: 500 }}>Built by sota / gogh9@susaek.sen.es.kr</div>
-              {progress.total > 0 && (
-                <div style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 600, background: 'rgba(56, 189, 248, 0.1)', padding: '2px 6px', borderRadius: '4px', whiteSpace: 'nowrap' }}>
-                  완료율({revealThreshold}명 완료): {progress.completed} / {progress.total} ({((progress.completed / progress.total) * 100).toFixed(1)}%)
-                </div>
-              )}
+        <header className="sidebar-header" style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'stretch' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', width: '100%' }}>
+            <div className="nav-brand" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              우리반 백지도 🗺️ {mapName}
+            </div>
+            <div className="nav-user">
+              <span className="user-name">{formatDisplayName(user.user_metadata.full_name)}</span>
+              <button 
+                onClick={() => navigate('/dashboard')} 
+                className="dashboard-btn" 
+                title="대시보드"
+              >
+                <LayoutDashboard size={18} />
+              </button>
+              <button 
+                onClick={handleLogout} 
+                className="logout-btn" 
+                title="로그아웃"
+              >
+                <LogOut size={18} />
+              </button>
             </div>
           </div>
-          <div className="nav-user">
-            <span className="user-name">{formatDisplayName(user.user_metadata.full_name)}</span>
-            <button onClick={() => navigate('/dashboard')} className="dashboard-btn" title="대시보드" style={{ background: 'transparent', border: 'none', color: '#a7a7a7', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s', padding: '4px' }} onMouseEnter={(e) => e.currentTarget.style.color = '#fff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a7a7a7'}>
-              <LayoutDashboard size={18} />
-            </button>
-            <button onClick={handleLogout} className="logout-btn" title="로그아웃">
-              <LogOut size={18} />
-            </button>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div className="nav-subtitle" style={{ fontSize: '11px', color: '#888', fontWeight: 500 }}>
+              Built by sota / gogh9@susaek.sen.es.kr
+            </div>
+            {progress.total > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(30, 215, 96, 0.05)', border: '1px solid rgba(30, 215, 96, 0.2)', padding: '10px 12px', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: 'var(--text-color)', fontWeight: 600 }}>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '11px' }}>완료율</span>
+                  <span style={{ color: 'var(--primary-color)' }}>
+                    {progress.completed} / {progress.total} ({((progress.completed / progress.total) * 100).toFixed(1)}%)
+                  </span>
+                </div>
+                <div style={{ width: '100%', height: '4px', backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                  <div style={{ width: `${(progress.completed / progress.total) * 100}%`, height: '100%', backgroundColor: 'var(--primary-color)', transition: 'width 0.3s ease' }}></div>
+                </div>
+              </div>
+            )}
           </div>
         </header>
 
