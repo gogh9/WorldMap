@@ -16,6 +16,7 @@ export default function Home() {
   const [revealThreshold, setRevealThreshold] = useState(5)
   const [isActive, setIsActive] = useState(true)
   const [isTeacher, setIsTeacher] = useState(false)
+  const [progress, setProgress] = useState({ completed: 0, total: 0 })
 
   useEffect(() => {
     if (user && !mapId) {
@@ -100,14 +101,21 @@ export default function Home() {
   return (
     <div className="home-container">
       <main className="map-section">
-        <WorldMap onCountryClick={handleCountryClick} mapId={mapId} revealThreshold={revealThreshold} currentUser={user} />
+        <WorldMap onCountryClick={handleCountryClick} mapId={mapId} revealThreshold={revealThreshold} currentUser={user} onProgressUpdate={setProgress} />
       </main>
       
       <aside className="right-sidebar">
         <header className="sidebar-header">
           <div className="nav-brand-container" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <div className="nav-brand">우리반 백지도 🗺️ {mapName}</div>
-            <div className="nav-subtitle" style={{ fontSize: '11px', color: '#888', fontWeight: 500 }}>Built by sota / gogh9@susaek.sen.es.kr</div>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <div className="nav-subtitle" style={{ fontSize: '11px', color: '#888', fontWeight: 500 }}>Built by sota / gogh9@susaek.sen.es.kr</div>
+              {progress.total > 0 && (
+                <div style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 600, background: 'rgba(56, 189, 248, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                  완료율: {progress.completed} / {progress.total} ({((progress.completed / progress.total) * 100).toFixed(1)}%)
+                </div>
+              )}
+            </div>
           </div>
           <div className="nav-user">
             <span className="user-name">{formatDisplayName(user.user_metadata.full_name)}</span>

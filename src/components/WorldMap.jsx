@@ -18,11 +18,26 @@ const projection = geoNaturalEarth1()
   .translate([mapWidth / 2, mapHeight / 2])
   .scale(160)
 
-export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, currentUser }) {
+export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, currentUser, onProgressUpdate }) {
   const [geoData, setGeoData] = useState(null)
   const [registeredCountries, setRegisteredCountries] = useState({})
   const [hoveredCountry, setHoveredCountry] = useState(null)
   const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 })
+
+  useEffect(() => {
+    if (onProgressUpdate && geoData) {
+      // Exclude Antarctica (AQ) or similar if needed, but for simplicity we use total features.
+      // Usually ne_50m has ~241 features.
+      const total = geoData.features.length;
+      let completed = 0;
+      Object.keys(registeredCountries).forEach(link => {
+        if (registeredCountries[link].authors.size >= revealThreshold) {
+          completed++;
+        }
+      });
+      onProgressUpdate({ completed, total });
+    }
+  }, [geoData, registeredCountries, revealThreshold, onProgressUpdate]);
 
   useEffect(() => {
     // 고해상도(50m) 세계 국가 GeoJSON 데이터 가져오기
