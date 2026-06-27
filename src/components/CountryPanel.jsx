@@ -38,19 +38,24 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
         setSavedData(data || [])
         
         const nameCounts = {};
+        const allAuthors = new Set();
         (data || []).forEach(r => {
           if (r.country_name && r.content && r.content.includes('등록했습니다! 🎉') && r.author_name) {
             const name = r.country_name.trim();
-            if (!nameCounts[name]) nameCounts[name] = new Set();
-            nameCounts[name].add(r.author_name);
+            allAuthors.add(r.author_name);
+            if (!nameCounts[name]) nameCounts[name] = 0;
+            nameCounts[name]++;
           }
         });
 
         let winningName = null;
-        for (const [name, authorsSet] of Object.entries(nameCounts)) {
-          if (authorsSet.size >= revealThreshold) {
-            winningName = name;
-            break;
+        if (allAuthors.size >= revealThreshold) {
+          let maxVotes = 0;
+          for (const [name, votes] of Object.entries(nameCounts)) {
+            if (votes > maxVotes) {
+              maxVotes = votes;
+              winningName = name;
+            }
           }
         }
 

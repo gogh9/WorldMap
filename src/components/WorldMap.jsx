@@ -61,38 +61,40 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
       if (data && !error) {
         const countryStats = {}
         data.forEach(item => {
-           if (item.country_name) {
+           if (item.country_name && item.link) {
              if (!countryStats[item.link]) {
-               countryStats[item.link] = { nameCounts: {} }
+               countryStats[item.link] = {
+                 allAuthors: new Set(),
+                 nameCounts: {}
+               }
              }
              if (item.author_name && item.content && item.content.includes('등록했습니다! 🎉')) {
                const name = item.country_name.trim()
+               countryStats[item.link].allAuthors.add(item.author_name)
                if (!countryStats[item.link].nameCounts[name]) {
-                 countryStats[item.link].nameCounts[name] = new Set()
+                 countryStats[item.link].nameCounts[name] = 0
                }
-               countryStats[item.link].nameCounts[name].add(item.author_name)
+               countryStats[item.link].nameCounts[name]++
              }
            }
         })
         
         const formattedStats = {}
         Object.keys(countryStats).forEach(link => {
-           let maxCount = 0;
+           let maxVotes = 0;
            let maxName = '';
-           let allAuthorsForMaxName = new Set();
-           Object.entries(countryStats[link].nameCounts).forEach(([name, authorsSet]) => {
-             if (authorsSet.size > maxCount) {
-               maxCount = authorsSet.size;
+           Object.entries(countryStats[link].nameCounts).forEach(([name, votes]) => {
+             if (votes > maxVotes) {
+               maxVotes = votes;
                maxName = name;
-               allAuthorsForMaxName = authorsSet;
              }
            });
            
            if (maxName) {
              formattedStats[link] = {
                name: maxName,
-               count: maxCount,
-               authors: allAuthorsForMaxName
+               count: countryStats[link].allAuthors.size,
+               authors: countryStats[link].allAuthors
              }
            }
         })
