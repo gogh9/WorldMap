@@ -203,39 +203,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
     }
   }
 
-  const handleAdminEditName = async () => {
-    const newName = window.prompt("새로운 나라 이름을 입력하세요:", displayCountryName);
-    if (newName && newName.trim() !== "") {
-      try {
-        const { error } = await supabase
-          .from('countries_data')
-          .update({ country_name: newName.trim() })
-          .eq('link', countryId)
-          .eq('map_id', mapId);
-        if (error) throw error;
-        alert("나라 이름이 수정되었습니다.");
-        fetchData();
-      } catch (err) {
-        alert("수정 실패: " + err.message);
-      }
-    }
-  }
 
-  const handleAdminDeleteCountryName = async () => {
-    if (!window.confirm("나라 이름을 초기화하시겠습니까? (학생들의 기록은 유지됩니다)")) return;
-    try {
-      const { error } = await supabase
-        .from('countries_data')
-        .update({ country_name: '' })
-        .eq('link', countryId)
-        .eq('map_id', mapId);
-      if (error) throw error;
-      alert("나라 이름이 초기화되었습니다.");
-      fetchData();
-    } catch (err) {
-      alert("초기화 실패: " + err.message);
-    }
-  }
 
   // 시스템이 자동 생성한 '등록' 메시지는 목록에서 숨김
   const displayRecords = savedData.filter(item => !item.content.includes('등록했습니다! 🎉'))
@@ -244,16 +212,8 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
     <aside className="country-panel">
       <div className="panel-header">
         {hasCountryName && (
-          <div className="header-title-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
-              <h2 className="country-title-display">{displayCountryName}</h2>
-              {isAdmin && (
-                <div className="admin-actions-header" style={{ flexShrink: 0, marginTop: '4px' }}>
-                  <button className="edit-btn" onClick={handleAdminEditName}>수정</button>
-                  <button className="delete-btn" onClick={handleAdminDeleteCountryName}>삭제</button>
-                </div>
-              )}
-            </div>
+          <div className="header-title-container">
+            <h2 className="country-title-display">{displayCountryName}</h2>
           </div>
         )}
 
