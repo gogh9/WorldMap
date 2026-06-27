@@ -13,7 +13,6 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   const [editingId, setEditingId] = useState(null)
   const [editContent, setEditContent] = useState('')
   const [hasCountryName, setHasCountryName] = useState(false)
-  const [countryMedal, setCountryMedal] = useState('🏅')
 
   const isAdmin = user?.email === 'gogh999@gmail.com' || isTeacher
 
@@ -63,47 +62,6 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           setHasCountryName(false)
         }
         setInputCountryName('')
-
-        const { data: allCountries, error: err2 } = await supabase
-          .from('countries_data')
-          .select('link, created_at')
-          .eq('map_id', mapId)
-          .order('created_at', { ascending: true })
-        
-        let assignedMedal = '🏅';
-        if (allCountries && !err2) {
-          const MEDAL_TYPES = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟'];
-          const firstRegs = [];
-          const seen = new Set();
-          for (const row of allCountries) {
-            if (!seen.has(row.link)) {
-              seen.add(row.link);
-              firstRegs.push(row.link);
-            }
-          }
-          
-          const counts = {};
-          MEDAL_TYPES.forEach(m => counts[m] = 0);
-          
-          for (const link of firstRegs) {
-            let minCount = Infinity;
-            for (const m of MEDAL_TYPES) if (counts[m] < minCount) minCount = counts[m];
-            
-            const candidates = MEDAL_TYPES.filter(m => counts[m] === minCount);
-            
-            let hash = 0;
-            for (let i = 0; i < link.length; i++) hash = Math.imul(31, hash) + link.charCodeAt(i) | 0;
-            const rngValue = Math.abs(hash) % candidates.length;
-            
-            const chosenMedal = candidates[rngValue];
-            counts[chosenMedal]++;
-            if (link === countryId) {
-              assignedMedal = chosenMedal;
-              break;
-            }
-          }
-        }
-        setCountryMedal(assignedMedal);
       }
     } catch (err) {
       console.error(err)
@@ -288,7 +246,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
         {hasCountryName && (
           <div className="header-title-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
-              <h2 className="country-title-display">{countryMedal} {displayCountryName}</h2>
+              <h2 className="country-title-display">{displayCountryName}</h2>
               {isAdmin && (
                 <div className="admin-actions-header" style={{ flexShrink: 0, marginTop: '4px' }}>
                   <button className="edit-btn" onClick={handleAdminEditName}>수정</button>
@@ -337,8 +295,8 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
             const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
             if (regs.length === 0) return null;
             
-            // 4등 이하 학생들에게 수여되는 무작위 데코 에모지 리스트
-            const DECORATIVE_ITEMS = ['🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
+            // 일반 데코레이션 에모지 리스트 (순위/메달 등은 배제)
+            const RANDOM_ITEMS = ['🎉', '🍎', '🍀', '✨', '🔥', '💎', '🌟', '👑', '🔮', '🎈', '🚀', '🌈', '🍕', '🐱', '🐼', '🧸'];
             let countryHash = 0;
             if (countryId) {
               for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
@@ -348,17 +306,8 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
               const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
               const finalName = formatDisplayName(cleanName);
               
-              // 1등 🥇, 2등 🥈, 3등 🥉 고정 부여. 4등 이하부턴 나라별 해시값 기준으로 데코 에모지 랜덤 부여
-              let item;
-              if (index === 0) {
-                item = '🥇';
-              } else if (index === 1) {
-                item = '🥈';
-              } else if (index === 2) {
-                item = '🥉';
-              } else {
-                item = DECORATIVE_ITEMS[(index - 3 + countryHash) % DECORATIVE_ITEMS.length];
-              }
+              // 입력 순서대로 정렬하되 에모지 아이콘은 해시 기반으로 임의 지정
+              const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
 
               return (
                 <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
