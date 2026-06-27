@@ -130,7 +130,7 @@ export default function Home() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <div className="nav-subtitle" style={{ fontSize: '11px', color: '#888', fontWeight: 500 }}>
+            <div className="nav-subtitle" style={{ fontSize: '11px', color: '#888', fontWeight: 500, textAlign: 'right' }}>
               Built by sota / gogh9@susaek.sen.es.kr
             </div>
             {progress.total > 0 && (
