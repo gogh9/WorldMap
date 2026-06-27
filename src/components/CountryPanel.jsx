@@ -283,7 +283,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   return (
     <aside className="country-panel">
       <div className="panel-header">
-        {hasCountryName ? (
+        {hasCountryName && (
           <div className="header-title-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
               <h2 className="country-title-display">{inputCountryName}</h2>
@@ -294,87 +294,68 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
                 </div>
               )}
             </div>
-            {/* 공개 시 이름 표시 */}
-            <div className="discoverers-list">
-              {(() => {
-                const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
-                const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
-                let countryHash = 0;
-                if (countryId) {
-                  for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
-                }
-                return regs.map((reg, index) => {
-                  const rawName = reg.author_name || '익명 학생';
-                  const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
-                  const finalName = formatDisplayName(cleanName);
-                  const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
-                  return (
-                    <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
-                      <span className="discoverer-emoji">{item}</span>
-                      <span className="discoverer-name">{finalName}</span>
-                    </div>
-                  )
-                })
-              })()}
-            </div>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-            {(!isActive) ? (
-              <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
-                선생님께서 입력을 일시 중지하셨습니다.
-              </div>
-            ) : (() => {
-              const currentUserName = user?.user_metadata?.full_name || '익명 학생';
-              const totalRegistrations = savedData.filter(r => r.content && r.content.includes('등록했습니다! 🎉')).length;
-              const userAlreadyRegistered = savedData.some(r => r.author_name === currentUserName && r.content && r.content.includes('등록했습니다! 🎉'));
-              if (totalRegistrations >= 8 && !userAlreadyRegistered && !isTeacher) {
-                return (
-                  <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
-                    이 나라는 이미 8명의 친구들이 모두 참여했습니다! 🚀
-                  </div>
-                );
-              }
-              return (
-                <div className="header-input-group">
-                  <input 
-                    type="text" 
-                    className="country-name-input-header"
-                    placeholder="이 나라의 이름은?"
-                    value={inputCountryName}
-                    onChange={(e) => setInputCountryName(e.target.value)}
-                    required
-                  />
-                  <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
-                </div>
-              );
-            })()}
-            {/* 비공개 시에도 이름 표시 */}
-            <div className="discoverers-list" style={{ marginTop: '12px' }}>
-              {(() => {
-                const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
-                if (regs.length === 0) return null;
-                const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
-                let countryHash = 0;
-                if (countryId) {
-                  for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
-                }
-                return regs.map((reg, index) => {
-                  const rawName = reg.author_name || '익명 학생';
-                  const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
-                  const finalName = formatDisplayName(cleanName);
-                  const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
-                  return (
-                    <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
-                      <span className="discoverer-emoji">{item}</span>
-                      <span className="discoverer-name">{finalName}</span>
-                    </div>
-                  )
-                })
-              })()}
-            </div>
           </div>
         )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', marginTop: hasCountryName ? '12px' : '0' }}>
+          {(!isActive) ? (
+            <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
+              선생님께서 입력을 일시 중지하셨습니다.
+            </div>
+          ) : (() => {
+            const currentUserName = user?.user_metadata?.full_name || '익명 학생';
+            const totalRegistrations = savedData.filter(r => r.content && r.content.includes('등록했습니다! 🎉')).length;
+            const userAlreadyRegistered = savedData.some(r => r.author_name === currentUserName && r.content && r.content.includes('등록했습니다! 🎉'));
+            
+            if (isTeacher) return null; // 선생님은 입력창 안봄
+            if (userAlreadyRegistered) return null; // 이미 입력한 학생도 안봄
+
+            if (totalRegistrations >= 8) {
+              return (
+                <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
+                  이 나라는 이미 8명의 친구들이 모두 참여했습니다! 🚀
+                </div>
+              );
+            }
+            return (
+              <div className="header-input-group">
+                <input 
+                  type="text" 
+                  className="country-name-input-header"
+                  placeholder="이 나라의 이름은?"
+                  value={inputCountryName}
+                  onChange={(e) => setInputCountryName(e.target.value)}
+                  required
+                />
+                <button className="name-apply-btn" onClick={handleNameUpdate}>입력</button>
+              </div>
+            );
+          })()}
+        </div>
+
+        <div className="discoverers-list" style={{ marginTop: '12px' }}>
+          {(() => {
+            const regs = [...savedData].filter(r => r.content && r.content.includes('등록했습니다! 🎉')).reverse();
+            if (regs.length === 0) return null;
+            const RANDOM_ITEMS = ['🥇', '🥈', '🥉', '🏅', '🎖️', '🏆', '💎', '🌟', '👑', '🔮', '🎈', '🎉', '🍎', '🍀', '✨', '🔥'];
+            let countryHash = 0;
+            if (countryId) {
+              for(let i=0; i<countryId.length; i++) countryHash += countryId.charCodeAt(i);
+            }
+            return regs.map((reg, index) => {
+              const rawName = reg.author_name || '익명 학생';
+              const cleanName = rawName.replace(/^.*반/, '').trim() || rawName;
+              const finalName = formatDisplayName(cleanName);
+              const item = RANDOM_ITEMS[(index + countryHash) % RANDOM_ITEMS.length];
+              return (
+                <div key={reg.id} className="discoverer-badge" title={`${finalName}님이 나라 이름 등록에 참여했습니다`}>
+                  <span className="discoverer-emoji">{item}</span>
+                  <span className="discoverer-name">{finalName}</span>
+                </div>
+              )
+            })
+          })()}
+        </div>
       </div>
 
       <div className="panel-content">
