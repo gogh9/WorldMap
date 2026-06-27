@@ -7,6 +7,7 @@ import './CountryPanel.css'
 export default function CountryPanel({ countryId, onClose, user, mapId, isTeacher, revealThreshold = 5, isActive = true }) {
   const [info, setInfo] = useState('')
   const [inputCountryName, setInputCountryName] = useState('')
+  const [displayCountryName, setDisplayCountryName] = useState('')
   const [loading, setLoading] = useState(false)
   const [savedData, setSavedData] = useState([])
   const [editingId, setEditingId] = useState(null)
@@ -55,12 +56,13 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
         }
 
         if (winningName) {
-          setInputCountryName(winningName)
+          setDisplayCountryName(winningName)
           setHasCountryName(true)
         } else {
-          setInputCountryName('')
+          setDisplayCountryName('')
           setHasCountryName(false)
         }
+        setInputCountryName('')
 
         const { data: allCountries, error: err2 } = await supabase
           .from('countries_data')
@@ -244,7 +246,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   }
 
   const handleAdminEditName = async () => {
-    const newName = window.prompt("새로운 나라 이름을 입력하세요:", inputCountryName);
+    const newName = window.prompt("새로운 나라 이름을 입력하세요:", displayCountryName);
     if (newName && newName.trim() !== "") {
       try {
         const { error } = await supabase
@@ -286,7 +288,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
         {hasCountryName && (
           <div className="header-title-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
-              <h2 className="country-title-display">{inputCountryName}</h2>
+              <h2 className="country-title-display">{displayCountryName}</h2>
               {isAdmin && (
                 <div className="admin-actions-header" style={{ flexShrink: 0, marginTop: '4px' }}>
                   <button className="edit-btn" onClick={handleAdminEditName}>수정</button>
