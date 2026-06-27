@@ -306,11 +306,8 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
             const currentUserName = user?.user_metadata?.full_name || '익명 학생';
             const totalRegistrations = savedData.filter(r => r.content && r.content.includes('등록했습니다! 🎉')).length;
             const userAlreadyRegistered = savedData.some(r => r.author_name === currentUserName && r.content && r.content.includes('등록했습니다! 🎉'));
-            
-            if (isTeacher) return null; // 선생님은 입력창 안봄
-            if (userAlreadyRegistered) return null; // 이미 입력한 학생도 안봄
 
-            if (totalRegistrations >= 8) {
+            if (totalRegistrations >= 8 && !userAlreadyRegistered && !isTeacher) {
               return (
                 <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
                   이 나라는 이미 8명의 친구들이 모두 참여했습니다! 🚀
