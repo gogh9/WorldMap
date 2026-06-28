@@ -176,6 +176,62 @@ export default function Dashboard() {
     }
   }
 
+  const handleUpdateStudyMode = async (mapId, newMode) => {
+    try {
+      setMyMaps(prev => prev.map(m => m.id === mapId ? { ...m, study_mode: newMode } : m))
+      const { error } = await supabase.from('maps').update({ study_mode: newMode }).eq('id', mapId)
+      if (error) throw error
+    } catch (err) {
+      alert("설정 변경 실패: " + err.message)
+      fetchMyMaps()
+    }
+  }
+
+  const handleToggleOceans = async (mapId, checked) => {
+    try {
+      setMyMaps(prev => prev.map(m => m.id === mapId ? { ...m, include_oceans: checked } : m))
+      const { error } = await supabase.from('maps').update({ include_oceans: checked }).eq('id', mapId)
+      if (error) throw error
+    } catch (err) {
+      alert("설정 변경 실패: " + err.message)
+      fetchMyMaps()
+    }
+  }
+
+  const handleTogglePolar = async (mapId, checked) => {
+    try {
+      setMyMaps(prev => prev.map(m => m.id === mapId ? { ...m, include_polar: checked } : m))
+      const { error } = await supabase.from('maps').update({ include_polar: checked }).eq('id', mapId)
+      if (error) throw error
+    } catch (err) {
+      alert("설정 변경 실패: " + err.message)
+      fetchMyMaps()
+    }
+  }
+
+  const handleToggleContinent = async (mapId, continentId, checked, currentAllowed = '') => {
+    let allowedList = currentAllowed ? currentAllowed.split(',').map(s => s.trim()).filter(Boolean) : ['Asia', 'Europe', 'Africa', 'North America', 'South America', 'Oceania', 'Antarctica'];
+    
+    if (checked) {
+      if (!allowedList.includes(continentId)) {
+        allowedList.push(continentId);
+      }
+    } else {
+      allowedList = allowedList.filter(c => c !== continentId);
+    }
+    
+    const newListStr = allowedList.join(',');
+    
+    try {
+      setMyMaps(prev => prev.map(m => m.id === mapId ? { ...m, allowed_continents: newListStr } : m))
+      const { error } = await supabase.from('maps').update({ allowed_continents: newListStr }).eq('id', mapId)
+      if (error) throw error
+    } catch (err) {
+      alert("설정 변경 실패: " + err.message)
+      fetchMyMaps()
+    }
+  }
+
   const copyMapLink = (mapId) => {
     const link = `${window.location.origin}/map/${mapId}`
     navigator.clipboard.writeText(link)
@@ -264,18 +320,28 @@ export default function Dashboard() {
   const displayGroups = Object.values(groupedRecords);
 
   const handleExportExcel = () => {
-    const headers = ['작성자', '구분', '나라 이름', '작성 날짜', '내용'];
+    const headers = ['작성자', '구분', '나라/바다/대륙 이름', '작성 날짜', '내용'];
     const csvData = filteredRecords.map(record => {
       const author = formatDisplayName(record.author_name) || '익명 학생';
-      const country = record.country_name || '이름 없는 나라';
+      const country = record.country_name || '이름 없는 지역';
       const date = new Date(record.created_at).toLocaleDateString();
       
       let category = '조사 내용';
       let cleanContent = record.content || '';
       
       if (cleanContent.includes('등록했습니다! 🎉')) {
-        category = '나라 이름 등록';
-        cleanContent = '나라 이름 등록 참여 🎉';
+        category = '이름 등록';
+        cleanContent = '이름 등록 참여 🎉';
+      }
+      
+      if (record.link) {
+        if (record.link.startsWith('ocean_')) {
+          category = cleanContent.includes('등록했습니다! 🎉') ? '바다 이름 등록' : '바다 조사 내용';
+        } else if (record.link.startsWith('continent_')) {
+          category = cleanContent.includes('등록했습니다! 🎉') ? '대륙 이름 등록' : '대륙 조사 내용';
+        } else if (record.link === 'polar_arctic' || record.link === 'AQ') {
+          category = cleanContent.includes('등록했습니다! 🎉') ? '극지 이름 등록' : '극지 조사 내용';
+        }
       }
       
       const content = `"${cleanContent.replace(/"/g, '""')}"`;
@@ -379,6 +445,74 @@ export default function Dashboard() {
                   >
                     {map.is_active !== false ? '✅ 입력 가능' : '⏸️ 입력 중지'}
                   </button>
+                </div>
+                
+                <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', borderTop: '1px dashed var(--border-color)', paddingTop: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>기본 학습 대상:</span>
+                    <select
+                      value={map.study_mode || 'countries'}
+                      onChange={(e) => handleUpdateStudyMode(map.id, e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-color)', cursor: 'pointer' }}
+                    >
+                      <option value="countries">국가 (200여 개국)</option>
+                      <option value="continents">6대주 (대륙 단위)</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '4px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-color)' }} onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={map.include_oceans !== false}
+                        onChange={(e) => handleToggleOceans(map.id, e.target.checked)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                      <span>5대양 포함</span>
+                    </label>
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-color)' }} onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={map.include_polar !== false}
+                        onChange={(e) => handleTogglePolar(map.id, e.target.checked)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                      <span>북극/남극 포함</span>
+                    </label>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px', borderTop: '1px dotted var(--border-color)', paddingTop: '8px' }}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600 }}>입력 허용 대륙:</span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 12px' }}>
+                      {[
+                        { id: 'Asia', nameKo: '아시아' },
+                        { id: 'Europe', nameKo: '유럽' },
+                        { id: 'Africa', nameKo: '아프리카' },
+                        { id: 'North America', nameKo: '북아메리카' },
+                        { id: 'South America', nameKo: '남아메리카' },
+                        { id: 'Oceania', nameKo: '오세아니아' },
+                        { id: 'Antarctica', nameKo: '남극' }
+                      ].map(cont => {
+                        const allowedStr = map.allowed_continents || 'Asia,Europe,Africa,North America,South America,Oceania,Antarctica';
+                        const allowedList = allowedStr.split(',').map(s => s.trim()).filter(Boolean);
+                        const isChecked = allowedList.includes(cont.id);
+                        
+                        return (
+                          <label key={cont.id} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-color)', fontSize: '0.75rem' }} onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => handleToggleContinent(map.id, cont.id, e.target.checked, map.allowed_continents)}
+                              style={{ cursor: 'pointer' }}
+                            />
+                            <span>{cont.nameKo}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
                 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>

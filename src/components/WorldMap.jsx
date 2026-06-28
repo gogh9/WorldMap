@@ -18,26 +18,91 @@ const projection = geoNaturalEarth1()
   .translate([mapWidth / 2, mapHeight / 2])
   .scale(160)
 
-export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, currentUser, onProgressUpdate }) {
+const OCEANS_CONFIG = [
+  { id: 'ocean_pacific_west', linkId: 'ocean_pacific', nameKo: '태평양', nameEn: 'Pacific Ocean (West)', coordinates: [150, -10] },
+  { id: 'ocean_pacific_east', linkId: 'ocean_pacific', nameKo: '태평양', nameEn: 'Pacific Ocean (East)', coordinates: [-160, -10] },
+  { id: 'ocean_atlantic', linkId: 'ocean_atlantic', nameKo: '대서양', nameEn: 'Atlantic Ocean', coordinates: [-30, 20] },
+  { id: 'ocean_indian', linkId: 'ocean_indian', nameKo: '인도양', nameEn: 'Indian Ocean', coordinates: [80, -15] },
+  { id: 'ocean_arctic', linkId: 'ocean_arctic', nameKo: '북극해', nameEn: 'Arctic Ocean', coordinates: [-90, 78] },
+  { id: 'ocean_antarctic', linkId: 'ocean_antarctic', nameKo: '남극해', nameEn: 'Southern Ocean', coordinates: [0, -68] },
+];
+
+export default function WorldMap({ 
+  onCountryClick, 
+  mapId, 
+  revealThreshold = 5, 
+  currentUser, 
+  onProgressUpdate,
+  studyMode = 'countries',
+  includeOceans = true,
+  includePolar = true,
+  allowedContinents = 'Asia,Europe,Africa,North America,South America,Oceania,Antarctica'
+}) {
   const [geoData, setGeoData] = useState(null)
   const [registeredCountries, setRegisteredCountries] = useState({})
   const [hoveredCountry, setHoveredCountry] = useState(null)
   const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 })
 
+  const allowedSet = useMemo(() => {
+    return new Set(allowedContinents.split(',').map(s => s.trim().toLowerCase()));
+  }, [allowedContinents]);
+
   useEffect(() => {
     if (onProgressUpdate && geoData) {
-      // Exclude Antarctica (AQ) or similar if needed, but for simplicity we use total features.
-      // Usually ne_50m has ~241 features.
-      const total = geoData.features.length;
+      let activeLinks = new Set();
+      
+      if (studyMode === 'continents') {
+        if (allowedSet.has('asia')) activeLinks.add('continent_asia');
+        if (allowedSet.has('europe')) activeLinks.add('continent_europe');
+        if (allowedSet.has('africa')) activeLinks.add('continent_africa');
+        if (allowedSet.has('north america')) activeLinks.add('continent_north_america');
+        if (allowedSet.has('south america')) activeLinks.add('continent_south_america');
+        if (allowedSet.has('oceania')) activeLinks.add('continent_oceania');
+        if (includePolar && allowedSet.has('antarctica')) {
+          activeLinks.add('continent_antarctica');
+        }
+      } else {
+        // Countries mode
+        geoData.features.forEach(f => {
+          let iso2 = f.properties.iso_a2 || f.properties['ISO3166-1-Alpha-2'];
+          if (f.properties.name === "Antarctica") iso2 = "AQ";
+          
+          const cont = f.properties.continent;
+          const contNormalized = cont ? cont.toLowerCase() : '';
+          
+          if (iso2 && iso2 !== "-99") {
+            if (iso2 === "AQ" && !includePolar) return;
+            if (!allowedSet.has(contNormalized)) return;
+            activeLinks.add(iso2);
+          }
+        });
+      }
+
+      if (includeOceans) {
+        activeLinks.add('ocean_pacific');
+        activeLinks.add('ocean_atlantic');
+        activeLinks.add('ocean_indian');
+        activeLinks.add('ocean_arctic');
+        activeLinks.add('ocean_antarctic');
+      }
+
+      if (includePolar) {
+        activeLinks.add('polar_arctic');
+        if (studyMode !== 'continents' && allowedSet.has('antarctica')) {
+          activeLinks.add('AQ'); // Antarctica in country mode
+        }
+      }
+
+      const total = activeLinks.size;
       let completed = 0;
-      Object.keys(registeredCountries).forEach(link => {
-        if (registeredCountries[link].authors.size >= revealThreshold) {
+      activeLinks.forEach(link => {
+        if (registeredCountries[link] && registeredCountries[link].count >= revealThreshold) {
           completed++;
         }
       });
       onProgressUpdate({ completed, total });
     }
-  }, [geoData, registeredCountries, revealThreshold, onProgressUpdate]);
+  }, [geoData, registeredCountries, revealThreshold, onProgressUpdate, studyMode, includeOceans, includePolar, allowedSet]);
 
   useEffect(() => {
     // 고해상도(50m) 세계 국가 GeoJSON 데이터 가져오기
@@ -117,23 +182,70 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
 
   // 중심점 계산
   const centroids = useMemo(() => {
+    if (studyMode === 'continents') {
+      const CONTINENTS_CONFIG = {
+        'continent_asia': { name: '아시아', coordinates: [90, 35] },
+        'continent_europe': { name: '유럽', coordinates: [20, 50] },
+        'continent_africa': { name: '아프리카', coordinates: [20, 10] },
+        'continent_north_america': { name: '북아메리카', coordinates: [-100, 40] },
+        'continent_south_america': { name: '남아메리카', coordinates: [-60, -15] },
+        'continent_oceania': { name: '오세아니아', coordinates: [135, -25] },
+        'continent_antarctica': { name: '남극', coordinates: [0, -82] }
+      };
+
+      const list = [];
+      Object.entries(CONTINENTS_CONFIG).forEach(([key, config]) => {
+        if (!includePolar && key === 'continent_antarctica') return;
+        
+        const contName = key.replace('continent_', '').replace('_', ' ');
+        if (!allowedSet.has(contName)) return;
+
+        const stats = registeredCountries[key];
+        let customName = null;
+        if (stats && stats.count > 0) {
+          if (stats.count >= revealThreshold) {
+            customName = stats.name;
+          } else {
+            const nameLen = stats.name.length;
+            const unmaskedLen = Math.floor((stats.count / revealThreshold) * nameLen);
+            const maskedLen = nameLen - unmaskedLen;
+            const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
+            customName = `${masked} (${stats.count}/${revealThreshold})`;
+          }
+          list.push({
+            iso2: key,
+            name: customName,
+            coordinates: config.coordinates
+          });
+        }
+      });
+      return list;
+    }
+
     if (!geoData) return []
     const seen = new Set()
     const list = []
     
     // 일부 영토가 떨어져 있어 수학적 중심점이 이상하게 나오는 나라들의 중심점 수동 보정 (경도, 위도)
     const CENTROID_OVERRIDES = {
-      "FR": [2.2137, 46.2276], // 프랑스 (해외 영토 때문에 대서양으로 잡히는 문제 보정)
-      "US": [-95.7129, 37.0902], // 미국 (알래스카 때문에 치우치는 현상 보정)
+      "FR": [2.2137, 46.2276], // 프랑스
+      "US": [-95.7129, 37.0902], // 미국
       "RU": [90.0, 60.0], // 러시아
       "NL": [5.2913, 52.1326], // 네덜란드
       "GB": [-3.4360, 55.3781], // 영국
+      "AQ": [0, -82], // 남극
     }
     
     geoData.features.forEach(feature => {
-      const iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
+      let iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
+      if (feature.properties.name === "Antarctica") iso2 = "AQ";
       if (!iso2 || seen.has(iso2)) return;
+      if (iso2 === 'AQ' && !includePolar) return;
       
+      const cont = feature.properties.continent;
+      const contNormalized = cont ? cont.toLowerCase() : '';
+      if (!allowedSet.has(contNormalized)) return;
+
       const stats = registeredCountries[iso2]
       let customName = null
       
@@ -194,7 +306,7 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
     }
     
     return list;
-  }, [geoData, registeredCountries, position.zoom, revealThreshold, currentUser])
+  }, [geoData, registeredCountries, position.zoom, revealThreshold, currentUser, studyMode, includePolar, allowedSet])
 
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
@@ -212,8 +324,19 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
             <Geographies geography={geoData}>
               {({ geographies }) =>
                 geographies.map((geo) => {
-                  const iso2 = geo.properties.iso_a2 || geo.properties['ISO3166-1-Alpha-2']
-                  const isRegistered = !!registeredCountries[iso2]
+                  let iso2 = geo.properties.iso_a2 || geo.properties['ISO3166-1-Alpha-2']
+                  if (geo.properties.name === "Antarctica") iso2 = "AQ"
+                  
+                  let isRegistered = false
+                  let continentKey = null
+                  if (studyMode === 'continents') {
+                    if (geo.properties.continent) {
+                      continentKey = `continent_${geo.properties.continent.toLowerCase().replace(/\s+/g, '_')}`
+                      isRegistered = !!registeredCountries[continentKey]
+                    }
+                  } else {
+                    isRegistered = !!registeredCountries[iso2]
+                  }
 
                   const continentColors = {
                     'North America': '#81c784',
@@ -225,20 +348,39 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
                     'Antarctica': '#e0e0e0'
                   };
                   
-                  const defaultFill = !isRegistered ? '#ff6b6b' : (continentColors[geo.properties.continent] || '#d1d5db');
-                  const hoverFill = !isRegistered ? '#ff5252' : '#80deea';
-                  const pressedFill = !isRegistered ? '#ff1744' : '#26c6da';
+                  const isPolarAntarctica = iso2 === 'AQ';
+                  const isPolarAntarcticaDisabled = isPolarAntarctica && !includePolar;
+                  const isContinentAllowed = geo.properties.continent ? allowedSet.has(geo.properties.continent.toLowerCase()) : true;
+                  const isDisabled = !isContinentAllowed || isPolarAntarcticaDisabled;
+
+                  let defaultFill = !isRegistered ? '#ff6b6b' : (continentColors[geo.properties.continent] || '#d1d5db');
+                  let hoverFill = !isRegistered ? '#ff5252' : '#80deea';
+                  let pressedFill = !isRegistered ? '#ff1744' : '#26c6da';
+
+                  if (isDisabled) {
+                    defaultFill = '#e5e7eb';
+                    hoverFill = '#e5e7eb';
+                    pressedFill = '#e5e7eb';
+                  }
 
                   return (
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
                       onClick={() => {
+                        if (isDisabled) return;
                         if (onCountryClick) {
-                          onCountryClick({ ...geo.properties, countryId: iso2 })
+                          if (studyMode === 'continents') {
+                            onCountryClick({ ...geo.properties, countryId: continentKey, type: 'continent' })
+                          } else {
+                            onCountryClick({ ...geo.properties, countryId: iso2, type: 'country' })
+                          }
                         }
                       }}
-                      onMouseEnter={() => setHoveredCountry(iso2)}
+                      onMouseEnter={() => {
+                        if (isDisabled) return;
+                        setHoveredCountry(studyMode === 'continents' ? continentKey : iso2)
+                      }}
                       onMouseLeave={() => setHoveredCountry(null)}
                       style={{
                         default: {
@@ -249,15 +391,15 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
                         },
                         hover: {
                           fill: hoverFill,
-                          stroke: '#00838f',
-                          strokeWidth: 1.5,
+                          stroke: isDisabled ? '#444' : '#00838f',
+                          strokeWidth: isDisabled ? 0.5 : 1.5,
                           outline: 'none',
-                          cursor: 'pointer',
+                          cursor: isDisabled ? 'default' : 'pointer',
                         },
                         pressed: {
                           fill: pressedFill,
-                          stroke: '#00838f',
-                          strokeWidth: 1.5,
+                          stroke: isDisabled ? '#444' : '#00838f',
+                          strokeWidth: isDisabled ? 0.5 : 1.5,
                           outline: 'none',
                         },
                       }}
@@ -268,7 +410,121 @@ export default function WorldMap({ onCountryClick, mapId, revealThreshold = 5, c
             </Geographies>
           )}
 
-          {/* 등록된 국가 이름 표시 */}
+          {/* 5대양 마커 표시 */}
+          {includeOceans && OCEANS_CONFIG.map(ocean => {
+            const isRegistered = !!registeredCountries[ocean.linkId];
+            const stats = registeredCountries[ocean.linkId];
+            let displayName = '';
+            
+            if (stats && stats.count > 0) {
+              if (stats.count >= revealThreshold) {
+                displayName = stats.name;
+              } else {
+                const nameLen = stats.name.length;
+                const unmaskedLen = Math.floor((stats.count / revealThreshold) * nameLen);
+                const maskedLen = nameLen - unmaskedLen;
+                const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
+                displayName = `${masked} (${stats.count}/${revealThreshold})`;
+              }
+            }
+
+            return (
+              <Marker key={ocean.id} coordinates={ocean.coordinates}>
+                <g
+                  onClick={() => {
+                    if (onCountryClick) {
+                      onCountryClick({ name: ocean.nameKo, countryId: ocean.linkId, type: 'ocean' });
+                    }
+                  }}
+                  onMouseEnter={() => setHoveredCountry(ocean.linkId)}
+                  onMouseLeave={() => setHoveredCountry(null)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <circle
+                    r={14 / position.zoom}
+                    fill={isRegistered ? '#00bcd4' : '#ffb74d'}
+                    stroke="#fff"
+                    strokeWidth={2 / position.zoom}
+                    opacity={0.9}
+                    style={{ transition: 'all 0.2s ease-in-out' }}
+                  />
+                  <text
+                    y={-(20 / position.zoom)}
+                    textAnchor="middle"
+                    style={{
+                      fontFamily: "system-ui",
+                      fill: '#fff',
+                      fontSize: (11 + position.zoom * 0.5) / position.zoom,
+                      fontWeight: 800,
+                      pointerEvents: "none",
+                      textShadow: `${1/position.zoom}px ${1/position.zoom}px ${2/position.zoom}px rgba(0,0,0,0.8)`
+                    }}
+                  >
+                    {displayName || `🌊 ?`}
+                  </text>
+                </g>
+              </Marker>
+            );
+          })}
+
+          {/* 북극 마커 표시 */}
+          {includePolar && (() => {
+            const isRegistered = !!registeredCountries['polar_arctic'];
+            const stats = registeredCountries['polar_arctic'];
+            let displayName = '';
+            
+            if (stats && stats.count > 0) {
+              if (stats.count >= revealThreshold) {
+                displayName = stats.name;
+              } else {
+                const nameLen = stats.name.length;
+                const unmaskedLen = Math.floor((stats.count / revealThreshold) * nameLen);
+                const maskedLen = nameLen - unmaskedLen;
+                const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
+                displayName = `${masked} (${stats.count}/${revealThreshold})`;
+              }
+            }
+
+            return (
+              <Marker coordinates={[0, 85]}>
+                <g
+                  onClick={() => {
+                    if (onCountryClick) {
+                      onCountryClick({ name: '북극', countryId: 'polar_arctic', type: 'polar' });
+                    }
+                  }}
+                  onMouseEnter={() => setHoveredCountry('polar_arctic')}
+                  onMouseLeave={() => setHoveredCountry(null)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <circle
+                    r={14 / position.zoom}
+                    fill={isRegistered ? '#81c784' : '#90a4ae'}
+                    stroke="#fff"
+                    strokeWidth={2 / position.zoom}
+                    opacity={0.9}
+                    style={{ transition: 'all 0.2s ease-in-out' }}
+                  />
+                  <text
+                    y={-(20 / position.zoom)}
+                    textAnchor="middle"
+                    style={{
+                      fontFamily: "system-ui",
+                      fill: '#fff',
+                      fontSize: (11 + position.zoom * 0.5) / position.zoom,
+                      fontWeight: 800,
+                      pointerEvents: "none",
+                      textShadow: `${1/position.zoom}px ${1/position.zoom}px ${2/position.zoom}px rgba(0,0,0,0.8)`
+                    }}
+                  >
+                    {displayName || `❄️ ?`}
+                  </text>
+                </g>
+              </Marker>
+            );
+          })()}
+
+          {/* 등록된 국가/대륙 이름 표시 */}
           {[...centroids]
             .sort((a, b) => (a.iso2 === hoveredCountry ? 1 : b.iso2 === hoveredCountry ? -1 : 0))
             .map(({ iso2, name, coordinates }, idx) => {

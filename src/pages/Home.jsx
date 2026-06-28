@@ -17,6 +17,10 @@ export default function Home() {
   const [isActive, setIsActive] = useState(true)
   const [isTeacher, setIsTeacher] = useState(false)
   const [progress, setProgress] = useState({ completed: 0, total: 0 })
+  const [studyMode, setStudyMode] = useState('countries')
+  const [includeOceans, setIncludeOceans] = useState(true)
+  const [includePolar, setIncludePolar] = useState(true)
+  const [allowedContinents, setAllowedContinents] = useState('Asia,Europe,Africa,North America,South America,Oceania,Antarctica')
 
   useEffect(() => {
     if (user && !mapId) {
@@ -29,7 +33,7 @@ export default function Home() {
       const fetchMapDetails = async () => {
         const { data } = await supabase
           .from('maps')
-          .select('name, teacher_email, reveal_threshold, is_active')
+          .select('name, teacher_email, reveal_threshold, is_active, study_mode, include_oceans, include_polar, allowed_continents')
           .eq('id', mapId)
           .single()
         
@@ -37,6 +41,10 @@ export default function Home() {
           setMapName(data.name)
           setRevealThreshold(data.reveal_threshold || 5)
           setIsActive(data.is_active !== false)
+          setStudyMode(data.study_mode || 'countries')
+          setIncludeOceans(data.include_oceans !== false)
+          setIncludePolar(data.include_polar !== false)
+          setAllowedContinents(data.allowed_continents || 'Asia,Europe,Africa,North America,South America,Oceania,Antarctica')
           if (user && data.teacher_email === user.email) {
             setIsTeacher(true)
           }
@@ -101,7 +109,17 @@ export default function Home() {
   return (
     <div className="home-container">
       <main className="map-section">
-        <WorldMap onCountryClick={handleCountryClick} mapId={mapId} revealThreshold={revealThreshold} currentUser={user} onProgressUpdate={setProgress} />
+        <WorldMap 
+          onCountryClick={handleCountryClick} 
+          mapId={mapId} 
+          revealThreshold={revealThreshold} 
+          currentUser={user} 
+          onProgressUpdate={setProgress}
+          studyMode={studyMode}
+          includeOceans={includeOceans}
+          includePolar={includePolar}
+          allowedContinents={allowedContinents}
+        />
       </main>
       
       <aside className="right-sidebar">
@@ -158,6 +176,9 @@ export default function Home() {
               isTeacher={isTeacher}
               revealThreshold={revealThreshold}
               isActive={isActive}
+              studyMode={studyMode}
+              includeOceans={includeOceans}
+              includePolar={includePolar}
               onClose={() => setSelectedCountry(null)} 
             />
           ) : (

@@ -5,6 +5,15 @@ import { formatDisplayName } from '../utils/nameFormat'
 import './CountryPanel.css'
 
 export default function CountryPanel({ countryId, onClose, user, mapId, isTeacher, revealThreshold = 5, isActive = true }) {
+  const isOcean = countryId && countryId.startsWith('ocean_');
+  const isContinent = countryId && countryId.startsWith('continent_');
+  const isPolar = countryId === 'polar_arctic' || countryId === 'AQ';
+
+  let termSingular = '나라';
+  if (isOcean) termSingular = '바다';
+  else if (isContinent) termSingular = '대륙';
+  else if (isPolar) termSingular = '지역';
+
   const [info, setInfo] = useState('')
   const [inputCountryName, setInputCountryName] = useState('')
   const [displayCountryName, setDisplayCountryName] = useState('')
@@ -83,7 +92,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       return;
     }
     if (!inputCountryName.trim()) {
-      alert("나라 이름을 먼저 입력해주세요!");
+      alert(`${termSingular} 이름을 먼저 입력해주세요!`);
       return;
     }
 
@@ -154,7 +163,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
 
   const handleNameUpdate = async () => {
     if (!inputCountryName.trim()) {
-      alert("나라 이름을 먼저 입력해주세요!");
+      alert(`${termSingular} 이름을 먼저 입력해주세요!`);
       return;
     }
     if (!isActive) {
@@ -171,7 +180,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
     );
 
     if (!userAlreadyRegistered && totalRegistrations >= 8 && !isTeacher) {
-      alert("이 나라는 이미 8명의 친구들이 모두 참여했습니다!");
+      alert(`이 ${termSingular}는 이미 8명의 친구들이 모두 참여했습니다!`);
       return;
     }
 
@@ -187,12 +196,12 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
           .eq('author_name', currentUserName)
           .like('content', '%등록했습니다! 🎉%');
         if (error && error.code !== '42P01') throw error;
-        alert("나라 이름이 수정되었습니다!");
+        alert(`${termSingular} 이름이 수정되었습니다!`);
       } else {
         const isFirst = savedData.length === 0;
         const { error } = await supabase.from('countries_data').insert([{
           country_name: inputCountryName,
-          content: `${currentUserName}님이 이 나라의 이름을 ${isFirst ? '최초로 ' : ''}등록했습니다! 🎉`,
+          content: `${currentUserName}님이 이 ${termSingular}의 이름을 ${isFirst ? '최초로 ' : ''}등록했습니다! 🎉`,
           link: countryId,
           map_id: mapId,
           author_name: currentUserName,
@@ -200,10 +209,10 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
         }]);
         if (error && error.code !== '42P01') throw error;
 
-        alert("나라 이름 등록에 참여하셨습니다!");
+        alert(`${termSingular} 이름 등록에 참여하셨습니다!`);
       }
       
-      alert("나라 이름이 적용되었습니다!");
+      alert(`${termSingular} 이름이 적용되었습니다!`);
       fetchData();
     } catch (err) {
       console.error(err);
@@ -270,7 +279,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
             if (totalRegistrations >= 8 && !userAlreadyRegistered && !isTeacher) {
               return (
                 <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', textAlign: 'center', color: '#a7a7a7', fontSize: '0.9rem' }}>
-                  이 나라는 이미 8명의 친구들이 모두 참여했습니다! 🚀
+                  이 {termSingular}는 이미 8명의 친구들이 모두 참여했습니다! 🚀
                 </div>
               );
             }
@@ -279,7 +288,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
                 <input 
                   type="text" 
                   className="country-name-input-header"
-                  placeholder="이 나라의 이름은?"
+                  placeholder={`이 ${termSingular}의 이름은?`}
                   value={inputCountryName}
                   onChange={(e) => setInputCountryName(e.target.value)}
                   required
@@ -457,7 +466,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
             <h3>새로운 정보 기록하기</h3>
             <form onSubmit={handleSubmit}>
               <textarea 
-                placeholder="이 나라에 대해 조사한 내용을 자유롭게 적어주세요!"
+                placeholder={`이 ${termSingular}에 대해 조사한 내용을 자유롭게 적어주세요!`}
                 value={info}
                 onChange={(e) => setInfo(e.target.value)}
                 required
