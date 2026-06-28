@@ -305,46 +305,57 @@ export default function Dashboard() {
   
   const displayGroups = Object.values(groupedRecords);
 
-  const handleExportExcel = () => {
-    const headers = ['작성자', '구분', '나라/바다/대륙 이름', '작성 날짜', '내용'];
-    const csvData = filteredRecords.map(record => {
-      const author = formatDisplayName(record.author_name) || '익명 학생';
-      const country = record.country_name || '이름 없는 지역';
-      const date = new Date(record.created_at).toLocaleDateString();
-      
-      let category = '조사 내용';
-      let cleanContent = record.content || '';
-      
-      if (cleanContent.includes('등록했습니다! 🎉')) {
-        category = '이름 등록';
-        cleanContent = '이름 등록 참여 🎉';
+  const handleExportMapExcel = async (mapId, mapName) => {
+    try {
+      const { data: mapRecords, error } = await dbService.countriesData.getAllCountriesData(mapId)
+      if (error) throw error
+      if (!mapRecords || mapRecords.length === 0) {
+        alert("이 지도의 저장된 기록이 없습니다.")
+        return
       }
       
-      if (record.link) {
-        if (record.link.startsWith('ocean_')) {
-          category = cleanContent.includes('등록했습니다! 🎉') ? '바다 이름 등록' : '바다 조사 내용';
-        } else if (record.link.startsWith('continent_')) {
-          category = cleanContent.includes('등록했습니다! 🎉') ? '대륙 이름 등록' : '대륙 조사 내용';
-        } else if (record.link === 'polar_arctic' || record.link === 'AQ') {
-          category = cleanContent.includes('등록했습니다! 🎉') ? '극지 이름 등록' : '극지 조사 내용';
+      const headers = ['작성자', '구분', '나라/바다/대륙 이름', '작성 날짜', '내용'];
+      const csvData = mapRecords.map(record => {
+        const author = formatDisplayName(record.author_name) || '익명 학생';
+        const country = record.country_name || '이름 없는 지역';
+        const date = new Date(record.created_at).toLocaleDateString();
+        
+        let category = '조사 내용';
+        let cleanContent = record.content || '';
+        
+        if (cleanContent.includes('등록했습니다! 🎉')) {
+          category = '이름 등록';
+          cleanContent = '이름 등록 참여 🎉';
         }
-      }
-      
-      const content = `"${cleanContent.replace(/"/g, '""')}"`;
-      return `${author},${category},${country},${date},${content}`;
-    });
+        
+        if (record.link) {
+          if (record.link.startsWith('ocean_')) {
+            category = cleanContent.includes('등록했습니다! 🎉') ? '바다 이름 등록' : '바다 조사 내용';
+          } else if (record.link.startsWith('continent_')) {
+            category = cleanContent.includes('등록했습니다! 🎉') ? '대륙 이름 등록' : '대륙 조사 내용';
+          } else if (record.link === 'polar_arctic' || record.link === 'AQ') {
+            category = cleanContent.includes('등록했습니다! 🎉') ? '극지 이름 등록' : '극지 조사 내용';
+          }
+        }
+        
+        const content = `"${cleanContent.replace(/"/g, '""')}"`;
+        return `${author},${category},${country},${date},${content}`;
+      });
 
-    const csvString = '\uFEFF' + [headers.join(','), ...csvData].join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', '우리반_세계지도_기록.csv');
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const csvString = '\uFEFF' + [headers.join(','), ...csvData].join('\n');
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `우리반_세계지도_기록_${mapName}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (err) {
+      alert("엑셀 저장 실패: " + err.message)
     }
   }
 
@@ -369,12 +380,7 @@ export default function Dashboard() {
                 >
                   <LogOut size={18} />
                 </button>
-                {selectedMapId && (
-                  <button onClick={handleExportExcel} className="export-btn" title="엑셀로 저장" style={{ borderRadius: '6px', padding: '8px 16px' }}>
-                    <Download size={16} />
-                    <span>엑셀 저장</span>
-                  </button>
-                )}
+                {/* Global excel button removed */}
                 {myMaps.length < 3 && (
                   <button onClick={handleCreateMap} className="create-map-btn" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--primary-color)', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
                     <Plus size={16} /> 새 지도 만들기
@@ -407,31 +413,61 @@ export default function Dashboard() {
                         ))}
                       </select>
                     </div>
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        const newActive = map.is_active === false ? true : false;
-                        setMyMaps(prev => prev.map(m => m.id === map.id ? { ...m, is_active: newActive } : m));
-                        dbService.maps.updateMap(map.id, { is_active: newActive }).then(({error}) => {
-                          if(error) alert('상태 변경 실패: ' + error.message);
-                        });
-                      }}
-                      style={{ 
-                        padding: '4px 8px', 
-                        borderRadius: '4px', 
-                        border: 'none', 
-                        background: map.is_active !== false ? 'var(--primary-color)' : '#ef4444', 
-                        color: map.is_active !== false ? '#000' : '#fff', 
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        fontSize: '0.75rem',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {map.is_active !== false ? '✅ 입력 가능' : '⏸️ 입력 중지'}
-                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleExportMapExcel(map.id, map.name)
+                        }}
+                        className="export-btn"
+                        title="엑셀로 저장"
+                        style={{
+                          borderRadius: '4px',
+                          padding: '4px 8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px',
+                          fontSize: '0.75rem',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          background: 'var(--primary-color)',
+                          color: '#000',
+                          border: 'none'
+                        }}
+                      >
+                        <Download size={12} />
+                        <span>엑셀 저장</span>
+                      </button>
+
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          const newActive = map.is_active === false ? true : false;
+                          setMyMaps(prev => prev.map(m => m.id === map.id ? { ...m, is_active: newActive } : m));
+                          dbService.maps.updateMap(map.id, { is_active: newActive }).then(({error}) => {
+                            if(error) alert('상태 변경 실패: ' + error.message);
+                          });
+                        }}
+                        style={{ 
+                          padding: '4px 8px', 
+                          borderRadius: '4px', 
+                          border: 'none', 
+                          background: map.is_active !== false ? 'var(--primary-color)' : '#ef4444', 
+                          color: map.is_active !== false ? '#000' : '#fff', 
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px',
+                          fontSize: '0.75rem',
+                          fontWeight: 'bold',
+                          minWidth: '75px'
+                        }}
+                      >
+                        {map.is_active !== false ? '✅ 입력 가능' : '⏸️ 입력 중지'}
+                      </button>
+                    </div>
                   </div>
                   
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', borderTop: '1px dashed var(--border-color)', paddingTop: '12px' }}>
