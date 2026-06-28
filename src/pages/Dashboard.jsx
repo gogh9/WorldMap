@@ -399,7 +399,7 @@ export default function Dashboard() {
                     </h3>
                   </div>
                   
-                  <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                  <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ color: 'var(--text-muted)' }}>나라 이름 표시 조건:</span>
                       <select 
