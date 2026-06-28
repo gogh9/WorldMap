@@ -392,14 +392,14 @@ export default function Dashboard() {
             <div className="maps-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
               
               {[...myMaps].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).map(map => (
-                <div key={map.id} style={{ padding: '16px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === map.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === map.id ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '250px', position: 'relative' }}>
+                <div key={map.id} style={{ padding: '12px 14px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === map.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === map.id ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '250px', position: 'relative' }}>
                   <div onClick={() => handleMapSelect(map.id)}>
-                    <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem' }}>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>
                       {`${map.name}(${new Date(map.created_at).toLocaleDateString()})`}
                     </h3>
                   </div>
                   
-                  <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                  <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ color: 'var(--text-muted)' }}>나라 이름 표시 조건:</span>
                       <select 
@@ -470,7 +470,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   
-                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', borderTop: '1px dashed var(--border-color)', paddingTop: '12px' }}>
+                  <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem', borderTop: '1px dashed var(--border-color)', paddingTop: '8px' }}>
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '4px' }}>
                       <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-color)' }} onClick={(e) => e.stopPropagation()}>
                         <input
@@ -493,7 +493,7 @@ export default function Dashboard() {
                       </label>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px', borderTop: '1px dotted var(--border-color)', paddingTop: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px', borderTop: '1px dotted var(--border-color)', paddingTop: '6px' }}>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600 }}>입력 허용 대륙:</span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 12px' }}>
                         {[
@@ -525,7 +525,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
                     <button onClick={(e) => { e.stopPropagation(); copyMapLink(map.id); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: 'var(--primary-color)', color: '#000', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
                       <Copy size={16} /> 학생 배부용 링크 복사
                     </button>
