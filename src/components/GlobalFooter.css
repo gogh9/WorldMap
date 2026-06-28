@@ -25,16 +25,6 @@
   gap: 8px;
 }
 
-.footer-school {
-  color: #ffffff;
-  font-weight: 500;
-}
-
-.footer-creator strong {
-  color: #1ed760;
-  font-weight: 600;
-}
-
 .footer-center {
   display: flex;
   align-items: center;
