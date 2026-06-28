@@ -134,14 +134,6 @@ export default function Home() {
                 <span className="user-name">{formatDisplayName(user.user_metadata.full_name)}</span>
                 
                 <button 
-                  onClick={() => setIsHelpOpen(true)} 
-                  className="help-btn" 
-                  title="사용방법 안내"
-                >
-                  <HelpCircle size={18} />
-                </button>
-
-                <button 
                   onClick={() => navigate('/dashboard')} 
                   className="dashboard-btn" 
                   title="대시보드"
