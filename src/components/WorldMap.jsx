@@ -19,7 +19,7 @@ const projection = geoNaturalEarth1()
   .scale(160)
 
 const OCEANS_CONFIG = [
-  { id: 'ocean_pacific_west', linkId: 'ocean_pacific', nameKo: '태평양', nameEn: 'Pacific Ocean (West)', coordinates: [150, -10] },
+  { id: 'ocean_pacific_west', linkId: 'ocean_pacific', nameKo: '태평양', nameEn: 'Pacific Ocean (West)', coordinates: [150, 20] },
   { id: 'ocean_pacific_east', linkId: 'ocean_pacific', nameKo: '태평양', nameEn: 'Pacific Ocean (East)', coordinates: [-160, -10] },
   { id: 'ocean_atlantic', linkId: 'ocean_atlantic', nameKo: '대서양', nameEn: 'Atlantic Ocean', coordinates: [-30, 20] },
   { id: 'ocean_indian', linkId: 'ocean_indian', nameKo: '인도양', nameEn: 'Indian Ocean', coordinates: [80, -15] },
