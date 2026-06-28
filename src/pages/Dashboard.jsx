@@ -510,13 +510,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-color)', textDecoration: 'none', fontWeight: 'bold' }}>
-                <ArrowLeft size={20} />
-                <span>지도로 돌아가기</span>
-              </Link>
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
             
             {records.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
