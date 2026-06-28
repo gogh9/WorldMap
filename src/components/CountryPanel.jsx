@@ -230,11 +230,6 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   return (
     <aside className="country-panel">
       <div className="panel-header">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <button className="close-btn" onClick={onClose} title="닫기">
-            <X size={20} />
-          </button>
-        </div>
 
         {hasCountryName && (
           <div className="header-title-container">
