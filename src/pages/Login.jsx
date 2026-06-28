@@ -12,7 +12,7 @@ export default function Login() {
   const [isHelpOpen, setIsHelpOpen] = useState(false)
 
   const schoolName = import.meta.env.VITE_SCHOOL_NAME || '서울수색초등학교'
-  const creatorName = import.meta.env.VITE_CREATOR_NAME || 'sota'
+  const creatorName = import.meta.env.VITE_CREATOR_NAME || '김세찬'
 
   useEffect(() => {
     // Check if there is an error in URL

@@ -22,7 +22,7 @@ export default function GlobalFooter() {
 
   // Environment variable loading with fallbacks
   const schoolName = import.meta.env.VITE_SCHOOL_NAME || '서울수색초등학교'
-  const creatorName = import.meta.env.VITE_CREATOR_NAME || 'sota'
+  const creatorName = import.meta.env.VITE_CREATOR_NAME || '김세찬'
   const githubUrl = import.meta.env.VITE_GITHUB_URL || 'https://github.com/gogh9/WorldMap'
   const contactEmail = 'gogh9@susaek.sen.es.kr'
 

@@ -26,7 +26,7 @@ export default function Home() {
   const [isHelpOpen, setIsHelpOpen] = useState(false)
 
   const creatorEmail = 'gogh9@susaek.sen.es.kr'
-  const creatorName = import.meta.env.VITE_CREATOR_NAME || 'sota'
+  const creatorName = import.meta.env.VITE_CREATOR_NAME || '김세찬'
 
   useEffect(() => {
     if (user && !mapId) {
