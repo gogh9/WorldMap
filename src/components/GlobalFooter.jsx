@@ -33,9 +33,7 @@ export default function GlobalFooter() {
     <footer className="global-footer">
       <div className="footer-content">
         <div className="footer-left">
-          <span className="footer-school">🏫 {schoolName}</span>
-          <span className="footer-divider">•</span>
-          <span className="footer-creator">제작자: <strong>{creatorName}</strong></span>
+          <span className="footer-creator">powerd by <strong>sota</strong> / gogh9@susaek.sen.es.kr</span>
         </div>
 
         <div className="footer-center">

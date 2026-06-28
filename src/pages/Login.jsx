@@ -66,7 +66,6 @@ export default function Login() {
 
       <div className="login-main-content">
         <div className="login-box">
-          <div className="school-tag">🏫 {schoolName}</div>
           <h1>🌎 세계 백지도 탐험</h1>
           <p>우리 반 친구들과 함께 세계 여러 나라를 조사해 보아요!</p>
           
@@ -79,7 +78,7 @@ export default function Login() {
             {loading ? '로그인 중...' : '구글 계정으로 시작하기'}
           </button>
           
-          <div className="creator-tag">제작자: {creatorName}</div>
+          <div className="creator-tag">powerd by sota / gogh9@susaek.sen.es.kr</div>
         </div>
       </div>
 
