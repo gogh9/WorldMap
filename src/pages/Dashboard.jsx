@@ -448,19 +448,6 @@ export default function Dashboard() {
                 </div>
                 
                 <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', borderTop: '1px dashed var(--border-color)', paddingTop: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>기본 학습 대상:</span>
-                    <select
-                      value={map.study_mode || 'countries'}
-                      onChange={(e) => handleUpdateStudyMode(map.id, e.target.value)}
-                      onClick={(e) => e.stopPropagation()}
-                      style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-color)', cursor: 'pointer' }}
-                    >
-                      <option value="countries">국가 (200여 개국)</option>
-                      <option value="continents">6대주 (대륙 단위)</option>
-                    </select>
-                  </div>
-
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '4px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-color)' }} onClick={(e) => e.stopPropagation()}>
                       <input
