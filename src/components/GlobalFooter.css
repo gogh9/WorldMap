@@ -1,0 +1,222 @@
+.global-footer {
+  background-color: #121212;
+  border-top: 1px solid #282828;
+  padding: 12px 24px;
+  font-family: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  color: #b3b3b3;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-school {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.footer-creator strong {
+  color: #1ed760;
+  font-weight: 600;
+}
+
+.footer-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-link-btn {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.footer-link-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.footer-divider {
+  color: #4d4d4d;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+}
+
+.footer-github-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #b3b3b3;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 9999px; /* Spotify pill style */
+  background-color: #1f1f1f;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.footer-github-link:hover {
+  color: #ffffff;
+  background-color: #282828;
+  transform: translateY(-1px);
+}
+
+/* Modal Overlay Styling */
+.footer-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.footer-modal-content {
+  background-color: #181818;
+  border: 1px solid #282828;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 8px 24px;
+  animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #282828;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.modal-close-btn:hover {
+  color: #ffffff;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  color: #cbcbcb;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.modal-body h3 {
+  color: #ffffff;
+  font-size: 15px;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.modal-body ul {
+  padding-left: 20px;
+  margin-bottom: 16px;
+}
+
+.modal-body li {
+  margin-bottom: 6px;
+}
+
+.contact-info {
+  background-color: rgba(30, 215, 96, 0.05);
+  border: 1px solid rgba(30, 215, 96, 0.2);
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: inline-block;
+  color: #1ed760;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #282828;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal-confirm-btn {
+  background-color: #1ed760; /* Spotify Green */
+  color: #000000;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 500px; /* Full pill button */
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.modal-confirm-btn:hover {
+  background-color: #1db954;
+  transform: scale(1.04);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive details */
+@media (max-width: 600px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}

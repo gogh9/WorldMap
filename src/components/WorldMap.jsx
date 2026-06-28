@@ -3,7 +3,7 @@ import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker, Sphere, G
 import { geoCentroid, geoNaturalEarth1 } from 'd3-geo'
 import countries from 'i18n-iso-countries'
 import koLocale from 'i18n-iso-countries/langs/ko.json'
-import { supabase } from '../lib/supabase'
+import { dbService } from '../lib/dbService'
 import { formatDisplayName } from '../utils/nameFormat'
 import './WorldMap.css'
 
@@ -113,15 +113,8 @@ export default function WorldMap({
 
     // DB에서 등록된 나라 정보 가져오기
     const fetchCountries = async () => {
-      let query = supabase
-        .from('countries_data')
-        .select('link, country_name, author_name, content')
-        
-      if (mapId) {
-        query = query.eq('map_id', mapId)
-      }
-      
-      const { data, error } = await query
+      if (!mapId) return
+      const { data, error } = await dbService.countriesData.getAllCountriesData(mapId)
       
       if (data && !error) {
         const countryStats = {}
@@ -169,14 +162,12 @@ export default function WorldMap({
     fetchCountries()
 
     // 실시간 업데이트 구독
-    const channel = supabase.channel('countries_data_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'countries_data' }, payload => {
-        fetchCountries()
-      })
-      .subscribe()
+    const sub = dbService.countriesData.subscribeCountriesData(mapId, () => {
+      fetchCountries()
+    })
       
     return () => {
-      supabase.removeChannel(channel)
+      sub.unsubscribe()
     }
   }, [mapId])
 

@@ -1,37 +1,64 @@
 .login-container {
   display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-color); /* #121212 */
+  position: relative;
+}
+
+.login-main-content {
+  flex: 1;
+  display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: var(--bg-color); /* #121212 */
+  padding: 40px 20px;
 }
 
 .login-box {
   background: var(--bg-surface); /* #181818 */
-  padding: 50px 60px;
+  padding: 40px 50px;
   border-radius: var(--border-radius); /* 6px */
   box-shadow: var(--box-shadow); /* Heavy shadow */
   text-align: center;
   animation: slideUp 0.6s ease-out;
   width: 100%;
-  max-width: 600px; /* 너비 증가 */
+  max-width: 500px;
+  position: relative;
+  border: 1px solid #282828;
+}
+
+.school-tag {
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbcbcb;
+  font-size: 12px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  display: inline-block;
+  margin-bottom: 20px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.creator-tag {
+  color: #888888;
+  font-size: 11px;
+  margin-top: 24px;
 }
 
 .login-box h1 {
   margin-top: 0;
   color: var(--text-color);
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   letter-spacing: -1px;
-  white-space: nowrap; /* 한 줄로 표시 */
 }
 
 .login-box p {
   color: var(--text-secondary);
-  margin-bottom: 40px;
-  font-size: 1rem;
-  white-space: nowrap; /* 한 줄로 표시 */
+  margin-bottom: 32px;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .google-login-btn {
@@ -41,28 +68,61 @@
   gap: 12px;
   width: 100%;
   padding: 14px 24px;
-  background-color: var(--primary-color);
+  background-color: var(--primary-color); /* Spotify Green */
   border: none;
   border-radius: var(--pill-radius);
   font-size: 0.88rem;
   font-weight: 700;
   color: #000000;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .google-login-btn:hover {
   background-color: var(--primary-hover);
-  transform: scale(1.04);
+  transform: scale(1.03);
 }
 
 .google-login-btn:active {
   transform: scale(1);
 }
 
+.login-help-floating-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #1f1f1f;
+  border: 1px solid #282828;
+  color: #b3b3b3;
+  padding: 8px 16px;
+  border-radius: 9999px; /* Pill style */
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-help-floating-btn:hover {
+  color: #ffffff;
+  background: #282828;
+  border-color: #4d4d4d;
+}
+
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .login-box {
+    padding: 30px 20px;
+  }
+  .login-box h1 {
+    font-size: 1.8rem;
+  }
 }

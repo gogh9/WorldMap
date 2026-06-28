@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { dbService } from '../lib/dbService'
 import { X, Save, Edit2, Trash2 } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
 import './CountryPanel.css'
@@ -36,15 +36,10 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
 
   const fetchData = async () => {
     try {
-      const { data, error } = await supabase
-        .from('countries_data')
-        .select('*')
-        .eq('link', countryId)
-        .eq('map_id', mapId)
-        .order('created_at', { ascending: false })
+      const { data, error } = await dbService.countriesData.getCountriesData(mapId, countryId)
       
       if (error) {
-        if (error.code !== '42P01') console.error("Error fetching data:", error)
+        console.error("Error fetching data:", error)
       } else {
         setSavedData(data || [])
         
@@ -100,26 +95,16 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
 
     try {
       // 새 글 작성
-      const { error } = await supabase
-        .from('countries_data')
-        .insert([
-          { 
-            country_name: inputCountryName, 
-            content: info, 
-            link: countryId,
-            map_id: mapId,
-            author_name: user?.user_metadata?.full_name || '익명 학생',
-            author_avatar: user?.user_metadata?.avatar_url || ''
-          }
-        ])
+      const { error } = await dbService.countriesData.addCountryData({ 
+        country_name: inputCountryName, 
+        content: info, 
+        link: countryId,
+        map_id: mapId,
+        author_name: user?.user_metadata?.full_name || '익명 학생',
+        author_avatar: user?.user_metadata?.avatar_url || ''
+      })
 
-      if (error) {
-        if (error.code === '42P01') {
-          alert('Supabase에 countries_data 테이블이 아직 생성되지 않았습니다!')
-        } else {
-          throw error
-        }
-      }
+      if (error) throw error
 
       setInfo('')
       fetchData() // 목록 새로고침
@@ -138,10 +123,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   const saveEdit = async (id) => {
     if (!editContent.trim()) return;
     try {
-      const { error } = await supabase
-        .from('countries_data')
-        .update({ content: editContent })
-        .eq('id', id);
+      const { error } = await dbService.countriesData.updateCountryContent(id, editContent);
       if (error) throw error;
       setEditingId(null);
       fetchData();
@@ -153,7 +135,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   const handleDelete = async (id) => {
     if (!window.confirm("정말 이 기록을 삭제하시겠습니까?")) return
     try {
-      const { error } = await supabase.from('countries_data').delete().eq('id', id)
+      const { error } = await dbService.countriesData.deleteCountryData(id)
       if (error) throw error
       fetchData()
     } catch (err) {
@@ -185,29 +167,22 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
     }
 
     try {
-
       if (userAlreadyRegistered) {
         // Only update the current user's registration record!
-        const { error } = await supabase
-          .from('countries_data')
-          .update({ country_name: inputCountryName })
-          .eq('link', countryId)
-          .eq('map_id', mapId)
-          .eq('author_name', currentUserName)
-          .like('content', '%등록했습니다! 🎉%');
-        if (error && error.code !== '42P01') throw error;
+        const { error } = await dbService.countriesData.updateCountryNameByQuery(mapId, countryId, currentUserName, inputCountryName)
+        if (error) throw error;
         alert(`${termSingular} 이름이 수정되었습니다!`);
       } else {
         const isFirst = savedData.length === 0;
-        const { error } = await supabase.from('countries_data').insert([{
+        const { error } = await dbService.countriesData.addCountryData({
           country_name: inputCountryName,
           content: `${currentUserName}님이 이 ${termSingular}의 이름을 ${isFirst ? '최초로 ' : ''}등록했습니다! 🎉`,
           link: countryId,
           map_id: mapId,
           author_name: currentUserName,
           author_avatar: user?.user_metadata?.avatar_url || ''
-        }]);
-        if (error && error.code !== '42P01') throw error;
+        });
+        if (error) throw error;
 
         alert(`${termSingular} 이름 등록에 참여하셨습니다!`);
       }
@@ -218,14 +193,12 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       console.error(err);
     }
   }
+
   const handleAdminEditStudentName = async (reg) => {
     const newName = window.prompt(`[${formatDisplayName(reg.author_name)}] 학생이 입력한 나라 이름 수정:`, reg.country_name)
     if (newName !== null && newName.trim() !== '') {
       try {
-        const { error } = await supabase
-          .from('countries_data')
-          .update({ country_name: newName.trim() })
-          .eq('id', reg.id)
+        const { error } = await dbService.countriesData.updateCountryData(reg.id, { country_name: newName.trim() })
         if (error) throw error;
         alert("수정되었습니다.");
         setAdminMode(null);
@@ -240,10 +213,7 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
     const confirmDelete = window.confirm(`[${formatDisplayName(reg.author_name)}] 학생의 등록 데이터를 완전히 삭제하시겠습니까? (이 작업은 되돌릴 수 없으며 대시보드 기록도 삭제됩니다)`)
     if (confirmDelete) {
       try {
-        const { error } = await supabase
-          .from('countries_data')
-          .delete()
-          .eq('id', reg.id)
+        const { error } = await dbService.countriesData.deleteCountryData(reg.id)
         if (error) throw error;
         alert("삭제되었습니다.");
         setAdminMode(null);
@@ -260,6 +230,12 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   return (
     <aside className="country-panel">
       <div className="panel-header">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <button className="close-btn" onClick={onClose} title="닫기">
+            <X size={20} />
+          </button>
+        </div>
+
         {hasCountryName && (
           <div className="header-title-container">
             <h2 className="country-title-display">{displayCountryName}</h2>

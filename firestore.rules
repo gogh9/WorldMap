@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Maps Collection Rules
+    match /maps/{mapId} {
+      // Any authenticated user can view the maps
+      allow read: if request.auth != null;
+      
+      // Only authenticated users can create maps
+      allow create: if request.auth != null;
+      
+      // Only the teacher who created the map can update or delete it
+      allow update, delete: if request.auth != null && 
+        (resource.data.teacher_email == request.auth.token.email || 
+         request.auth.token.email == 'gogh999@gmail.com');
+    }
+    
+    // Countries Data Collection Rules
+    match /countries_data/{docId} {
+      // Any authenticated user can read registrations
+      allow read: if request.auth != null;
+      
+      // Any authenticated user can add registrations/notes
+      allow create: if request.auth != null;
+      
+      // Users can modify or delete their own registrations, and teachers/admins can modify/delete any registrations
+      allow update, delete: if request.auth != null && 
+        (resource.data.author_name == request.auth.token.name || 
+         request.auth.token.email == 'gogh999@gmail.com' ||
+         // Allow updates by teachers (checked via their email in the UI, or custom claims if configured)
+         true); // Keeping it permissive for classroom collaboration
+    }
+  }
+}
