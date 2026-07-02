@@ -10,7 +10,7 @@ import './WorldMap.css'
 // 한국어 번역 로케일 등록
 countries.registerLocale(koLocale)
 
-const geoUrl = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_countries.geojson"
+const geoUrl = "/ne_50m_admin_0_countries.geojson"
 
 const mapWidth = 800;
 const mapHeight = 600;

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { dbService } from '../lib/dbService'
 import { X, Save, Edit2, Trash2 } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
+import { validateCountryName } from '../utils/countryValidator'
 import './CountryPanel.css'
 
 export default function CountryPanel({ countryId, onClose, user, mapId, isTeacher, revealThreshold = 5, isActive = true }) {
@@ -91,6 +92,12 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
       return;
     }
 
+    const isValid = validateCountryName(inputCountryName, countryId);
+    if (!isValid) {
+      alert(`입력하신 '${inputCountryName}'은(는) 정확한 ${termSingular} 이름이 아닌 것 같아요. 다시 확인해 보세요! 🗺️`);
+      return;
+    }
+
     setLoading(true)
 
     try {
@@ -146,6 +153,12 @@ export default function CountryPanel({ countryId, onClose, user, mapId, isTeache
   const handleNameUpdate = async () => {
     if (!inputCountryName.trim()) {
       alert(`${termSingular} 이름을 먼저 입력해주세요!`);
+      return;
+    }
+
+    const isValid = validateCountryName(inputCountryName, countryId);
+    if (!isValid) {
+      alert(`입력하신 '${inputCountryName}'은(는) 정확한 ${termSingular} 이름이 아닌 것 같아요. 다시 확인해 보세요! 🗺️`);
       return;
     }
     if (!isActive) {
