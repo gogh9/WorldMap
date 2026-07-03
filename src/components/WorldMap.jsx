@@ -23,7 +23,7 @@ const OCEANS_CONFIG = [
   { id: 'ocean_pacific_east', linkId: 'ocean_pacific', nameKo: '태평양', nameEn: 'Pacific Ocean (East)', coordinates: [-160, -10] },
   { id: 'ocean_atlantic', linkId: 'ocean_atlantic', nameKo: '대서양', nameEn: 'Atlantic Ocean', coordinates: [-30, 20] },
   { id: 'ocean_indian', linkId: 'ocean_indian', nameKo: '인도양', nameEn: 'Indian Ocean', coordinates: [80, -15] },
-  { id: 'ocean_arctic', linkId: 'ocean_arctic', nameKo: '북극해', nameEn: 'Arctic Ocean', coordinates: [-90, 78] },
+  { id: 'ocean_arctic', linkId: 'ocean_arctic', nameKo: '북극해', nameEn: 'Arctic Ocean', coordinates: [0, 85] },
   { id: 'ocean_antarctic', linkId: 'ocean_antarctic', nameKo: '남극해', nameEn: 'Southern Ocean', coordinates: [0, -68] },
 ];
 
@@ -458,62 +458,7 @@ export default function WorldMap({
             );
           })}
 
-          {/* 북극 마커 표시 */}
-          {includePolar && (() => {
-            const isRegistered = !!registeredCountries['polar_arctic'];
-            const stats = registeredCountries['polar_arctic'];
-            let displayName = '';
-            
-            if (stats && stats.count > 0) {
-              if (stats.count >= revealThreshold) {
-                displayName = stats.name;
-              } else {
-                const nameLen = stats.name.length;
-                const unmaskedLen = Math.floor((stats.count / revealThreshold) * nameLen);
-                const maskedLen = nameLen - unmaskedLen;
-                const masked = "*".repeat(maskedLen) + stats.name.slice(maskedLen);
-                displayName = `${masked} (${stats.count}/${revealThreshold})`;
-              }
-            }
-
-            return (
-              <Marker coordinates={[0, 85]}>
-                <g
-                  onClick={() => {
-                    if (onCountryClick) {
-                      onCountryClick({ name: '북극', countryId: 'polar_arctic', type: 'polar' });
-                    }
-                  }}
-                  onMouseEnter={() => setHoveredCountry('polar_arctic')}
-                  onMouseLeave={() => setHoveredCountry(null)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <circle
-                    r={14 / position.zoom}
-                    fill={isRegistered ? '#81c784' : '#90a4ae'}
-                    stroke="#fff"
-                    strokeWidth={2 / position.zoom}
-                    opacity={0.9}
-                    style={{ transition: 'all 0.2s ease-in-out' }}
-                  />
-                  <text
-                    y={-(20 / position.zoom)}
-                    textAnchor="middle"
-                    style={{
-                      fontFamily: "system-ui",
-                      fill: '#fff',
-                      fontSize: (11 + position.zoom * 0.5) / position.zoom,
-                      fontWeight: 800,
-                      pointerEvents: "none",
-                      textShadow: `${1/position.zoom}px ${1/position.zoom}px ${2/position.zoom}px rgba(0,0,0,0.8)`
-                    }}
-                  >
-                    {displayName || `❄️ ?`}
-                  </text>
-                </g>
-              </Marker>
-            );
-          })()}
+          {/* 북극 마커 제거됨 */}
 
           {/* 등록된 국가/대륙 이름 표시 */}
           {[...centroids]

@@ -110,7 +110,7 @@ export default function Login() {
             <div style={{ display: 'flex', gap: '8px' }}>
               <input 
                 type="text" 
-                placeholder="이름을 입력해 주세요 (예: 홍길동)" 
+                placeholder="이름을 입력해 주세요" 
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
                 disabled={loading}
