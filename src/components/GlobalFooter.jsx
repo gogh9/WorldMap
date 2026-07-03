@@ -31,25 +31,15 @@ export default function GlobalFooter() {
 
   return (
     <footer className="global-footer">
-      <div className="footer-content">
-        <div className="footer-left">
-          <span className="footer-school">🏫 {schoolName}</span>
-          <span className="footer-divider">•</span>
-          <span className="footer-creator">제작자: {creatorName}</span>
-        </div>
-
-        <div className="footer-center">
-          <button className="footer-link-btn" onClick={() => openModal('privacy')}>개인정보처리방침</button>
-          <span className="footer-divider">•</span>
-          <button className="footer-link-btn" onClick={() => openModal('terms')}>사용약관</button>
-        </div>
-
-        <div className="footer-right">
-          <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="footer-github-link" title="GitHub Repository">
-            <GithubIcon size={16} />
-            <span>Open Source</span>
-          </a>
-        </div>
+      <div className="footer-content" style={{ justifyContent: 'center', gap: '20px' }}>
+        <button className="footer-link-btn" onClick={() => openModal('privacy')}>개인정보처리방침</button>
+        <span className="footer-divider">•</span>
+        <button className="footer-link-btn" onClick={() => openModal('terms')}>사용약관</button>
+        <span className="footer-divider">•</span>
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="footer-github-link" title="GitHub Repository">
+          <GithubIcon size={16} />
+          <span>Open Source</span>
+        </a>
       </div>
 
       {/* Modal Dialog overlay */}
