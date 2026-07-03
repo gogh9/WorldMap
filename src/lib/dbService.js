@@ -44,52 +44,94 @@ export const dbService = {
     // Check session
     getSession: () => new Promise((resolve) => {
       if (isFirebaseActive()) {
-        const unsubscribe = fbAuth.onAuthStateChanged((fbUser) => {
-          unsubscribe()
-          resolve({ data: { session: fbUser ? { user: mapFirebaseUser(fbUser) } : null } })
-        })
+        try {
+          const unsubscribe = fbAuth.onAuthStateChanged((fbUser) => {
+            unsubscribe()
+            resolve({ data: { session: fbUser ? { user: mapFirebaseUser(fbUser) } : null } })
+          })
+        } catch (error) {
+          console.error("Firebase getSession error:", error)
+          resolve({ data: { session: null }, error })
+        }
       } else {
-        supabase.auth.getSession().then(resolve)
+        try {
+          supabase.auth.getSession()
+            .then(resolve)
+            .catch((error) => {
+              console.error("Supabase getSession error:", error)
+              resolve({ data: { session: null }, error })
+            })
+        } catch (error) {
+          console.error("Supabase getSession sync error:", error)
+          resolve({ data: { session: null }, error })
+        }
       }
     }),
 
     // Listen for Auth changes
     onAuthStateChange: (callback) => {
       if (isFirebaseActive()) {
-        const unsubscribe = fbAuth.onAuthStateChanged((fbUser) => {
-          const mappedSession = fbUser ? { user: mapFirebaseUser(fbUser) } : null
-          callback('SIGNED_IN', mappedSession)
-        })
-        return {
-          data: {
-            subscription: {
-              unsubscribe: () => unsubscribe()
+        try {
+          const unsubscribe = fbAuth.onAuthStateChanged((fbUser) => {
+            const mappedSession = fbUser ? { user: mapFirebaseUser(fbUser) } : null
+            callback('SIGNED_IN', mappedSession)
+          })
+          return {
+            data: {
+              subscription: {
+                unsubscribe: () => unsubscribe()
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Firebase onAuthStateChange error:", error)
+          return {
+            data: {
+              subscription: {
+                unsubscribe: () => {}
+              }
             }
           }
         }
       } else {
-        return supabase.auth.onAuthStateChange(callback)
+        try {
+          return supabase.auth.onAuthStateChange(callback)
+        } catch (error) {
+          console.error("Supabase onAuthStateChange error:", error)
+          return {
+            data: {
+              subscription: {
+                unsubscribe: () => {}
+              }
+            }
+          }
+        }
       }
     },
 
     // Sign in with Google
     signInWithGoogle: async (returnTo = '/') => {
       if (isFirebaseActive()) {
-        const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth')
-        const provider = new GoogleAuthProvider()
         try {
+          const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth')
+          const provider = new GoogleAuthProvider()
           const result = await signInWithPopup(fbAuth, provider)
           return { data: { user: mapFirebaseUser(result.user) }, error: null }
         } catch (error) {
           return { data: null, error }
         }
       } else {
-        return supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}${returnTo}`
-          }
-        })
+        try {
+          return await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: `${window.location.origin}${returnTo}`
+            }
+          })
+        } catch (error) {
+          console.error("Supabase signInWithOAuth error:", error)
+          return { data: null, error }
+        }
       }
     },
 
