@@ -43,6 +43,18 @@ export const dbService = {
   auth: {
     // Check session
     getSession: () => new Promise((resolve) => {
+      // Check if there is a local student session
+      try {
+        const localStudent = localStorage.getItem('student_user')
+        if (localStudent) {
+          const user = JSON.parse(localStudent)
+          resolve({ data: { session: { user } } })
+          return
+        }
+      } catch (e) {
+        localStorage.removeItem('student_user')
+      }
+
       if (isFirebaseActive()) {
         try {
           const unsubscribe = fbAuth.onAuthStateChanged((fbUser) => {
@@ -70,6 +82,24 @@ export const dbService = {
 
     // Listen for Auth changes
     onAuthStateChange: (callback) => {
+      // Check if there is a local student session
+      try {
+        const localStudent = localStorage.getItem('student_user')
+        if (localStudent) {
+          const user = JSON.parse(localStudent)
+          callback('SIGNED_IN', { user })
+          return {
+            data: {
+              subscription: {
+                unsubscribe: () => {}
+              }
+            }
+          }
+        }
+      } catch (e) {
+        localStorage.removeItem('student_user')
+      }
+
       if (isFirebaseActive()) {
         try {
           const unsubscribe = fbAuth.onAuthStateChanged((fbUser) => {
@@ -109,6 +139,24 @@ export const dbService = {
       }
     },
 
+    // Sign in as student
+    signInAsStudent: async (name) => {
+      try {
+        const studentUser = {
+          uid: `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          email: `student@susaek.sen.es.kr`,
+          user_metadata: {
+            full_name: name,
+            avatar_url: ''
+          }
+        }
+        localStorage.setItem('student_user', JSON.stringify(studentUser))
+        return { data: { user: studentUser }, error: null }
+      } catch (error) {
+        return { data: null, error }
+      }
+    },
+
     // Sign in with Google
     signInWithGoogle: async (returnTo = '/') => {
       if (isFirebaseActive()) {
@@ -137,6 +185,7 @@ export const dbService = {
 
     // Sign out
     signOut: async () => {
+      localStorage.removeItem('student_user')
       if (isFirebaseActive()) {
         const { signOut } = await import('firebase/auth')
         try {

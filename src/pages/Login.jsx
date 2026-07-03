@@ -10,6 +10,7 @@ export default function Login() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [isHelpOpen, setIsHelpOpen] = useState(false)
+  const [studentName, setStudentName] = useState('')
 
   const schoolName = import.meta.env.VITE_SCHOOL_NAME || '서울수색초등학교'
   const creatorName = import.meta.env.VITE_CREATOR_NAME || '김세찬'
@@ -52,6 +53,29 @@ export default function Login() {
     }
   }
 
+  const handleStudentLogin = async (e) => {
+    e.preventDefault()
+    if (!studentName.trim()) {
+      alert("이름을 입력해 주세요!")
+      return
+    }
+    try {
+      setLoading(true)
+      const queryParams = new URLSearchParams(window.location.search);
+      const returnTo = queryParams.get('returnTo') || '/';
+      
+      const { error } = await dbService.auth.signInAsStudent(studentName.trim())
+      if (error) throw error
+      
+      navigate(returnTo)
+      window.location.reload()
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="login-container">
       {/* Floating help button top right */}
@@ -77,6 +101,50 @@ export default function Login() {
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" width="20" />
             {loading ? '로그인 중...' : '구글 계정으로 시작하기'}
           </button>
+
+          {/* Student direct login alternative */}
+          <form onSubmit={handleStudentLogin} style={{ marginTop: '24px', borderTop: '1px dashed #282828', paddingTop: '24px' }}>
+            <div style={{ fontSize: '0.85rem', color: '#b3b3b3', marginBottom: '10px', textAlign: 'left', fontWeight: 600 }}>
+              학생 이름으로 시작하기
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input 
+                type="text" 
+                placeholder="이름을 입력해 주세요 (예: 홍길동)" 
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                disabled={loading}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  borderRadius: '30px',
+                  border: '1px solid #333',
+                  background: '#121212',
+                  color: '#fff',
+                  fontSize: '0.85rem',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+              <button 
+                type="submit"
+                disabled={loading}
+                style={{
+                  padding: '12px 20px',
+                  borderRadius: '30px',
+                  border: 'none',
+                  background: 'var(--primary-color)',
+                  color: '#000',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                입장
+              </button>
+            </div>
+          </form>
           
           <div className="creator-tag">powerd by sota / gogh9@susaek.sen.es.kr</div>
         </div>
