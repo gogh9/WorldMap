@@ -49,6 +49,8 @@ export default function Home() {
           setAllowedContinents(data.allowed_continents || 'Asia,Europe,Africa,North America,South America,Oceania,Antarctica')
           if (user && data.teacher_email === user.email) {
             setIsTeacher(true)
+          } else {
+            dbService.maps.incrementVisitCount(mapId)
           }
         }
       }

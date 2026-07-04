@@ -247,7 +247,7 @@ export const dbService = {
       } else {
         return supabase
           .from('maps')
-          .select('name, teacher_email, reveal_threshold, is_active, study_mode, include_oceans, include_polar, allowed_continents')
+          .select('*')
           .eq('id', mapId)
           .single()
       }
@@ -336,6 +336,43 @@ export const dbService = {
         }
       } else {
         return supabase.from('maps').update(updates).eq('id', mapId)
+      }
+    },
+
+    // Increment visit count for a map
+    incrementVisitCount: async (mapId) => {
+      if (isFirebaseActive()) {
+        try {
+          const { doc, updateDoc, increment } = await import('firebase/firestore')
+          const docRef = doc(fbDb, 'maps', mapId)
+          await updateDoc(docRef, { visit_count: increment(1) })
+          return { error: null }
+        } catch (error) {
+          console.error("Firebase incrementVisitCount error:", error)
+          return { error }
+        }
+      } else {
+        try {
+          // Read first to get current value
+          const { data, error: readError } = await supabase
+            .from('maps')
+            .select('visit_count')
+            .eq('id', mapId)
+            .single()
+          if (readError) throw readError
+
+          const current = data?.visit_count || 0
+          const { error: updateError } = await supabase
+            .from('maps')
+            .update({ visit_count: current + 1 })
+            .eq('id', mapId)
+          if (updateError) throw updateError
+
+          return { error: null }
+        } catch (error) {
+          console.error("Supabase incrementVisitCount error:", error)
+          return { error }
+        }
       }
     }
   },

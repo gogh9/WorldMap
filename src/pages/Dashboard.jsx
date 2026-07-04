@@ -394,9 +394,13 @@ export default function Dashboard() {
               {[...myMaps].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).map(map => (
                 <div key={map.id} style={{ padding: '12px 14px', borderRadius: '8px', cursor: 'pointer', border: selectedMapId === map.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)', background: selectedMapId === map.id ? 'rgba(29, 185, 84, 0.1)' : 'var(--bg-color)', minWidth: '250px', position: 'relative' }}>
                   <div onClick={() => handleMapSelect(map.id)}>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>
+                    <h3 style={{ margin: '0 0 2px 0', fontSize: '1.1rem' }}>
                       {`${map.name}(${new Date(map.created_at).toLocaleDateString()})`}
                     </h3>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span>접속 횟수 (학생):</span>
+                      <strong style={{ color: 'var(--primary-color)' }}>{map.visit_count || 0}회</strong>
+                    </div>
                   </div>
                   
                   <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', fontSize: '0.85rem' }}>
