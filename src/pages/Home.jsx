@@ -25,7 +25,7 @@ export default function Home() {
   const [allowedContinents, setAllowedContinents] = useState('Asia,Europe,Africa,North America,South America,Oceania,Antarctica')
   const [isHelpOpen, setIsHelpOpen] = useState(false)
 
-  const creatorEmail = 'gogh9@susaek.sen.es.kr'
+  const creatorEmail = 'gogh999@gmail.com'
   const creatorName = import.meta.env.VITE_CREATOR_NAME || '김세찬'
 
   useEffect(() => {
@@ -155,7 +155,7 @@ export default function Home() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div className="nav-subtitle" style={{ fontSize: '11px', color: '#888', fontWeight: 500, textAlign: 'right' }}>
-                Built by sota / gogh9@susaek.sen.es.kr
+                powerd by sota / gogh999@gmail.com
               </div>
               {progress.total > 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(30, 215, 96, 0.05)', border: '1px solid rgba(30, 215, 96, 0.2)', padding: '8px 10px', borderRadius: '8px' }}>

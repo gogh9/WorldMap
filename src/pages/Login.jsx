@@ -152,7 +152,7 @@ export default function Login() {
             </form>
           )}
           
-          <div className="creator-tag">powerd by sota / gogh9@susaek.sen.es.kr</div>
+          <div className="creator-tag">powerd by sota / gogh999@gmail.com</div>
         </div>
       </div>
 
