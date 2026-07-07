@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { dbService } from '../lib/dbService'
 import { useNavigate, useParams } from 'react-router-dom'
-import { LogOut, LayoutDashboard, HelpCircle } from 'lucide-react'
+import { LogOut, LayoutDashboard } from 'lucide-react'
 import WorldMap from '../components/WorldMap'
 import CountryPanel from '../components/CountryPanel'
 import GlobalFooter from '../components/GlobalFooter'
-import HelpModal from '../components/HelpModal'
 import { formatDisplayName } from '../utils/nameFormat'
 import './Home.css'
 
@@ -23,7 +22,7 @@ export default function Home() {
   const [includeOceans, setIncludeOceans] = useState(true)
   const [includePolar, setIncludePolar] = useState(true)
   const [allowedContinents, setAllowedContinents] = useState('Asia,Europe,Africa,North America,South America,Oceania,Antarctica')
-  const [isHelpOpen, setIsHelpOpen] = useState(false)
+
 
   const creatorEmail = 'gogh999@gmail.com'
   const creatorName = import.meta.env.VITE_CREATOR_NAME || '김세찬'
@@ -196,7 +195,7 @@ export default function Home() {
         </aside>
       </div>
       <GlobalFooter />
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+
     </div>
   )
 }

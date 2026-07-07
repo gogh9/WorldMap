@@ -38,10 +38,7 @@ export default function GlobalFooter() {
         <span className="footer-divider">•</span>
         <button className="footer-link-btn" onClick={() => openModal('terms')}>사용약관</button>
         <span className="footer-divider">•</span>
-        <button className="footer-help-btn" onClick={() => openModal('help')} title="사용방법 안내">
-          <HelpIcon size={16} />
-          <span>도움말</span>
-        </button>
+        <button className="footer-link-btn" onClick={() => openModal('help')} title="사용방법 안내">도움말</button>
       </div>
 
       {/* Modal Dialog overlay */}
@@ -117,23 +114,28 @@ export default function GlobalFooter() {
               {modalType === 'help' && (
                 <div className="help-text">
                   <p className="help-welcome" style={{ marginBottom: '20px', fontSize: '15px' }}>
-                    🗺️ 세계 백지도 탐험 서비스에 오신 것을 환영합니다! 아래 사용법을 읽고 나만의 세계지도를 탐험해 보세요.
+                    🗺️ 세계 백지도 탐험 서비스에 오신 것을 환영합니다! 아래 안내를 읽고 나만의 세계지도를 탐험해 보세요.
                   </p>
 
-                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>🔑 1. 로그인 방법</h3>
-                  <p style={{ margin: '8px 0 16px' }}>첫 화면에서 <strong>'GOOGLE 로그인'</strong> 버튼을 클릭하여 소셜 계정으로 빠르고 안전하게 인증하거나, 지도 링크에 따라 학생 이름으로 직접 입장할 수 있습니다.</p>
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>🔑 1. 로그인 및 입장</h3>
+                  <p style={{ margin: '8px 0 16px' }}>첫 화면에서 <strong>'GOOGLE 로그인'</strong> 버튼을 클릭하여 소셜 계정으로 빠르고 안전하게 입장할 수 있습니다. 공유받은 개별 지도 링크를 통해 접속하시는 경우, 로그인 화면 하단에서 <strong>학생 이름만 입력</strong>하여 소셜 계정 없이 즉시 간편 입장도 가능합니다.</p>
 
-                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>💡 2. 주요 기능 및 규칙</h3>
-                  <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
-                    <li style={{ marginBottom: '8px' }}><strong>나라/바다/대륙 선택</strong>: 지도 상의 빈 백지도를 클릭하면 우측 패널에 이름을 입력할 수 있는 정보 창이 활성화됩니다.</li>
-                    <li style={{ marginBottom: '8px' }}><strong>명칭 공동 등록</strong>: 여러 친구들이 등록한 명칭 정답이 설정된 기준 횟수만큼 누적되면, 백지도에 해당 지명이 선명하게 공개됩니다!</li>
-                    <li style={{ marginBottom: '8px' }}><strong>탐험 노트 작성</strong>: 각 지역에 관한 흥미로운 지식이나 스스로 조사한 정보를 메모하여 반 친구들과 실시간으로 공유하고 학습해 보세요.</li>
-                  </ul>
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>🗺️ 2. 지명 맞추기 및 자동 검증</h3>
+                  <p style={{ margin: '8px 0 16px' }}>지도에서 빈 지리적 영역(국가, 바다, 대륙)을 클릭하면 우측 정보 입력 패널이 열립니다. 띄어쓰기나 대소문자에 무관하게 보편적인 지명(예: 대한민국, 한국, 남한, Korea 등)과 공식 국문/영문 명칭이 모두 인식되도록 <strong>지명 자동 검증 시스템</strong>이 탑재되어 있습니다.</p>
 
-                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>⚠️ 3. 이용자 주의사항</h3>
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>👥 3. 백지도 공동 완성 규칙</h3>
+                  <p style={{ margin: '8px 0 16px' }}>혼자 정답을 맞춘다고 지명이 공개되지 않으며, 반 친구들 **여러 명(설정된 기준 인원수 이상)**이 동일한 지명 정답을 함께 등록해야 해당 지역의 이름이 백지도 상에 선명하게 드러나 공개됩니다.</p>
+
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>📝 4. 탐험 노트 및 실시간 공유</h3>
+                  <p style={{ margin: '8px 0 16px' }}>알맞은 이름을 맞춘 뒤, 해당 국가나 지역에 대해 스스로 조사한 지식, 문화, 역사 등의 흥미로운 정보를 메모로 적어 등록하면, 반 친구들과 실시간으로 공유하고 함께 학습할 수 있습니다.</p>
+
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>📊 5. 학습 진행 상황 모니터링</h3>
+                  <p style={{ margin: '8px 0 16px' }}>오른쪽 사이드바 영역에서 지도의 <strong>누적 방문 횟수</strong> 및 완료한 지명 수와 전체 지명 수를 한눈에 볼 수 있는 <strong>완료율 게이지 바</strong>를 실시간으로 확인하면서 전체 지도를 탐험해 나갈 수 있습니다.</p>
+
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>⚠️ 6. 이용자 주의사항</h3>
                   <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
-                    <li style={{ marginBottom: '8px' }}>반 친구들이 함께 완성해 가는 지도이므로 장난식 기입이나 정확하지 않은 정보 등록은 피해 주세요.</li>
-                    <li style={{ marginBottom: '8px' }}>욕설, 비속어, 광고성 글이나 비방하는 표현을 남길 경우, 담당 선생님이나 관리자에 의해 <strong>예고 없이 영구 삭제</strong> 및 이용 차단 조치가 될 수 있습니다.</li>
+                    <li style={{ marginBottom: '8px' }}>반 친구들이 함께 완성해 가는 지도이므로 장난식 기입이나 정확하지 않은 정보 등록은 피해주시기 바랍니다.</li>
+                    <li style={{ marginBottom: '8px' }}>욕설, 비속어, 스팸 광고나 타인을 비방하는 표현을 작성할 경우, 담당 선생님 또는 시스템 관리자에 의해 <strong>예고 없이 영구 삭제 및 이용 제한</strong> 조치가 취해질 수 있습니다.</li>
                   </ul>
                 </div>
               )}
