@@ -83,7 +83,7 @@ export default function Login() {
 
       <div className="login-main-content">
         <div className="login-box">
-          <h1>🗺️ 우리 반 백지도</h1>
+          <h1>🗺️ 우리 반 세계지도</h1>
           <p>우리 반 친구들과 함께 세계 여러 나라를 조사해 보아요!</p>
           
           <button 

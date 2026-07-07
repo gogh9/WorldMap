@@ -129,7 +129,7 @@ export default function Home() {
           <header className="sidebar-header" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'stretch' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', width: '100%' }}>
               <div className="nav-brand" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                우리반 백지도 🗺️ {mapName}
+                우리 반 세계지도 🗺️ {mapName}
               </div>
               <div className="nav-user">
                 <span className="user-name">{formatDisplayName(user.user_metadata.full_name)}</span>
