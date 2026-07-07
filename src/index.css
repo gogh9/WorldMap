@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+
 :root {
   --primary-color: #1ed760;
   --primary-hover: #1db954;
@@ -14,7 +16,7 @@
 
 body {
   margin: 0;
-  font-family: 'CircularSp', 'Helvetica Neue', helvetica, arial, 'Noto Sans KR', sans-serif;
+  font-family: 'Noto Sans KR', 'CircularSp', 'Helvetica Neue', helvetica, arial, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   -webkit-font-smoothing: antialiased;
