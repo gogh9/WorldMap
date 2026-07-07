@@ -102,8 +102,7 @@ export default function Login() {
             onClick={handleGoogleLogin}
             disabled={loading}
           >
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" width="20" />
-            {loading ? '로그인 중...' : '구글 계정으로 시작하기'}
+            {loading ? '로그인 중...' : 'GOOGLE 로그인'}
           </button>
 
           {/* Student direct login alternative */}
