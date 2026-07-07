@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react'
 import { dbService } from '../lib/dbService'
 import { useNavigate } from 'react-router-dom'
-import { HelpCircle } from 'lucide-react'
 import GlobalFooter from '../components/GlobalFooter'
-import HelpModal from '../components/HelpModal'
 import './Login.css'
 
 export default function Login() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
-  const [isHelpOpen, setIsHelpOpen] = useState(false)
   const [studentName, setStudentName] = useState('')
 
   const schoolName = import.meta.env.VITE_SCHOOL_NAME || '서울수색초등학교'
@@ -82,15 +79,7 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      {/* Floating help button top right */}
-      <button 
-        className="login-help-floating-btn" 
-        onClick={() => setIsHelpOpen(true)}
-        title="사용방법 안내"
-      >
-        <HelpCircle size={20} />
-        <span>도움말</span>
-      </button>
+
 
       <div className="login-main-content">
         <div className="login-box">
@@ -157,7 +146,7 @@ export default function Login() {
 
       <GlobalFooter />
 
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+
     </div>
   )
 }

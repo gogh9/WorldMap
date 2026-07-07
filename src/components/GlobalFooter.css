@@ -56,20 +56,23 @@
   align-items: center;
 }
 
-.footer-github-link {
+.footer-help-btn {
   display: flex;
   align-items: center;
   gap: 6px;
   color: #b3b3b3;
-  text-decoration: none;
+  border: none;
+  cursor: pointer;
   padding: 6px 12px;
   border-radius: 9999px; /* Spotify pill style */
   background-color: #1f1f1f;
   transition: all 0.2s ease;
   font-weight: 500;
+  font-size: 13px;
+  font-family: inherit;
 }
 
-.footer-github-link:hover {
+.footer-help-btn:hover {
   color: #ffffff;
   background-color: #282828;
   transform: translateY(-1px);

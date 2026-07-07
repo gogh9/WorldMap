@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import './GlobalFooter.css'
 
-// Inline SVG for GitHub icon to prevent version mismatch errors
-const GithubIcon = ({ size = 16 }) => (
+// Inline SVG for Help icon to prevent version mismatch errors
+const HelpIcon = ({ size = 16 }) => (
   <svg
     viewBox="0 0 24 24"
     width={size}
@@ -12,18 +12,20 @@ const GithubIcon = ({ size = 16 }) => (
     fill="none"
     strokeLinecap="round"
     strokeLinejoin="round"
+    style={{ display: 'inline-block', verticalAlign: 'middle' }}
   >
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
   </svg>
 )
 
 export default function GlobalFooter() {
-  const [modalType, setModalType] = useState(null) // 'privacy' | 'terms' | null
+  const [modalType, setModalType] = useState(null) // 'privacy' | 'terms' | 'help' | null
 
   // Environment variable loading with fallbacks
   const schoolName = import.meta.env.VITE_SCHOOL_NAME || '서울수색초등학교'
   const creatorName = import.meta.env.VITE_CREATOR_NAME || '김세찬'
-  const githubUrl = import.meta.env.VITE_GITHUB_URL || 'https://github.com/gogh9/WorldMap'
   const contactEmail = 'gogh999@gmail.com'
 
   const openModal = (type) => setModalType(type)
@@ -36,10 +38,10 @@ export default function GlobalFooter() {
         <span className="footer-divider">•</span>
         <button className="footer-link-btn" onClick={() => openModal('terms')}>사용약관</button>
         <span className="footer-divider">•</span>
-        <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="footer-github-link" title="GitHub Repository">
-          <GithubIcon size={16} />
-          <span>Open Source</span>
-        </a>
+        <button className="footer-help-btn" onClick={() => openModal('help')} title="사용방법 안내">
+          <HelpIcon size={16} />
+          <span>도움말</span>
+        </button>
       </div>
 
       {/* Modal Dialog overlay */}
@@ -47,12 +49,18 @@ export default function GlobalFooter() {
         <div className="footer-modal-overlay" onClick={closeModal}>
           <div className="footer-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{modalType === 'privacy' ? '🛡️ 개인정보처리방침' : '📜 서비스 이용약관'}</h2>
+              <h2>
+                {modalType === 'privacy' 
+                  ? '🛡️ 개인정보처리방침' 
+                  : modalType === 'terms' 
+                  ? '📜 서비스 이용약관' 
+                  : '🗺️ 백지도 탐험 가이드'}
+              </h2>
               <button className="modal-close-btn" onClick={closeModal}>&times;</button>
             </div>
             
             <div className="modal-body">
-              {modalType === 'privacy' ? (
+              {modalType === 'privacy' && (
                 <div className="policy-text">
                   <h3>1. 수집하는 개인정보 항목</h3>
                   <p>본 서비스는 로그인 및 교육 활동 참여를 위해 아래와 같은 정보를 수집합니다.</p>
@@ -82,7 +90,8 @@ export default function GlobalFooter() {
                   <p>개인정보 처리에 관한 문의 사항은 아래로 연락해 주시기 바랍니다.</p>
                   <p className="contact-info">이메일: <strong>{contactEmail}</strong></p>
                 </div>
-              ) : (
+              )}
+              {modalType === 'terms' && (
                 <div className="terms-text">
                   <h3>1. 서비스 이용 조건</h3>
                   <p>본 서비스는 전국의 초등학교, 중학교 및 교육 기관의 사회, 지리 수업 목적을 위해 개발된 교육용 비상업적 웹 어플리케이션입니다. 누구나 회원가입 후 백지도 학습 및 제작 기능을 자유롭게 이용할 수 있습니다.</p>
@@ -103,6 +112,29 @@ export default function GlobalFooter() {
 
                   <h3>4. 약관의 변경 및 안내</h3>
                   <p>약관 내용은 서비스 기능 개선과 정책 반영을 위해 예고 없이 변경될 수 있습니다. 이용자는 수시로 본 약관을 통해 변경 여부를 확인할 수 있습니다.</p>
+                </div>
+              )}
+              {modalType === 'help' && (
+                <div className="help-text">
+                  <p className="help-welcome" style={{ marginBottom: '20px', fontSize: '15px' }}>
+                    🗺️ 세계 백지도 탐험 서비스에 오신 것을 환영합니다! 아래 사용법을 읽고 나만의 세계지도를 탐험해 보세요.
+                  </p>
+
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>🔑 1. 로그인 방법</h3>
+                  <p style={{ margin: '8px 0 16px' }}>첫 화면에서 <strong>'GOOGLE 로그인'</strong> 버튼을 클릭하여 소셜 계정으로 빠르고 안전하게 인증하거나, 지도 링크에 따라 학생 이름으로 직접 입장할 수 있습니다.</p>
+
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>💡 2. 주요 기능 및 규칙</h3>
+                  <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
+                    <li style={{ marginBottom: '8px' }}><strong>나라/바다/대륙 선택</strong>: 지도 상의 빈 백지도를 클릭하면 우측 패널에 이름을 입력할 수 있는 정보 창이 활성화됩니다.</li>
+                    <li style={{ marginBottom: '8px' }}><strong>명칭 공동 등록</strong>: 여러 친구들이 등록한 명칭 정답이 설정된 기준 횟수만큼 누적되면, 백지도에 해당 지명이 선명하게 공개됩니다!</li>
+                    <li style={{ marginBottom: '8px' }}><strong>탐험 노트 작성</strong>: 각 지역에 관한 흥미로운 지식이나 스스로 조사한 정보를 메모하여 반 친구들과 실시간으로 공유하고 학습해 보세요.</li>
+                  </ul>
+
+                  <h3 style={{ borderBottom: '1px solid #282828', paddingBottom: '6px', marginTop: '16px' }}>⚠️ 3. 이용자 주의사항</h3>
+                  <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
+                    <li style={{ marginBottom: '8px' }}>반 친구들이 함께 완성해 가는 지도이므로 장난식 기입이나 정확하지 않은 정보 등록은 피해 주세요.</li>
+                    <li style={{ marginBottom: '8px' }}>욕설, 비속어, 광고성 글이나 비방하는 표현을 남길 경우, 담당 선생님이나 관리자에 의해 <strong>예고 없이 영구 삭제</strong> 및 이용 차단 조치가 될 수 있습니다.</li>
+                  </ul>
                 </div>
               )}
             </div>
