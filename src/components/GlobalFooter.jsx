@@ -20,7 +20,7 @@ const HelpIcon = ({ size = 16 }) => (
   </svg>
 )
 
-export default function GlobalFooter() {
+export default function GlobalFooter({ inline = false }) {
   const [modalType, setModalType] = useState(null) // 'privacy' | 'terms' | 'help' | null
 
   // Environment variable loading with fallbacks
@@ -32,12 +32,12 @@ export default function GlobalFooter() {
   const closeModal = () => setModalType(null)
 
   return (
-    <footer className="global-footer">
-      <div className="footer-content" style={{ justifyContent: 'center', gap: '20px' }}>
+    <footer className={inline ? "" : "global-footer"}>
+      <div className="footer-content" style={{ justifyContent: 'center', gap: inline ? '16px' : '20px', marginTop: inline ? '24px' : '0' }}>
         <button className="footer-link-btn" onClick={() => openModal('privacy')}>개인정보처리방침</button>
-        <span className="footer-divider">•</span>
+        <span className="footer-divider">{inline ? '·' : '•'}</span>
         <button className="footer-link-btn" onClick={() => openModal('terms')}>사용약관</button>
-        <span className="footer-divider">•</span>
+        <span className="footer-divider">{inline ? '·' : '•'}</span>
         <button className="footer-link-btn" onClick={() => openModal('help')} title="사용방법 안내">도움말</button>
       </div>
 

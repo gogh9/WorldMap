@@ -141,12 +141,9 @@ export default function Login() {
           )}
           
           <div className="creator-tag">powerd by sota / gogh999@gmail.com</div>
+          <GlobalFooter inline={true} />
         </div>
       </div>
-
-      <GlobalFooter />
-
-
     </div>
   )
 }
