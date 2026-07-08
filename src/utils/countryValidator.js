@@ -816,6 +816,13 @@ export const COUNTRY_ALIASES = {
     "투발루",
     "tuvalu"
   ],
+  "TW": [
+    "대만",
+    "대만(타이페이)",
+    "타이페이",
+    "타이완",
+    "taiwan"
+  ],
   "TZ": [
     "탄자니아",
     "united republic of tanzania",
