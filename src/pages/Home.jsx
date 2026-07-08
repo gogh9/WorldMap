@@ -4,7 +4,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { LogOut, LayoutDashboard } from 'lucide-react'
 import WorldMap from '../components/WorldMap'
 import CountryPanel from '../components/CountryPanel'
-import GlobalFooter from '../components/GlobalFooter'
 import { formatDisplayName } from '../utils/nameFormat'
 import './Home.css'
 
@@ -195,7 +194,6 @@ export default function Home() {
           </div>
         </aside>
       </div>
-      <GlobalFooter />
 
     </div>
   )

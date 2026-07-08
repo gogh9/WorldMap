@@ -232,6 +232,13 @@ export default function WorldMap({
       "NL": [5.2913, 52.1326], // 네덜란드
       "GB": [-3.4360, 55.3781], // 영국
       "AQ": [0, -82], // 남극
+      // 발칸반도 국가 중심점 수동 보정 (경도, 위도) - 겹침 방지용
+      "HR": [16.2, 45.5], // 크로아티아 (북쪽으로)
+      "BA": [17.5, 44.1], // 보스니아 헤르체고비나 (북서쪽으로)
+      "RS": [21.3, 44.2], // 세르비아 (북동쪽으로)
+      "ME": [18.8, 42.9], // 몬테네그로 (서쪽으로)
+      "XK": [20.8, 42.6], // 코소보 (중앙)
+      "MK": [22.2, 41.5], // 북마케도니아 (동남쪽으로)
     }
     
     geoData.features.forEach(feature => {
@@ -281,8 +288,8 @@ export default function WorldMap({
           const cosLat = Math.max(0.2, Math.cos(avgLat * Math.PI / 180));
           
           // 폰트 크기에 비례하는 필요 위경도 거리 (줌 레벨에 따라 겹침 허용 거리 축소)
-          const minDx = (((list[j].name.length + list[k].name.length) * 0.7) / cosLat) / position.zoom;
-          const minDy = 2.0 / position.zoom;
+          const minDx = (((list[j].name.length + list[k].name.length) * 1.25) / cosLat) / position.zoom;
+          const minDy = 4.25 / position.zoom;
 
           if (Math.abs(dx) < minDx && Math.abs(dy) < minDy) {
             const overlapX = minDx - Math.abs(dx);
