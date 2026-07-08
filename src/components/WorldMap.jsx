@@ -68,6 +68,7 @@ export default function WorldMap({
           let iso2 = f.properties.iso_a2 || f.properties['ISO3166-1-Alpha-2'];
           if (f.properties.name === "Antarctica") iso2 = "AQ";
           if (f.properties.name === "Kosovo") iso2 = "XK";
+          if (f.properties.name === "Somaliland") iso2 = "SO";
           
           const cont = f.properties.continent;
           const contNormalized = cont ? cont.toLowerCase() : '';
@@ -237,6 +238,7 @@ export default function WorldMap({
       let iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
       if (feature.properties.name === "Antarctica") iso2 = "AQ";
       if (feature.properties.name === "Kosovo") iso2 = "XK";
+      if (feature.properties.name === "Somaliland") iso2 = "SO";
       if (!iso2 || seen.has(iso2)) return;
       if (iso2 === 'AQ' && !includePolar) return;
       
@@ -325,6 +327,7 @@ export default function WorldMap({
                   let iso2 = geo.properties.iso_a2 || geo.properties['ISO3166-1-Alpha-2']
                   if (geo.properties.name === "Antarctica") iso2 = "AQ"
                   if (geo.properties.name === "Kosovo") iso2 = "XK"
+                  if (geo.properties.name === "Somaliland") iso2 = "SO"
                   
                   let isRegistered = false
                   let continentKey = null
