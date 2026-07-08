@@ -61,6 +61,7 @@ export default function Home() {
 
   useEffect(() => {
     let mounted = true
+    const originalPath = window.location.pathname + window.location.search
 
     const checkSession = async () => {
       const { data: { session } } = await dbService.auth.getSession()
@@ -70,7 +71,7 @@ export default function Home() {
                                window.location.search.includes('error=');
         
         if (!session && !isAuthCallback) {
-          navigate(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`)
+          navigate(`/login?returnTo=${encodeURIComponent(originalPath)}`)
         } else if (session) {
           setUser(session.user)
         }
@@ -85,7 +86,7 @@ export default function Home() {
                                window.location.hash.includes('access_token=');
                                
         if (!session && !isAuthCallback) {
-          navigate(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`)
+          navigate(`/login?returnTo=${encodeURIComponent(originalPath)}`)
         } else if (session) {
           setUser(session.user)
         }

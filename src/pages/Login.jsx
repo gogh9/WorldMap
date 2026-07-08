@@ -1,32 +1,31 @@
 import { useEffect, useState } from 'react'
 import { dbService } from '../lib/dbService'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import GlobalFooter from '../components/GlobalFooter'
 import './Login.css'
 
 export default function Login() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [studentName, setStudentName] = useState('')
 
   const schoolName = import.meta.env.VITE_SCHOOL_NAME || '서울수색초등학교'
   const creatorName = import.meta.env.VITE_CREATOR_NAME || '김세찬'
 
-  const queryParams = new URLSearchParams(window.location.search)
-  const returnToParam = queryParams.get('returnTo') || ''
+  const returnToParam = searchParams.get('returnTo') || ''
   const showStudentLogin = returnToParam.includes('/map/')
 
   useEffect(() => {
     // Check if there is an error in URL
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const queryParams = new URLSearchParams(window.location.search);
-    const errorDescription = hashParams.get('error_description') || queryParams.get('error_description');
+    const errorDescription = hashParams.get('error_description') || searchParams.get('error_description');
     
     if (errorDescription) {
       alert("로그인 에러 발생: " + decodeURIComponent(errorDescription).replace(/\+/g, ' '));
     }
 
-    const returnTo = queryParams.get('returnTo') || '/';
+    const returnTo = searchParams.get('returnTo') || '/';
 
     const { data: authListener } = dbService.auth.onAuthStateChange((event, session) => {
       console.log("Auth Event:", event, "Session:", session)
@@ -37,13 +36,12 @@ export default function Login() {
     return () => {
       authListener.subscription.unsubscribe()
     }
-  }, [navigate])
+  }, [navigate, searchParams])
 
   const handleGoogleLogin = async () => {
     try {
       setLoading(true)
-      const queryParams = new URLSearchParams(window.location.search);
-      const returnTo = queryParams.get('returnTo') || '/';
+      const returnTo = searchParams.get('returnTo') || '/';
       
       const { error } = await dbService.auth.signInWithGoogle(returnTo)
       if (error) throw error
@@ -62,8 +60,7 @@ export default function Login() {
     }
     try {
       setLoading(true)
-      const queryParams = new URLSearchParams(window.location.search);
-      const returnTo = queryParams.get('returnTo') || '/';
+      const returnTo = searchParams.get('returnTo') || '/';
       
       const { error } = await dbService.auth.signInAsStudent(studentName.trim())
       if (error) throw error

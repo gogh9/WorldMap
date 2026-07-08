@@ -5,6 +5,7 @@ import countries from 'i18n-iso-countries'
 import koLocale from 'i18n-iso-countries/langs/ko.json'
 import { dbService } from '../lib/dbService'
 import { formatDisplayName } from '../utils/nameFormat'
+import { COUNTRY_ALIASES } from '../utils/countryValidator'
 import './WorldMap.css'
 
 // 한국어 번역 로케일 등록
@@ -66,6 +67,7 @@ export default function WorldMap({
         geoData.features.forEach(f => {
           let iso2 = f.properties.iso_a2 || f.properties['ISO3166-1-Alpha-2'];
           if (f.properties.name === "Antarctica") iso2 = "AQ";
+          if (f.properties.name === "Kosovo") iso2 = "XK";
           
           const cont = f.properties.continent;
           const contNormalized = cont ? cont.toLowerCase() : '';
@@ -73,6 +75,10 @@ export default function WorldMap({
           if (iso2 && iso2 !== "-99") {
             if (iso2 === "AQ" && !includePolar) return;
             if (!allowedSet.has(contNormalized)) return;
+            
+            // 제외: 사전에 키가 존재하지 않는 국가(속령 등)는 분모에서 배제
+            if (!COUNTRY_ALIASES[iso2]) return;
+            
             activeLinks.add(iso2);
           }
         });
@@ -230,6 +236,7 @@ export default function WorldMap({
     geoData.features.forEach(feature => {
       let iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2']
       if (feature.properties.name === "Antarctica") iso2 = "AQ";
+      if (feature.properties.name === "Kosovo") iso2 = "XK";
       if (!iso2 || seen.has(iso2)) return;
       if (iso2 === 'AQ' && !includePolar) return;
       
@@ -317,6 +324,7 @@ export default function WorldMap({
                 geographies.map((geo) => {
                   let iso2 = geo.properties.iso_a2 || geo.properties['ISO3166-1-Alpha-2']
                   if (geo.properties.name === "Antarctica") iso2 = "AQ"
+                  if (geo.properties.name === "Kosovo") iso2 = "XK"
                   
                   let isRegistered = false
                   let continentKey = null
@@ -342,7 +350,8 @@ export default function WorldMap({
                   const isPolarAntarctica = iso2 === 'AQ';
                   const isPolarAntarcticaDisabled = isPolarAntarctica && !includePolar;
                   const isContinentAllowed = geo.properties.continent ? allowedSet.has(geo.properties.continent.toLowerCase()) : true;
-                  const isDisabled = !isContinentAllowed || isPolarAntarcticaDisabled;
+                  const isCountryInAliases = studyMode === 'continents' ? true : (iso2 && !!COUNTRY_ALIASES[iso2]);
+                  const isDisabled = !isContinentAllowed || isPolarAntarcticaDisabled || !isCountryInAliases;
 
                   let defaultFill = !isRegistered ? '#ff6b6b' : (continentColors[geo.properties.continent] || '#d1d5db');
                   let hoverFill = !isRegistered ? '#ff5252' : '#80deea';
