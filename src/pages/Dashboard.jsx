@@ -303,7 +303,17 @@ export default function Dashboard() {
     return acc;
   }, {});
   
-  const displayGroups = Object.values(groupedRecords);
+  const displayGroups = Object.values(groupedRecords).map(group => {
+    return {
+      ...group,
+      registrations: [...group.registrations].sort((a, b) => 
+        (a.country_name || '').localeCompare(b.country_name || '', 'ko')
+      ),
+      investigations: [...group.investigations].sort((a, b) => 
+        (a.country_name || '').localeCompare(b.country_name || '', 'ko')
+      )
+    };
+  }).sort((a, b) => a.author_name.localeCompare(b.author_name, 'ko'));
 
   const handleExportMapExcel = async (mapId, mapName) => {
     try {
