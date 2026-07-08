@@ -43,6 +43,8 @@ export default function WorldMap({
   const [registeredCountries, setRegisteredCountries] = useState({})
   const [hoveredCountry, setHoveredCountry] = useState(null)
   const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 })
+  const [completedCount, setCompletedCount] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
 
   const allowedSet = useMemo(() => {
     return new Set(allowedContinents.split(',').map(s => s.trim().toLowerCase()));
@@ -107,7 +109,11 @@ export default function WorldMap({
           completed++;
         }
       });
-      onProgressUpdate({ completed, total });
+      setCompletedCount(completed);
+      setTotalCount(total);
+      if (onProgressUpdate) {
+        onProgressUpdate({ completed, total });
+      }
     }
   }, [geoData, registeredCountries, revealThreshold, onProgressUpdate, studyMode, includeOceans, includePolar, allowedSet]);
 
@@ -315,6 +321,57 @@ export default function WorldMap({
     return list;
   }, [geoData, registeredCountries, position.zoom, revealThreshold, currentUser, studyMode, includePolar, allowedSet])
 
+  // 80% 이상 완료 시 미완료 국가 목록 계산
+  const uncompletedCountryFlags = useMemo(() => {
+    if (studyMode !== 'countries' || !geoData) return [];
+    
+    const is80PercentCompleted = totalCount > 0 && (completedCount / totalCount) >= 0.8;
+    if (!is80PercentCompleted) return [];
+
+    const list = [];
+    const CENTROID_OVERRIDES = {
+      "FR": [2.2137, 46.2276],
+      "US": [-95.7129, 37.0902],
+      "RU": [90.0, 60.0],
+      "NL": [5.2913, 52.1326],
+      "GB": [-3.4360, 55.3781],
+      "AQ": [0, -82],
+      "HR": [16.2, 45.5],
+      "BA": [17.5, 44.1],
+      "RS": [21.3, 44.2],
+      "ME": [18.8, 42.9],
+      "XK": [20.8, 42.6],
+      "MK": [22.2, 41.5],
+    };
+
+    geoData.features.forEach(feature => {
+      let iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2'];
+      if (feature.properties.name === "Antarctica") iso2 = "AQ";
+      if (feature.properties.name === "Kosovo") iso2 = "XK";
+      if (feature.properties.name === "Somaliland") iso2 = "SO";
+
+      if (!iso2 || iso2 === "-99") return;
+      if (iso2 === "AQ" && !includePolar) return;
+
+      const cont = feature.properties.continent;
+      const contNormalized = cont ? cont.toLowerCase() : '';
+      if (!allowedSet.has(contNormalized)) return;
+      if (!COUNTRY_ALIASES[iso2]) return;
+
+      const isCompleted = registeredCountries[iso2] && registeredCountries[iso2].count >= revealThreshold;
+      if (isCompleted) return;
+
+      if (list.some(item => item.iso2 === iso2)) return;
+
+      list.push({
+        iso2,
+        coordinates: CENTROID_OVERRIDES[iso2] || geoCentroid(feature)
+      });
+    });
+
+    return list;
+  }, [geoData, registeredCountries, revealThreshold, studyMode, includePolar, allowedSet, totalCount, completedCount]);
+
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
       <ComposableMap projection={projection} width={mapWidth} height={mapHeight} style={{ width: "100%", height: "100%" }}>
@@ -478,6 +535,20 @@ export default function WorldMap({
           })}
 
           {/* 북극 마커 제거됨 */}
+
+          {/* 80% 이상 완료 시 미완료 국가에 깃발 마커 렌더링 */}
+          {uncompletedCountryFlags.map(({ iso2, coordinates }, idx) => (
+            <Marker key={`flag-${iso2}-${idx}`} coordinates={coordinates}>
+              <g 
+                transform={`scale(${1 / position.zoom}) translate(-5, -25)`}
+                style={{ pointerEvents: 'none' }}
+              >
+                <line x1="5" y1="5" x2="5" y2="25" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" />
+                <path d="M5,5 L22,10 L5,15 Z" fill="#f43f5e" stroke="#be123c" strokeWidth="1" strokeLinejoin="round" />
+                <circle cx="5" cy="5" r="2" fill="#ffe4e6" />
+              </g>
+            </Marker>
+          ))}
 
           {/* 등록된 국가/대륙 이름 표시 */}
           {[...centroids]
