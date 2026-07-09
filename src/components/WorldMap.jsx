@@ -372,6 +372,57 @@ export default function WorldMap({
     return list;
   }, [geoData, registeredCountries, revealThreshold, studyMode, includePolar, allowedSet, totalCount, completedCount]);
 
+  // 미니 국가 클릭 도우미 리스트 계산
+  const tinyCountriesList = useMemo(() => {
+    if (studyMode !== 'countries' || !geoData) return [];
+    
+    const list = [];
+    const CENTROID_OVERRIDES = {
+      "FR": [2.2137, 46.2276],
+      "US": [-95.7129, 37.0902],
+      "RU": [90.0, 60.0],
+      "NL": [5.2913, 52.1326],
+      "GB": [-3.4360, 55.3781],
+      "AQ": [0, -82],
+      "HR": [16.2, 45.5],
+      "BA": [17.5, 44.1],
+      "RS": [21.3, 44.2],
+      "ME": [18.8, 42.9],
+      "XK": [20.8, 42.6],
+      "MK": [22.2, 41.5],
+    };
+
+    geoData.features.forEach(feature => {
+      let iso2 = feature.properties.iso_a2 || feature.properties['ISO3166-1-Alpha-2'];
+      if (feature.properties.name === "Antarctica") iso2 = "AQ";
+      if (feature.properties.name === "Kosovo") iso2 = "XK";
+      if (feature.properties.name === "Somaliland") iso2 = "SO";
+
+      if (!iso2 || iso2 === "-99") return;
+      if (iso2 === "AQ" && !includePolar) return;
+
+      const cont = feature.properties.continent;
+      const contNormalized = cont ? cont.toLowerCase() : '';
+      if (!allowedSet.has(contNormalized)) return;
+      if (!COUNTRY_ALIASES[iso2]) return;
+
+      // tiny가 3 이상인 국가들을 미니 국가로 판단
+      const isTiny = feature.properties.tiny >= 3;
+      if (!isTiny) return;
+
+      const isRegistered = registeredCountries[iso2] && registeredCountries[iso2].count >= revealThreshold;
+
+      list.push({
+        iso2,
+        name: COUNTRY_ALIASES[iso2][0],
+        coordinates: CENTROID_OVERRIDES[iso2] || geoCentroid(feature),
+        isRegistered
+      });
+    });
+
+    return list;
+  }, [geoData, registeredCountries, revealThreshold, studyMode, includePolar, allowedSet]);
+
   return (
     <div className="map-wrapper" style={{ background: "#f8f9fa", borderRadius: "8px", overflow: "hidden" }}>
       <ComposableMap projection={projection} width={mapWidth} height={mapHeight} style={{ width: "100%", height: "100%" }}>
@@ -549,6 +600,31 @@ export default function WorldMap({
               </g>
             </Marker>
           ))}
+
+          {/* 미니 국가 클릭 도우미 서클 표시 */}
+          {tinyCountriesList.map(({ iso2, name, coordinates, isRegistered }, idx) => {
+            const isHovered = hoveredCountry === iso2;
+            let fillColor = !isRegistered ? '#ff6b6b' : '#1db954';
+            
+            return (
+              <Marker key={`tiny-helper-${iso2}-${idx}`} coordinates={coordinates}>
+                <circle
+                  r={(isHovered ? 6 : 4) / position.zoom}
+                  fill={fillColor}
+                  stroke="#ffffff"
+                  strokeWidth={1.5 / position.zoom}
+                  style={{ cursor: 'pointer', transition: 'all 0.15s ease-in-out' }}
+                  onClick={() => {
+                    if (onCountryClick) {
+                      onCountryClick({ name, countryId: iso2, type: 'country' });
+                    }
+                  }}
+                  onMouseEnter={() => setHoveredCountry(iso2)}
+                  onMouseLeave={() => setHoveredCountry(null)}
+                />
+              </Marker>
+            );
+          })}
 
           {/* 등록된 국가/대륙 이름 표시 */}
           {[...centroids]
