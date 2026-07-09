@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { dbService } from '../lib/dbService'
 import { useNavigate, Link } from 'react-router-dom'
 import { Edit2, Trash2, ArrowLeft, Download, Plus, Copy, Map as MapIcon, ExternalLink, RefreshCcw, LogOut } from 'lucide-react'
 import { formatDisplayName } from '../utils/nameFormat'
+import { COUNTRY_ALIASES } from '../utils/countryValidator'
 import GlobalFooter from '../components/GlobalFooter'
 import './Dashboard.css'
 
@@ -22,6 +23,11 @@ export default function Dashboard() {
   const [editCountryName, setEditCountryName] = useState('')
   const [editContent, setEditContent] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+
+  // Unentered countries state
+  const [geoData, setGeoData] = useState(null)
+  const [showUnentered, setShowUnentered] = useState(false)
+  const [unenteredSearch, setUnenteredSearch] = useState('')
 
   useEffect(() => {
     let mounted = true
@@ -315,6 +321,110 @@ export default function Dashboard() {
     };
   }).sort((a, b) => a.author_name.localeCompare(b.author_name, 'ko'));
 
+  useEffect(() => {
+    fetch("/ne_50m_admin_0_countries.geojson")
+      .then(response => response.json())
+      .then(data => setGeoData(data))
+      .catch(err => console.error("GeoJSON 로드 실패:", err))
+  }, [])
+
+  const unenteredCountries = useMemo(() => {
+    if (!selectedMapId) return [];
+    const selectedMap = myMaps.find(m => m.id === selectedMapId);
+    if (!selectedMap) return [];
+
+    const studyMode = selectedMap.study_mode || 'countries';
+    const includeOceans = selectedMap.include_oceans !== false;
+    const includePolar = selectedMap.include_polar !== false;
+    const allowedContinents = selectedMap.allowed_continents || 'Asia,Europe,Africa,North America,South America,Oceania,Antarctica';
+    const allowedSet = new Set(allowedContinents.split(',').map(s => s.trim().toLowerCase()));
+
+    const activeLinks = new Set();
+
+    if (studyMode === 'continents') {
+      if (allowedSet.has('asia')) activeLinks.add('continent_asia');
+      if (allowedSet.has('europe')) activeLinks.add('continent_europe');
+      if (allowedSet.has('africa')) activeLinks.add('continent_africa');
+      if (allowedSet.has('north america')) activeLinks.add('continent_north_america');
+      if (allowedSet.has('south america')) activeLinks.add('continent_south_america');
+      if (allowedSet.has('oceania')) activeLinks.add('continent_oceania');
+      if (includePolar && allowedSet.has('antarctica')) {
+        activeLinks.add('continent_antarctica');
+      }
+    } else {
+      // Countries mode
+      if (!geoData) return [];
+      geoData.features.forEach(f => {
+        let iso2 = f.properties.iso_a2 || f.properties['ISO3166-1-Alpha-2'];
+        if (f.properties.name === "Antarctica") iso2 = "AQ";
+        if (f.properties.name === "Kosovo") iso2 = "XK";
+        if (f.properties.name === "Somaliland") iso2 = "SO";
+
+        const cont = f.properties.continent;
+        const contNormalized = cont ? cont.toLowerCase() : '';
+
+        if (iso2 && iso2 !== "-99") {
+          if (iso2 === "AQ" && !includePolar) return;
+          if (!allowedSet.has(contNormalized)) return;
+          if (!COUNTRY_ALIASES[iso2]) return;
+
+          activeLinks.add(iso2);
+        }
+      });
+    }
+
+    if (includeOceans) {
+      activeLinks.add('ocean_pacific');
+      activeLinks.add('ocean_atlantic');
+      activeLinks.add('ocean_indian');
+      activeLinks.add('ocean_arctic');
+      activeLinks.add('ocean_antarctic');
+    }
+
+    if (includePolar) {
+      activeLinks.add('polar_arctic');
+      if (studyMode !== 'continents' && allowedSet.has('antarctica')) {
+        activeLinks.add('AQ'); // Antarctica in country mode
+      }
+    }
+
+    // A region is entered if there is at least one record with that link
+    const enteredLinks = new Set(records.map(r => r.link).filter(Boolean));
+
+    const unentered = [];
+    activeLinks.forEach(link => {
+      if (!enteredLinks.has(link)) {
+        let name = '';
+        if (COUNTRY_ALIASES[link]) {
+          name = COUNTRY_ALIASES[link][0];
+        } else if (link.startsWith('continent_')) {
+          const contId = link.replace('continent_', '');
+          const mapping = {
+            'asia': '아시아',
+            'europe': '유럽',
+            'africa': '아프리카',
+            'north_america': '북아메리카',
+            'south_america': '남아메리카',
+            'oceania': '오세아니아',
+            'antarctica': '남극'
+          };
+          name = mapping[contId] || link;
+        } else {
+          name = link;
+        }
+        unentered.push({ id: link, name });
+      }
+    });
+
+    return unentered.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+  }, [selectedMapId, myMaps, records, geoData]);
+
+  const filteredUnentered = useMemo(() => {
+    const search = unenteredSearch.trim().toLowerCase();
+    if (!search) return unenteredCountries;
+    return unenteredCountries.filter(c => c.name.toLowerCase().includes(search));
+  }, [unenteredCountries, unenteredSearch]);
+
   const handleExportMapExcel = async (mapId, mapName) => {
     try {
       const { data: mapRecords, error } = await dbService.countriesData.getAllCountriesData(mapId)
@@ -559,6 +669,83 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
+
+          {/* 아직 입력되지 않은 나라 목록 */}
+          {selectedMapId && (
+            <div className="unentered-section" style={{ marginBottom: '30px', background: 'var(--bg-elevated)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+              <div 
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                onClick={() => setShowUnentered(!showUnentered)}
+              >
+                <h2 style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>🕵️ 아직 입력되지 않은 지역</span>
+                  <span style={{ fontSize: '0.9rem', color: '#000', background: 'var(--primary-color)', padding: '2px 8px', borderRadius: '12px', fontWeight: 'bold' }}>
+                    {unenteredCountries.length}개
+                  </span>
+                </h2>
+                <button style={{ background: 'none', border: 'none', color: 'var(--text-color)', cursor: 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  {showUnentered ? '접기 ▲' : '펼치기 ▼'}
+                </button>
+              </div>
+
+              {showUnentered && (
+                <div style={{ marginTop: '16px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="나라/바다/대륙 이름 검색..." 
+                    value={unenteredSearch}
+                    onChange={(e) => setUnenteredSearch(e.target.value)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '10px 16px', 
+                      borderRadius: '8px', 
+                      border: '1px solid var(--border-color)', 
+                      background: 'var(--bg-color)', 
+                      color: 'var(--text-color)',
+                      marginBottom: '16px',
+                      fontSize: '0.9rem',
+                      outline: 'none'
+                    }}
+                  />
+                  {filteredUnentered.length === 0 ? (
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '20px' }}>
+                      검색 결과가 없거나 모든 지역이 입력되었습니다.
+                    </div>
+                  ) : (
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', 
+                      gap: '8px',
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      paddingRight: '8px'
+                    }}>
+                      {filteredUnentered.map(c => (
+                        <div 
+                          key={c.id} 
+                          style={{ 
+                            padding: '8px 10px', 
+                            background: 'rgba(255, 255, 255, 0.03)', 
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '6px', 
+                            fontSize: '0.85rem', 
+                            textAlign: 'center',
+                            color: 'var(--text-muted)',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                          title={c.name}
+                        >
+                          {c.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
             
